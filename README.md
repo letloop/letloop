@@ -1,7 +1,7 @@
 # letloop, ze cli
 
 <div align=center>
-  <img src="https://avatars.githubusercontent.com/u/126236863" />
+  <img src="https://raw.githubusercontent.com/letloop/letloop-cli/main/letloop-logo.png" />
 </div>
 
 Opiniated Chez Scheme command line tool, with all the goodies packed in one binary.
