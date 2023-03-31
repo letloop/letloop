@@ -32,6 +32,8 @@ start with `~check`, such as `~check-srfi-167-000`:
   (define ~check-srfi-167-000 (lambda () (assert #t))))
 ```
 
+You can also check a library with `letloop check srfi-167.scm`.
+
 ## `letloop compile`
 
 Compile into a binary the file `PROGRAM.SCM`, and produce an
