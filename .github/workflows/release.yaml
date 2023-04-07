@@ -147,10 +147,10 @@ jobs:
       - run: git fetch --tags
       - run: git tag --points-at HEAD
       - run: LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 amazonlinux current cisco
-      - run: mv local/rootfs/amd64-amazonlinux-current-cisco/bin/letloop letloop.amd64-amazonlinux-current-cisco
+      - run: mv local/rootfs/amd64-amazonlinux-current-cisco/bin/letloop /tmp/letloop.amd64-amazonlinux-current-cisco
       - run: echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
-      - run: gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.amd64-amazonlinux-current-cisco
+      - run: gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.amd64-amazonlinux-current-cisco
 
   amd64-amazonlinux-current-racket:
     runs-on: ubuntu-latest
@@ -162,10 +162,10 @@ jobs:
       - run: git fetch --tags
       - run: git tag --points-at HEAD
       - run: LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 amazonlinux current racket
-      - run: mv local/rootfs/amd64-amazonlinux-current-racket/bin/letloop letloop.amd64-amazonlinux-current-racket
+      - run: mv local/rootfs/amd64-amazonlinux-current-racket/bin/letloop /tmp/letloop.amd64-amazonlinux-current-racket
       - run: echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
-      - run: gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.amd64-amazonlinux-current-racket
+      - run: gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.amd64-amazonlinux-current-racket
 
   aarch64-amazonlinux-current-racket:
     runs-on: ubuntu-latest
@@ -177,7 +177,7 @@ jobs:
       - run: git fetch --tags
       - run: git tag --points-at HEAD
       - run: LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh aarch64 amazonlinux current racket
-      - run: mv local/rootfs/aarch64-amazonlinux-current-racket/bin/letloop letloop.aarch64-amazonlinux-current-racket
+      - run: mv local/rootfs/aarch64-amazonlinux-current-racket/bin/letloop /tmp/letloop.aarch64-amazonlinux-current-racket
       - run: echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
-      - run: gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.aarch64-amazonlinux-current-racket
+      - run: gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.aarch64-amazonlinux-current-racket
