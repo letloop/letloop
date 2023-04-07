@@ -1,0 +1,33 @@
+#!/usr/bin/env sh
+
+set -e
+set -x
+
+if test -d "$(pwd)/.git"; then
+    if [ ! "$LETLOOP_VENV" ]; then
+        export LETLOOP_ROOT=$(pwd)
+        export LETLOOP_VENV=yes
+        export LETLOOP_CORE_COUNT=$(nproc --ignore=1)
+        if [ "x$1" != "x" ]; then
+            export LETLOOP_PREFIX=$1
+            shift
+        else
+            export LETLOOP_PREFIX=$(pwd)/local
+        fi
+        mkdir -p "$LETLOOP_PREFIX/bin"
+        export LD_LIBRARY_PATH="$LETLOOP_PREFIX/lib/"
+        export PATH="$LETLOOP_PREFIX/bin:$HOME/.local/bin:$PATH"
+        export LD_PRELOAD=$(find $LETLOOP_PREFIX/lib/ -name "liburing.so" 2> /dev/null)
+        if [ ! "$@" ]; then
+            echo "Entering letloop..."
+            $SHELL
+        else
+            exec $@
+        fi
+    else
+        echo "You are already in letloop!"
+    fi
+else
+    echo "You need to run $0 from the root of the repository..."
+    exit 1
+fi
