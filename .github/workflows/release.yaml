@@ -32,6 +32,41 @@ jobs:
             arch: amd64
             flavor: racket
 
+          - distribution: ubuntu
+            version: jammy
+            arch: aarch64
+            flavor: racket
+
+          - distribution: ubuntu
+            version: bionic
+            arch: amd64
+            flavor: cisco
+
+          - distribution: ubuntu
+            version: bionic
+            arch: amd64
+            flavor: racket
+
+          - distribution: ubuntu
+            version: bionic
+            arch: aarch64
+            flavor: racket
+
+          - distribution: ubuntu
+            version: focal
+            arch: amd64
+            flavor: cisco
+
+          - distribution: ubuntu
+            version: focal
+            arch: amd64
+            flavor: racket
+
+          - distribution: ubuntu
+            version: focal
+            arch: aarch64
+            flavor: racket
+
           - distribution: alpine
             version: 3.17
             arch: amd64
@@ -46,7 +81,97 @@ jobs:
             version: 3.17
             arch: aarch64
             flavor: racket
-          
+
+          - distribution: archlinux
+            version: current
+            arch: amd64
+            flavor: cisco
+
+          - distribution: archlinux
+            version: current
+            arch: amd64
+            flavor: racket
+
+          - distribution: archlinux
+            version: current
+            arch: aarch64
+            flavor: racket
+
+          - distribution: amazonlinux
+            version: current
+            arch: amd64
+            flavor: cisco
+
+          - distribution: amazonlinux
+            version: current
+            arch: amd64
+            flavor: racket
+
+          - distribution: amazonlinux
+            version: current
+            arch: aarch64
+            flavor: racket
+
+          - distribution: rockylinux
+            version: 9
+            arch: amd64
+            flavor: cisco
+
+          - distribution: rockylinux
+            version: 9
+            arch: amd64
+            flavor: racket
+
+          - distribution: rockylinux
+            version: 9
+            arch: aarch64
+            flavor: racket
+
+          - distribution: fedora
+            version: 36
+            arch: amd64
+            flavor: cisco
+
+          - distribution: fedora
+            version: 36
+            arch: amd64
+            flavor: racket
+
+          - distribution: fedora
+            version: 36
+            arch: aarch64
+            flavor: racket
+
+          - distribution: fedora
+            version: 37
+            arch: amd64
+            flavor: cisco
+
+          - distribution: fedora
+            version: 37
+            arch: amd64
+            flavor: racket
+
+          - distribution: fedora
+            version: 37
+            arch: aarch64
+            flavor: racket
+
+          - distribution: fedora
+            version: Rawhide
+            arch: amd64
+            flavor: cisco
+
+          - distribution: fedora
+            version: Rawhide
+            arch: amd64
+            flavor: racket
+
+          - distribution: fedora
+            version: Rawhide
+            arch: aarch64
+            flavor: racket
+
     runs-on: ubuntu-latest
     needs: create-release
     steps:
