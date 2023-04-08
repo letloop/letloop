@@ -32,6 +32,21 @@ jobs:
         id: version
       - run: gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.amd64-ubuntu-jammy-cisco
 
+  amd64-ubuntu-jammy-racket:
+    runs-on: ubuntu-latest
+    needs: create-release
+    steps:
+      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - run: git fetch --tags
+      - run: git tag --points-at HEAD
+      - run: LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 ubuntu jammy racket
+      - run: sudo mv local/rootfs/amd64-ubuntu-jammy-racket/bin/letloop letloop.amd64-ubuntu-jammy-racket
+      - run: echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
+        id: version
+      - run: gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.amd64-ubuntu-jammy-racket
+        
   aarch64-ubuntu-jammy-racket:
     runs-on: ubuntu-latest
     needs: create-release
@@ -181,3 +196,63 @@ jobs:
       - run: echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
       - run: gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.aarch64-amazonlinux-current-racket
+
+  amd64-fedora-rawhide-racket:
+    runs-on: ubuntu-latest
+    needs: create-release
+    steps:
+      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - run: git fetch --tags
+      - run: git tag --points-at HEAD
+      - run: LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 fedora Rawhide racket
+      - run: sudo mv local/rootfs/amd64-fedora-rawhide-racket/bin/letloop /tmp/letloop.amd64-fedora-rawhide-racket
+      - run: echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
+        id: version
+      - run: gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.amd64-fedora-rawhide-racket
+
+  aarch64-fedora-rawhide-racket:
+    runs-on: ubuntu-latest
+    needs: create-release
+    steps:
+      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - run: git fetch --tags
+      - run: git tag --points-at HEAD
+      - run: LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh aarch64 fedora Rawhide racket
+      - run: sudo mv local/rootfs/aarch64-fedora-rawhide-racket/bin/letloop /tmp/letloop.aarch64-fedora-rawhide-racket
+      - run: echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
+        id: version
+      - run: gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.aarch64-fedora-rawhide-racket
+
+  amd64-rockylinux-9-racket:
+    runs-on: ubuntu-latest
+    needs: create-release
+    steps:
+      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - run: git fetch --tags
+      - run: git tag --points-at HEAD
+      - run: LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 rockylinux 9 racket
+      - run: sudo mv local/rootfs/amd64-rockylinux-9-racket/bin/letloop /tmp/letloop.amd64-rockylinux-9-racket
+      - run: echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
+        id: version
+      - run: gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.amd64-rockylinux-9-racket
+
+  aarch64-rockylinux-9-racket:
+    runs-on: ubuntu-latest
+    needs: create-release
+    steps:
+      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - run: git fetch --tags
+      - run: git tag --points-at HEAD
+      - run: LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh aarch64 rockylinux 9 racket
+      - run: sudo mv local/rootfs/aarch64-rockylinux-9-racket/bin/letloop /tmp/letloop.aarch64-rockylinux-9-racket
+      - run: echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
+        id: version
+      - run: gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.aarch64-rockylinux-9-racket

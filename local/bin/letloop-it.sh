@@ -89,7 +89,7 @@ case "$LETLOOP_DISTRO" in
         $PROOT yum group install -y "C Development Tools and Libraries"
         $PROOT yum install -y git lz4-devel libuuid-devel zlib-devel
         ;;
-    "amazonlinux")
+    "amazonlinux"|"rockylinux")
         $PROOT yum group install -y "Development Tools"
         $PROOT yum install -y git lz4-devel libuuid-devel zlib-devel
         ;;
