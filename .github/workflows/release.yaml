@@ -31,7 +31,36 @@ jobs:
         id: version
       - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.ubuntu-jammy-cisco-amd64
 
-  ubuntu-jammy-racket-amd64:
+  build:
+    strategy:
+      fail-fast: true
+    matrix:
+      include:
+        - distribution: ubuntu
+          version: jammy
+          arch: amd64
+          flavor: cisco
+
+        - distribution: ubuntu
+          version: jammy
+          arch: amd64
+          flavor: racket
+
+        - distribution: alpine
+          version: 3.17
+          arch: amd64
+          flavor: cisco
+
+        - distribution: alpine
+          version: 3.17
+          arch: amd64
+          flavor: racket
+
+        - distribution: alpine
+          version: 3.17
+          arch: aarch64
+          flavor: racket
+          
     runs-on: ubuntu-latest
     needs: create-release
     steps:
@@ -39,216 +68,7 @@ jobs:
       - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
       - run: cd letloop-cli && git fetch --tags
       - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 ubuntu jammy racket
-      - run: cd letloop-cli && sudo mv local/rootfs/amd64-ubuntu-jammy-racket/bin/letloop /tmp/letloop.ubuntu-jammy-racket-amd64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.ubuntu-jammy-racket-amd64
+      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh ${{ matrix.arch }} ${{ matrix.distribution }} ${{ matrix.version }} ${{ matrix.flavor }}
+      - run: cd letloop-cli && sudo mv local/rootfs/${{ matrix.arch }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.flavor }}/bin/letloop /tmp/letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}
+      - run: cd letloop-cli && gh release upload $(git tag --points-at HEAD) /tmp/letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}
 
-  ubuntu-jammy-racket-aarch64:
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
-      - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh aarch64 ubuntu jammy racket
-      - run: cd letloop-cli && sudo mv local/rootfs/aarch64-ubuntu-jammy-racket/bin/letloop /tmp/letloop.ubuntu-jammy-racket-aarch64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.ubuntu-jammy-racket-aarch64
-
-  ubuntu-focal-cisco-amd64:
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
-
-      - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 ubuntu focal cisco
-      - run: cd letloop-cli && sudo mv local/rootfs/amd64-ubuntu-focal-cisco/bin/letloop /tmp/letloop.ubuntu-focal-cisco-amd64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.ubuntu-focal-cisco-amd64
-
-  ubuntu-bionic-cisco-amd64:
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
-
-      - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 ubuntu bionic cisco
-      - run: cd letloop-cli && sudo mv local/rootfs/amd64-ubuntu-bionic-cisco/bin/letloop /tmp/letloop.ubuntu-bionic-cisco-amd64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.ubuntu-bionic-cisco-amd64
-
-  alpine-3_17-cisco-amd64:
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
-
-      - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 alpine 3.17 cisco
-      - run: cd letloop-cli && sudo mv local/rootfs/amd64-alpine-3.17-cisco/bin/letloop /tmp/letloop.alpine-3.17-cisco-amd64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.alpine-3.17-cisco-amd64
-
-  alpine-3_17-racket-aarch64:
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
-
-      - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh aarch64 alpine 3.17 racket
-      - run: cd letloop-cli && sudo mv local/rootfs/aarch64-alpine-3.17-racket/bin/letloop /tmp/letloop.alpine-3.17-racket-aarch64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.alpine-3.17-racket-aarch64
-
-  archlinux-current-cisco-amd64:
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
-
-      - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 archlinux current cisco
-      - run: cd letloop-cli && sudo mv local/rootfs/amd64-archlinux-current-cisco/bin/letloop /tmp/letloop.archlinux-current-cisco-amd64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.archlinux-current-cisco-amd64
-
-  archlinux-current-racket-amd64:
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
-
-      - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 archlinux current racket
-      - run: cd letloop-cli && sudo mv local/rootfs/amd64-archlinux-current-racket/bin/letloop /tmp/letloop.archlinux-current-racket-amd64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.archlinux-current-racket-amd64
-
-  amazonlinux-current-cisco-amd64:
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
-
-      - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 amazonlinux current cisco
-      - run: cd letloop-cli && sudo mv local/rootfs/amd64-amazonlinux-current-cisco/bin/letloop /tmp/letloop.amazonlinux-current-cisco-amd64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.amazonlinux-current-cisco-amd64
-
-  amazonlinux-current-racket-amd64:
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
-
-      - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 amazonlinux current racket
-      - run: cd letloop-cli && sudo mv local/rootfs/amd64-amazonlinux-current-racket/bin/letloop /tmp/letloop.amazonlinux-current-racket-amd64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.amazonlinux-current-racket-amd64
-
-  amazonlinux-current-racket-aarch64:
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
-
-      - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh aarch64 amazonlinux current racket
-      - run: cd letloop-cli && sudo mv local/rootfs/aarch64-amazonlinux-current-racket/bin/letloop /tmp/letloop.amazonlinux-current-racket-aarch64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.amazonlinux-current-racket-aarch64
-
-  fedora-rawhide-racket-amd64:
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
-
-      - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 fedora Rawhide racket
-      - run: cd letloop-cli && sudo mv local/rootfs/amd64-fedora-Rawhide-racket/bin/letloop /tmp/letloop.fedora-rawhide-racket-amd64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.fedora-rawhide-racket-amd64
-
-  fedora-rawhide-racket-aarch64:
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
-
-      - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh aarch64 fedora Rawhide racket
-      - run: cd letloop-cli && sudo mv local/rootfs/aarch64-fedora-rawhide-racket/bin/letloop /tmp/letloop.fedora-rawhide-racket-aarch64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.fedora-rawhide-racket-aarch64
-
-  rockylinux-9-racket-amd64:
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
-
-      - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 rockylinux 9 racket
-      - run: cd letloop-cli && sudo mv local/rootfs/amd64-rockylinux-9-racket/bin/letloop /tmp/letloop.rockylinux-9-racket-amd64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.rockylinux-9-racket-amd64
-
-  rockylinux-9-racket-aarch64:
-    runs-on: ubuntu-latest
-    needs: create-release
-    steps:
-      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
-      - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh aarch64 rockylinux 9 racket
-      - run: cd letloop-cli && sudo mv local/rootfs/aarch64-rockylinux-9-racket/bin/letloop /tmp/letloop.rockylinux-9-racket-aarch64
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.rockylinux-9-racket-aarch64
