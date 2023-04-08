@@ -29,7 +29,7 @@ jobs:
       - run: cd letloop-cli && sudo mv local/rootfs/amd64-ubuntu-jammy-cisco/bin/letloop /tmp/letloop.ubuntu-jammy-cisco-amd64
       - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.ubuntu-jammy-cisco-amd64
+      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.ubuntu-jammy-cisco-amd64
 
   ubuntu-jammy-racket-amd64:
     runs-on: ubuntu-latest
@@ -43,7 +43,7 @@ jobs:
       - run: cd letloop-cli && sudo mv local/rootfs/amd64-ubuntu-jammy-racket/bin/letloop /tmp/letloop.ubuntu-jammy-racket-amd64
       - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.ubuntu-jammy-racket-amd64
+      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.ubuntu-jammy-racket-amd64
 
   ubuntu-jammy-racket-aarch64:
     runs-on: ubuntu-latest
@@ -57,7 +57,7 @@ jobs:
       - run: cd letloop-cli && sudo mv local/rootfs/aarch64-ubuntu-jammy-racket/bin/letloop /tmp/letloop.ubuntu-jammy-racket-aarch64
       - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.ubuntu-jammy-racket-aarch64
+      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.ubuntu-jammy-racket-aarch64
 
   ubuntu-focal-cisco-amd64:
     runs-on: ubuntu-latest
@@ -72,7 +72,7 @@ jobs:
       - run: cd letloop-cli && sudo mv local/rootfs/amd64-ubuntu-focal-cisco/bin/letloop /tmp/letloop.ubuntu-focal-cisco-amd64
       - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.ubuntu-focal-cisco-amd64
+      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.ubuntu-focal-cisco-amd64
 
   ubuntu-bionic-cisco-amd64:
     runs-on: ubuntu-latest
@@ -87,7 +87,7 @@ jobs:
       - run: cd letloop-cli && sudo mv local/rootfs/amd64-ubuntu-bionic-cisco/bin/letloop /tmp/letloop.ubuntu-bionic-cisco-amd64
       - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.ubuntu-bionic-cisco-amd64
+      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.ubuntu-bionic-cisco-amd64
 
   alpine-3_17-cisco-amd64:
     runs-on: ubuntu-latest
@@ -102,7 +102,7 @@ jobs:
       - run: cd letloop-cli && sudo mv local/rootfs/amd64-alpine-3.17-cisco/bin/letloop /tmp/letloop.alpine-3.17-cisco-amd64
       - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.alpine-3.17-cisco-amd64
+      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.alpine-3.17-cisco-amd64
 
   alpine-3_17-racket-aarch64:
     runs-on: ubuntu-latest
@@ -117,7 +117,7 @@ jobs:
       - run: cd letloop-cli && sudo mv local/rootfs/aarch64-alpine-3.17-racket/bin/letloop /tmp/letloop.alpine-3.17-racket-aarch64
       - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.alpine-3.17-racket-aarch64
+      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.alpine-3.17-racket-aarch64
 
   archlinux-current-cisco-amd64:
     runs-on: ubuntu-latest
@@ -132,7 +132,7 @@ jobs:
       - run: cd letloop-cli && sudo mv local/rootfs/amd64-archlinux-current-cisco/bin/letloop /tmp/letloop.archlinux-current-cisco-amd64
       - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.archlinux-current-cisco-amd64
+      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.archlinux-current-cisco-amd64
 
   archlinux-current-racket-amd64:
     runs-on: ubuntu-latest
@@ -147,7 +147,7 @@ jobs:
       - run: cd letloop-cli && sudo mv local/rootfs/amd64-archlinux-current-racket/bin/letloop /tmp/letloop.archlinux-current-racket-amd64
       - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.archlinux-current-racket-amd64
+      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.archlinux-current-racket-amd64
 
   amazonlinux-current-cisco-amd64:
     runs-on: ubuntu-latest
