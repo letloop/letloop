@@ -252,3 +252,17 @@ jobs:
       - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
       - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.rockylinux-9-racket-aarch64
+
+  oracle-9-racket-aarch64:
+    runs-on: ubuntu-latest
+    needs: create-release
+    steps:
+      - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
+      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
+      - run: cd letloop-cli && git fetch --tags
+      - run: cd letloop-cli && git tag --points-at HEAD
+      - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh aarch64 oracle 9 racket
+      - run: cd letloop-cli && sudo mv local/rootfs/aarch64-oracle-9-racket/bin/letloop /tmp/letloop.oracle-9-racket-aarch64
+      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
+        id: version
+      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.oracle-9-racket-aarch64
