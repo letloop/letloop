@@ -70,7 +70,7 @@
     (syntax-case x ()
       [(k)
        (let ([fn (datum filename)])
-         (with-syntax ([exp (run/output "date")])
+         (with-syntax ([exp (run/output "date +\"%Y-%m-%dT%H:%M:%S%z\"")])
                       #'exp))])))
 
 (define build-date (let ((date (include-date)))
