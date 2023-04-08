@@ -1,7 +1,5 @@
 #!chezscheme
 (import (chezscheme))
-;; (import (letloop html))
-;; (import (letloop match))
 
 
 (define LETLOOP_DEBUG (getenv "LETLOOP_DEBUG"))
@@ -97,7 +95,7 @@
   (newline)
   (write `(build-date ,build-date))
   (newline)
-  (write `(homepage "https://hyper.dev/"))
+  (write `(homepage "https://github.com/letloop/"))
   (newline))
 
 (define letloop-usage
@@ -504,7 +502,7 @@
     (debug-on-exception #t))
 
   (let loop ()
-    (display "\033[32m#;letloop #;\033[m ")
+    (display "\033[32m#;letl∞p #;\033[m ")
     (let ((expr (read)))
       (unless (eof-object? expr)
         (call-with-values
@@ -513,15 +511,11 @@
                       ((condition? ex)
                        (display "\033[31m;; raised condition:\033[m ")
                        (display-condition ex)
-                       (newline)
-                       #;(when dev?
-                         (break)))
+                       (newline))
                       (else
                        (display "\033[31m;; raised:\033[m ")
                        (write ex)
-                       (newline)
-                       #;(when dev?
-                         (break))))
+                       (newline)))
                 (eval expr)))
           (lambda args
             (unless (null? args)
@@ -733,80 +727,10 @@
       (format (current-output-port) "* Coverage profile can be found at: ~a/profile.html\n" temporary-directory))))
 
 
-;; TODO: make it default to be compatible with R7RS, put it at startup
-;; time inside letloop-compile:
+;; TODO: make it default to be more interoperable with R7RS code, put
+;; it at startup time inside letloop-compile?
 ;;
 ;; (self-evaluating-vectors #t)
-
-#;(define letloop-html-write
-  (lambda (file)
-    (let ((expr (call-with-input-file file read)))
-      (display "<!DOCTYPE html>")
-      (html-write expr display)
-      (newline)
-      (flush-output-port))))
-
-#;(define letloop-html-read
-  (lambda (file)
-
-    (define every
-      (lambda (predicate objects)
-        (let loop ((objects objects))
-          (if (null? objects)
-              #t
-              (if (predicate (car objects))
-                  (loop (cdr objects))
-                  #f)))))
-
-    (define space?
-      (lambda (string)
-        (every (lambda (x) (char=? x #\space)) (string->list string))))
-
-    (define massage
-      (lambda (x)
-        (match x
-          ((,[e] . ,[e*])
-           (if (eq? e '@)
-               (cons 'XYZ e*)
-               (if (and (string? e)
-                        (or (string=? e "\n")
-                            (space? e)))
-                   e*
-                   (cons e e*))))
-          (,e e))))
-
-    (let ((expr (call-with-input-file file html-read)))
-      (pretty-print (cadr (massage expr)))
-      (newline)
-      (flush-output-port))))
-
-#;(define letloop-html-bootstrap
-  (lambda (file)
-
-    (define bootstrapify
-      (lambda (body)
-        `(html
-          (head
-           (title "bootstrapify")
-           (meta (@ (charset "utf-8")))
-           (meta (@ (name "viewport") (content "width=device-width, initial-scale=1")))
-           (link (@ (href "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css")
-                    (rel "stylesheet")
-                    (integrity "sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD")
-                    (crossorigin "anonymous")))
-           (link (@ (href "letloop.css")
-                    (rel "stylesheet"))))
-          (body
-           ,body
-           (script (@ (src "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js")
-                      (integrity "sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN")
-                      (crossorigin "anonymous")))))))
-
-    (let ((expr (call-with-input-file file read)))
-      (display "<!DOCTYPE html>")
-      (html-write (bootstrapify expr) display)
-      (newline)
-      (flush-output-port))))
 
 (when (null? (cdr (command-line)))
   (letloop-usage)
