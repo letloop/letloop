@@ -43,7 +43,7 @@ jobs:
       - run: cd letloop-cli && sudo mv local/rootfs/amd64-ubuntu-jammy-racket/bin/letloop letloop.ubuntu-jammy-racket-amd64
       - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
-      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.amd64-ubuntu-jammy-racket
+      - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} letloop.ubuntu-jammy-racket-amd64
 
   ubuntu-jammy-racket-aarch64:
     runs-on: ubuntu-latest
@@ -204,7 +204,7 @@ jobs:
       - run: cd letloop-cli && git fetch --tags
       - run: cd letloop-cli && git tag --points-at HEAD
       - run: cd letloop-cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh amd64 fedora Rawhide racket
-      - run: cd letloop-cli && sudo mv local/rootfs/amd64-fedora-rawhide-racket/bin/letloop /tmp/letloop.fedora-rawhide-racket-amd64
+      - run: cd letloop-cli && sudo mv local/rootfs/amd64-fedora-Rawhide-racket/bin/letloop /tmp/letloop.fedora-rawhide-racket-amd64
       - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
         id: version
       - run: cd letloop-cli && gh release upload ${{ steps.version.outputs.TAG_NAME }} /tmp/letloop.fedora-rawhide-racket-amd64
