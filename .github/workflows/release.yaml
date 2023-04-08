@@ -113,6 +113,21 @@ jobs:
             flavor: racket
 
           - distribution: rockylinux
+            version: 8
+            arch: amd64
+            flavor: cisco
+
+          - distribution: rockylinux
+            version: 8
+            arch: amd64
+            flavor: racket
+
+          - distribution: rockylinux
+            version: 8
+            arch: aarch64
+            flavor: racket
+            
+          - distribution: rockylinux
             version: 9
             arch: amd64
             flavor: cisco
