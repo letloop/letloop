@@ -12,10 +12,7 @@ jobs:
     steps:
       - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1
       - run: cd letloop-cli && git fetch --tags
-      - run: cd letloop-cli && git tag --points-at HEAD
-      - run: cd letloop-cli && echo "TAG_NAME=$(git tag --points-at HEAD)" >> $GITHUB_OUTPUT
-        id: version
-      - run: cd letloop-cli && gh release create --draft ${{ steps.version.outputs.TAG_NAME }}
+      - run: cd letloop-cli && gh release create --draft $(git tag --points-at HEAD)
 
   build:
     strategy:
