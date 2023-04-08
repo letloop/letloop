@@ -148,12 +148,7 @@ jobs:
             version: 36
             arch: amd64
             flavor: racket
-
-          - distribution: fedora
-            version: 36
-            arch: aarch64
-            flavor: racket
-
+          
           - distribution: fedora
             version: 37
             arch: amd64
@@ -165,11 +160,6 @@ jobs:
             flavor: racket
 
           - distribution: fedora
-            version: 37
-            arch: aarch64
-            flavor: racket
-
-          - distribution: fedora
             version: Rawhide
             arch: amd64
             flavor: cisco
@@ -177,11 +167,6 @@ jobs:
           - distribution: fedora
             version: Rawhide
             arch: amd64
-            flavor: racket
-
-          - distribution: fedora
-            version: Rawhide
-            arch: aarch64
             flavor: racket
 
     runs-on: ubuntu-latest
