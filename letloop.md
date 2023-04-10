@@ -1,21 +1,19 @@
 Usage:
 
-  letloop check [--fail-fast] DIRECTORY ...
-  letloop compile [DIRECTORY ...] PROGRAM.SCM A.OUT
-  letloop exec [DIRECTORY ...] PROGRAM.SCM [ -- ARGUMENT ...]
-  letloop repl [DIRECTORY ...]
+  letloop check [--fail-fast] DIRECTORY-or-LIBRARY ...
+  letloop compile PROGRAM.SCM A.OUT
+  letloop exec PROGRAM.SCM [ -- ARGUMENT ...]
+  letloop repl 
   
-You can pass file extensions of libraries as standalone arguments.
+All subcommands directory, and extension of libraries as standalone
+arguments.
   
 Also the following flags are available:
 
-  --dev 
+  --dev  Generate allocation, and instruction counts, debug 
+         on exception, dump profiling information.
   
-  Generate allocation, and instruction counts, debug on exception,
-  dump profiling information.
-  
-  --optimize-level=0-3 
-  
-  Configure optimization level, higher is faster, and less safe.
+  --optimize-level=0-3  Configure optimization level, 
+                        higher is less safe, but faster.
 
 Let there be loops!
