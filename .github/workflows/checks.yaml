@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - run: sudo apt -qq install chezscheme chezscheme-dev uuid-dev liblz4-dev liburing* > /dev/null
-      - run: gh repo clone letloop/letloop-cli -- --branch $BRANCH --depth 1 
-      - run: cd letloop-cli && ./venv
-      - run: cd letloop-cli && scheme --program letloop.scm compile /usr/lib/csv9.5.4/ta6le/ letloop.scm letloop && mv letloop ./local/bin/
-      - run: cd letloop-cli && ./venv $(pwd)/local/ letloop exec main.scm
-      - run: cd letloop-cli && ./venv $(pwd)/local/ letloop compile /usr/lib/csv9.5.4/ta6le/ main.scm main
-      - run: cd letloop-cli && ./main
-      - run: cd letloop-cli && ./venv $(pwd)/local/ letloop check checks/check/ -- "(check-success)"
-      - run: cd letloop-cli && echo '! ./venv letloop check checks/check/ -- "(check-failure)"' | $SHELL
+      - run: gh repo clone letloop/cli -- --branch $BRANCH --depth 1 
+      - run: cd cli && ./venv
+      - run: cd cli && scheme --program letloop.scm compile /usr/lib/csv9.5.4/ta6le/ letloop.scm letloop && mv letloop ./local/bin/
+      - run: cd cli && ./venv $(pwd)/local/ letloop exec main.scm
+      - run: cd cli && ./venv $(pwd)/local/ letloop compile /usr/lib/csv9.5.4/ta6le/ main.scm main
+      - run: cd cli && ./main
+      - run: cd cli && ./venv $(pwd)/local/ letloop check checks/check/ -- "(check-success)"
+      - run: cd cli && echo '! ./venv letloop check checks/check/ -- "(check-failure)"' | $SHELL
