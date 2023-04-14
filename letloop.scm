@@ -21,11 +21,11 @@
           (read-string stdout))))
 
 (meta define basename
-  (lambda (string)
-    (let loop ((index (string-length string)))
-      (if (char=? (string-ref string (- index 1)) #\/)
-          (substring string index (string-length string))
-          (loop (- index 1))))))
+      (lambda (string)
+        (let loop ((index (string-length string)))
+          (if (char=? (string-ref string (- index 1)) #\/)
+              (substring string index (string-length string))
+              (loop (- index 1))))))
 
 (meta define scheme-binarypath
       (lambda ()
@@ -329,7 +329,7 @@
               (set! optimize-level* (string->number (cdr keyword))))
              (else (errors (format #f "Dubious keyword: ~a" (car keyword))))))
           (massage-keywords! (cdr keywords)))))
-       
+    
     (call-with-values (lambda () (command-line-parse arguments))
       (lambda (keywords standalone extra*)
         (massage-standalone! standalone)
@@ -568,7 +568,7 @@
                        (display "\033[31m;; raised:\033[m ")
                        (write ex)
                        (newline)))
-                (eval expr)))
+                     (eval expr)))
           (lambda args
             (unless (null? args)
               (for-each (lambda (x)
@@ -626,13 +626,13 @@
 
     (define (maybe-library-exports library-name)
       (guard (ex (else #f))
-        (eval `(library-exports ',library-name) (environment '(chezscheme) library-name))))
+             (eval `(library-exports ',library-name) (environment '(chezscheme) library-name))))
 
     (define maybe-read-library
       (lambda (file)
         (pk 'maybe-read-library file)
         (let ((sexp (guard (ex (else #f))
-                      (call-with-input-file file read))))
+                           (call-with-input-file file read))))
           (if (not sexp)
               (begin
                 (pk 'maybe-read-library "File is unreadable as Scheme file" file)
@@ -652,7 +652,7 @@
                   ;; Oops!
                   (begin
                     (pk 'maybe-read-library "not a valid scheme library file" file)
-                  '()))))))
+                    '()))))))
 
     (define string-prefix?
       (lambda (x y)
@@ -707,32 +707,32 @@
 
         (pk 'program `((import (chezscheme) ,@libraries)
 
-          (define errored? #f)
+                       (define errored? #f)
 
-          (display "* Will run tests from the following libraries:\n")
-          (for-each
-           (lambda (x)
-             (format #t "** ~a\n" x)) ',libraries)
+                       (display "* Will run tests from the following libraries:\n")
+                       (for-each
+                        (lambda (x)
+                          (format #t "** ~a\n" x)) ',libraries)
 
-          (newline)
-          (let loop ((thunks (list ,@procedures)))
-            (unless (null? thunks)
-              (format #t "* Checking `~a`:\n" (car thunks))
-              (guard (ex (else
-                          (display "** FAILED!\n")
-                          (if (condition? ex)
-                              (display-condition ex)
-                              (write ex))
-                          (if ,fail-fast?
-                              (begin (newline)
-                                     (exit 1))
-                              (begin (newline)
-                                     (set! errored? #t)))))
-                ((car thunks))
-                (display "* SUCCESS\n"))
-              (loop (cdr thunks))))
-          (newline)
-          (when errored? (exit 1))))))
+                       (newline)
+                       (let loop ((thunks (list ,@procedures)))
+                         (unless (null? thunks)
+                           (format #t "* Checking `~a`:\n" (car thunks))
+                           (guard (ex (else
+                                       (display "** FAILED!\n")
+                                       (if (condition? ex)
+                                           (display-condition ex)
+                                           (write ex))
+                                       (if ,fail-fast?
+                                           (begin (newline)
+                                                  (exit 1))
+                                           (begin (newline)
+                                                  (set! errored? #t)))))
+                                  ((car thunks))
+                                  (display "* SUCCESS\n"))
+                           (loop (cdr thunks))))
+                       (newline)
+                       (when errored? (exit 1))))))
 
     (call-with-values (lambda () (command-line-parse arguments))
       (lambda (keywords standalone extra)
