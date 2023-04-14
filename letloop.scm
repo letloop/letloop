@@ -4,6 +4,13 @@
 
 (define LETLOOP_DEBUG (getenv "LETLOOP_DEBUG"))
 
+(meta define (pk* . args)
+      (display ";;; " (current-error-port))
+      (write args (current-error-port))
+      (newline (current-error-port))
+      (flush-output-port (current-error-port))
+      (car (reverse args)))
+
 (meta define read-string
       (lambda (p)
         (let loop ([x (read-char p)]
@@ -29,29 +36,34 @@
 
 (meta define scheme-binarypath
       (lambda ()
-        (let ((out
-               (run/output
-                (format #f "file /proc/~a/exe | cut -d' ' -f5"
-                        (get-process-id)))))
+        (let* ((out
+                (run/output
+                 (format #f "readlink -n /proc/~a/exe"
+                         (get-process-id)))))
           (substring out 0 (- (string-length out)
                               (string-length (basename out)))))))
 
 (meta define binarypath->scheme-home
       (lambda (scheme what)
-        (call-with-values (lambda () (scheme-version-number))
-          (lambda args
-            (define version (let loop ((args args)
-                                       (out '()))
-                              (if (null? args)
-                                  (apply string-append (reverse (cdr out)))
-                                  (loop (cdr args)
-                                        (cons* "."
-                                               (number->string (car args))
-                                               out)))))
-            (string-append scheme (format "../lib/csv~a/~a/~a"
-                                          version
-                                          (machine-type)
-                                          what))))))
+        (call/cc
+         (lambda (k)
+           (for-each
+            (lambda (path)
+              (call-with-values (lambda () (scheme-version-number))
+                (lambda args
+                  (let* ((version (let loop ((args args)
+                                             (out '()))
+                                    (if (null? args)
+                                        (apply string-append (reverse (cdr out)))
+                                        (loop (cdr args)
+                                              (cons* "."
+                                                     (number->string (car args))
+                                                     out)))))
+                         (prefix (run/output (format #f "realpath $(ls -d ~a/../lib/csv~a*) | tr -d '\n'" path version))))
+                    (let ((out (format #f "~a/~a/~a" prefix (machine-type) what)))
+                      (when (file-exists? out)
+                        (k out)))))))
+            (list scheme "/usr/local/bin/" "/usr/bin/"))))))
 
 (define-syntax include-chez-file
   (lambda (x)
@@ -61,11 +73,6 @@
               [fn (binarypath->scheme-home (scheme-binarypath) fn)])
          (with-syntax ([exp (get-bytevector-all (open-file-input-port fn))])
                       #'exp))])))
-
-(define scheme.h (include-chez-file "scheme.h"))
-(define kernel.o (include-chez-file "kernel.o"))
-(define petite.boot (include-chez-file "petite.boot"))
-(define scheme.boot (include-chez-file "scheme.boot"))
 
 (define filepath->bytevector
   (lambda (filepath)
@@ -89,7 +96,7 @@
     (newline (current-error-port))
     (flush-output-port (current-error-port)))
   (car (reverse args)))
-
+ 
 (define (string-join strings)
   (let loop ((strings strings)
              (out '()))
@@ -274,6 +281,11 @@
 (define letloop-compile
   (lambda (arguments)
 
+    (define scheme.h (include-chez-file "scheme.h"))
+    (define kernel.o (include-chez-file "kernel.o"))
+    (define petite.boot (include-chez-file "petite.boot"))
+    (define scheme.boot (include-chez-file "scheme.boot"))
+    
     (define program.boot.scm
       '(let ([program-name
               (foreign-procedure "program_name" () string)])

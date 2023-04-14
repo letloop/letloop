@@ -177,6 +177,6 @@ jobs:
       - run: cd cli && git fetch --tags
       - run: cd cli && git tag --points-at HEAD
       - run: cd cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh ${{ matrix.arch }} ${{ matrix.distribution }} ${{ matrix.version }} ${{ matrix.flavor }}
-      - run: cd cli && sudo mv local/rootfs/${{ matrix.arch }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.flavor }}/bin/letloop /tmp/letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}
+      - run: cd cli && sudo mv local/rootfs/${{ matrix.arch }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.flavor }}/usr/local/bin/letloop /tmp/letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}
       - run: cd cli && gh release upload $(git tag --points-at HEAD) /tmp/letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}
 

@@ -101,4 +101,4 @@ case "$LETLOOP_DISTRO" in
         ;;
 esac
 
-$PROOT /mnt/local/bin/letloop-compile.sh /mnt/ / $LETLOOP_FLAVOR
+$PROOT /mnt/local/bin/letloop-compile.sh /mnt/ /usr/local/ $LETLOOP_FLAVOR
