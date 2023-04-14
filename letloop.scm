@@ -173,6 +173,19 @@
 
 (define stdlib (load-shared-object #f))
 
+(define dev!
+  (lambda (active?)
+    (when active?
+      (compile-profile 'source))
+    (generate-allocation-counts active?)
+    (generate-covin-files active?)
+    (generate-inspector-information active?)
+    (generate-instruction-counts active?)
+    (generate-interrupt-trap active?)
+    (generate-procedure-source-information active?)
+    (generate-profile-forms active?)
+    (debug-on-exception active?)))
+
 (define mkdtemp
   (foreign-procedure "mkdtemp" (string) string))
 
@@ -214,14 +227,19 @@
           (lambda (fn . fns)
             (command-line (cons (program-name) fns))
             (command-line-arguments fns)
+            (compile-file-message #f)
             (load-program fn)))))
 
     ;; parse ARGUMENTS, and set the following variables:
 
+    (define petite.boot #f)
+    (define scheme.boot #f)
+    (define kernel.o #f)
+    (define scheme.h #f)
     (define extensions '())
     (define directories '())
     (define program.scm #f)
-    (define a.out #f)
+    (define files '())
     (define dev? #f)
     (define optimize-level* 0)
     (define extra '())
@@ -229,6 +247,13 @@
 
     (define errors (make-accumulator))
 
+    (define basename
+      (lambda (string)
+        (let loop ((index (string-length string)))
+          (if (char=? (string-ref string (- index 1)) #\/)
+              (substring string index (string-length string))
+              (loop (- index 1))))))
+    
     (define massage-standalone!
       (lambda (standalone)
         (unless (null? standalone)
@@ -237,12 +262,8 @@
               (case type
                 (directory (set! directories (cons string* directories)))
                 (extension (set! extensions (cons string* extensions)))
-                (file (if program.scm
-                          (errors (format #f "You can compile only one file at a time, maybe remove: ~a" (car standalone)))
-                          (set! program.scm string*)))
-                (unknown (if a.out
-                             (errors (format #f "You provided more than one file that does not exists, maybe remove: ~a" (car standalone)))
-                             (set! a.out string*))))))
+                (file (set! files (cons string* files)))
+                (unknown (errors (format #f "Dubious argument: ~a" string*))))))
           (massage-standalone! (cdr standalone)))))
 
     (define massage-keywords!
@@ -258,29 +279,37 @@
               (set! optimize-level* (string->number (cdr keyword))))
              (else (errors (format #f "Dubious keyword: ~a" (car keyword))))))
           (massage-keywords! (cdr keywords)))))
-
-    (define massage-directories!
-      (lambda ()
-        (let loop ((directories* directories))
-          (if (null? directories*)
-              (errors "Please provide a directory containing both `scheme.h` and `kernel.o` from Chez")
-              (if (and (file-exists? (string-append (car directories*) "/scheme.h"))
-                       (file-exists? (string-append (car directories*) "/kernel.o")))
-                  (set! chez-home (car directories*))
-                  (loop (cdr directories*)))))))
-
+    
+    (define massage-files!
+      (lambda (files)
+        (for-each (lambda (x)
+                    (let ((name (basename x)))
+                      (case (string->symbol name)
+                        (kernel.o (set! kernel.o x))
+                        (scheme.h (set! scheme.h x))
+                        (scheme.boot (set! scheme.boot x))
+                        (petite.boot (set! petite.boot x))
+                        (else (set! program.scm x)))))
+                  files)))
+    
     (call-with-values (lambda () (command-line-parse arguments))
       (lambda (keywords standalone extra*)
         (massage-standalone! standalone)
+        (massage-files! files)
         (massage-keywords! keywords)
-        (massage-directories!)
         (set! extra extra*)))
 
     (unless program.scm
       (errors "You need to provide one program file PROGRAM.SCM to compile, that will be read and transmogriffied."))
-
-    (unless a.out
-      (errors "You need to provide one target file A.OUT that will be created, and stuffed with bits."))
+   
+    (unless petite.boot
+      (errors "You need to provide a compatible petite.boot. Usually it is $PREFIX/usr/lib/csvx.y.z/ta6le/."))
+    (unless scheme.boot
+      (errors "You need to provide a compatible scheme.boot. Usually it is $PREFIX/usr/lib/csvx.y.z/ta6le/."))
+    (unless kernel.o
+      (errors "You need to provide a compatible kernel.o. Usually it is $PREFIX/usr/lib/csvx.y.z/ta6le/."))
+    (unless scheme.h
+      (errors "You need to provide a compatible scheme.h. Usually it is $PREFIX/usr/lib/csvx.y.z/ta6le/."))
 
     (maybe-display-errors-then-exit errors)
 
@@ -296,11 +325,7 @@
       (unless (null? extensions)
         (library-extensions extensions))
 
-      (when dev?
-        ;; TODO: Link to documentation to help me remember what the
-        ;; following does.
-        (generate-allocation-counts #t)
-        (generate-instruction-counts #t))
+      (dev! dev?)
 
       (compile-imported-libraries #t)
       (generate-wpo-files #t)
@@ -313,8 +338,8 @@
 
       (make-boot-file (string-append temporary-directory "/program.boot")
                       '()
-                      (string-append chez-home "/petite.boot")
-                      (string-append chez-home "/scheme.boot")
+                      petite.boot
+                      scheme.boot
                       (string-append temporary-directory "/program.boot.scm"))
 
       ;; create main.c
@@ -343,12 +368,12 @@
       ;; create the output executable
 
       (system* (string-append "cp "
-                              chez-home "/scheme.h"
+                              scheme.h
                               " "
                               temporary-directory "/scheme.h"))
 
       (system* (string-append "cp "
-                              chez-home "/kernel.o"
+                              kernel.o
                               " "
                               temporary-directory "/kernel.o"))
 
@@ -363,7 +388,7 @@
                        (string-join extra)
                        temporary-directory
                        temporary-directory
-                       a.out)))))
+                       "a.out")))))
 
 (define (letloop-exec arguments)
 
@@ -424,11 +449,7 @@
   (unless (null? extensions)
     (library-extensions extensions))
 
-  (when dev?
-    (compile-profile 'source)
-    (generate-allocation-counts #t)
-    (generate-instruction-counts #t)
-    (debug-on-exception #t))
+  (dev! dev?)
 
   (command-line (cons program.scm extra))
 
@@ -730,7 +751,6 @@
 ;; TODO: make it default to be more interoperable with R7RS code, put
 ;; it at startup time inside letloop-compile?
 ;;
-;; (self-evaluating-vectors #t)
 
 (when (null? (cdr (command-line)))
   (letloop-usage)
