@@ -13,13 +13,14 @@ Usage:
 - `letloop exec PROGRAM.SCM [ -- ARGUMENT ...]`
 - `letloop repl`
 
-All subcommands take `EXTENSION ...` to consider, and `DIRECTORY ...`
-to look into.
+All subcommands take into consideration `EXTENSION ...` as part of the 
+library discovery machinery that rely on `DIRECTORY ...`. If no directory
+are provided, the current working directory is the only directory where
+libraries will be looked into.
 
 ## `letloop check [--fail-fast] LIBRARY`
 
-Discover, and execute checks from the directory, and libraries passed
-as argument.
+Discover libraries, and execute their checks.
 
 A procedure check must be a thunk exported by a library, with a
 procedure name that starts with `~check`, such as
@@ -33,7 +34,7 @@ procedure name that starts with `~check`, such as
   (define ~check-earth-is-not-flat-000 (lambda () (assert #t))))
 ```
 
-You can also check a library with:
+You can check a single library with the following syntax:
 
 ```sh
 #;sh> letloop check $(pwd) srfi-167.scm
@@ -44,15 +45,15 @@ above line the current directory was added with the shell device
 `$(pwd)`.
 
 If no library is provided as command line argument, `loop check` will
-fallback to discovery, and will look in all libraries, all available
-checks, and execute them.
+fallback to discovery based on directories, and will look for all
+libraries, for all available checks, and execute them.
 
 Use the flag `--fail-fast` to exit as soon as there is failure.
 
-## `letloop compile PROGRAM.SCM A.OUT`
+## `letloop compile PROGRAM.SCM`
 
 Compile into a binary the file `PROGRAM.SCM`, and produce an
-executable named `A.OUT`.
+executable named `a.out`.
 
 ## `letloop exec PROGRAM.SCM`
 
@@ -63,7 +64,8 @@ arguments comes after two dashes, such as:
 letloop exec hello.scm -- --french --date=now Amir
 ```
 
-Both `--french`, `--date=now` and `Amir` are an arguments of `hello.scm`.
+Both `--french`, `--date=now` and `Amir` are an arguments of
+`hello.scm`.
 
 ## `letloop repl`
 

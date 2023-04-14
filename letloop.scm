@@ -20,6 +20,60 @@
         (lambda (stdin stdout stderr pid)
           (read-string stdout))))
 
+(meta define basename
+  (lambda (string)
+    (let loop ((index (string-length string)))
+      (if (char=? (string-ref string (- index 1)) #\/)
+          (substring string index (string-length string))
+          (loop (- index 1))))))
+
+(meta define scheme-binarypath
+      (lambda ()
+        (let ((out
+               (run/output
+                (format #f "file /proc/~a/exe | cut -d' ' -f5"
+                        (get-process-id)))))
+          (substring out 0 (- (string-length out)
+                              (string-length (basename out)))))))
+
+(meta define binarypath->scheme-home
+      (lambda (scheme what)
+        (call-with-values (lambda () (scheme-version-number))
+          (lambda args
+            (define version (let loop ((args args)
+                                       (out '()))
+                              (if (null? args)
+                                  (apply string-append (reverse (cdr out)))
+                                  (loop (cdr args)
+                                        (cons* "."
+                                               (number->string (car args))
+                                               out)))))
+            (string-append scheme (format "../lib/csv~a/~a/~a"
+                                          version
+                                          (machine-type)
+                                          what))))))
+
+(define-syntax include-chez-file
+  (lambda (x)
+    (syntax-case x ()
+      [(k filename)
+       (let* ([fn (datum filename)]
+              [fn (binarypath->scheme-home (scheme-binarypath) fn)])
+         (with-syntax ([exp (get-bytevector-all (open-file-input-port fn))])
+                      #'exp))])))
+
+(define scheme.h (include-chez-file "scheme.h"))
+(define kernel.o (include-chez-file "kernel.o"))
+(define petite.boot (include-chez-file "petite.boot"))
+(define scheme.boot (include-chez-file "scheme.boot"))
+
+(define filepath->bytevector
+  (lambda (filepath)
+    (define port (open-file-input-port filepath))
+    (define out (get-bytevector-all port))
+    (close-port port)
+    out))
+
 (define-syntax include-filename-as-string
   (lambda (x)
     (syntax-case x ()
@@ -232,10 +286,6 @@
 
     ;; parse ARGUMENTS, and set the following variables:
 
-    (define petite.boot #f)
-    (define scheme.boot #f)
-    (define kernel.o #f)
-    (define scheme.h #f)
     (define extensions '())
     (define directories '())
     (define program.scm #f)
@@ -262,7 +312,7 @@
               (case type
                 (directory (set! directories (cons string* directories)))
                 (extension (set! extensions (cons string* extensions)))
-                (file (set! files (cons string* files)))
+                (file (set! program.scm string*))
                 (unknown (errors (format #f "Dubious argument: ~a" string*))))))
           (massage-standalone! (cdr standalone)))))
 
@@ -279,37 +329,15 @@
               (set! optimize-level* (string->number (cdr keyword))))
              (else (errors (format #f "Dubious keyword: ~a" (car keyword))))))
           (massage-keywords! (cdr keywords)))))
-    
-    (define massage-files!
-      (lambda (files)
-        (for-each (lambda (x)
-                    (let ((name (basename x)))
-                      (case (string->symbol name)
-                        (kernel.o (set! kernel.o x))
-                        (scheme.h (set! scheme.h x))
-                        (scheme.boot (set! scheme.boot x))
-                        (petite.boot (set! petite.boot x))
-                        (else (set! program.scm x)))))
-                  files)))
-    
+       
     (call-with-values (lambda () (command-line-parse arguments))
       (lambda (keywords standalone extra*)
         (massage-standalone! standalone)
-        (massage-files! files)
         (massage-keywords! keywords)
         (set! extra extra*)))
 
     (unless program.scm
       (errors "You need to provide one program file PROGRAM.SCM to compile, that will be read and transmogriffied."))
-   
-    (unless petite.boot
-      (errors "You need to provide a compatible petite.boot. Usually it is $PREFIX/usr/lib/csvx.y.z/ta6le/."))
-    (unless scheme.boot
-      (errors "You need to provide a compatible scheme.boot. Usually it is $PREFIX/usr/lib/csvx.y.z/ta6le/."))
-    (unless kernel.o
-      (errors "You need to provide a compatible kernel.o. Usually it is $PREFIX/usr/lib/csvx.y.z/ta6le/."))
-    (unless scheme.h
-      (errors "You need to provide a compatible scheme.h. Usually it is $PREFIX/usr/lib/csvx.y.z/ta6le/."))
 
     (maybe-display-errors-then-exit errors)
 
@@ -336,10 +364,24 @@
         (lambda (port)
           (write program.boot.scm port)))
 
+      (let loop ((todo (list
+                        (cons kernel.o "kernel.o")
+                        (cons scheme.h "scheme.h")
+                        (cons petite.boot "petite.boot")
+                        (cons scheme.boot "scheme.boot"))))
+        (unless (null? todo)
+          (call-with-port
+              (open-file-output-port
+               (string-append temporary-directory "/" (cdar todo)))
+            (lambda (port)
+              (put-bytevector port (caar todo))))
+          (loop (cdr todo))))
+
+      
       (make-boot-file (string-append temporary-directory "/program.boot")
                       '()
-                      petite.boot
-                      scheme.boot
+                      (string-append temporary-directory "/petite.boot")
+                      (string-append temporary-directory "/scheme.boot")
                       (string-append temporary-directory "/program.boot.scm"))
 
       ;; create main.c
@@ -348,10 +390,9 @@
 
       (compile-program (string-append temporary-directory "/program.scm"))
 
-      (pk 'compile-whole-program
-          (compile-whole-program (string-append temporary-directory "/program.wpo")
-                                 (string-append temporary-directory "/program.chez")
-                                 #t))
+      (compile-whole-program (string-append temporary-directory "/program.wpo")
+                             (string-append temporary-directory "/program.chez")
+                             #t)
 
       (call-with-output-file (string-append temporary-directory "/main.c")
         (lambda (port)
@@ -366,16 +407,6 @@
             (display (format #f main.c boot program) port))))
 
       ;; create the output executable
-
-      (system* (string-append "cp "
-                              scheme.h
-                              " "
-                              temporary-directory "/scheme.h"))
-
-      (system* (string-append "cp "
-                              kernel.o
-                              " "
-                              temporary-directory "/kernel.o"))
 
       ;; XXX: pass -fno-lto to disable link-time optimization, because
       ;; kernel.o may have been compiled with the different version of
