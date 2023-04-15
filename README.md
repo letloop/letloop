@@ -1,12 +1,26 @@
-# letloop cli
+# `letloop/cli`
 
 <div align=center>
   <img src="https://raw.githubusercontent.com/letloop/letloop-cli/main/letloop-logo-wide.png" />
 </div>
 
-A neat Chez Scheme command line tool, with all the goodies packed in.
+A *hyper than neat* Chez Scheme command line tool, with all goodies packed in.
 
-Usage:
+## Binary Installation
+
+1. [Download the latest release for your favorite Linux distribution](https://github.com/letloop/cli/releases/latest/)
+2. Install system dependencies:
+
+    - alpine: `apk build-base git lz4-dev libuuid util-linux-dev zlib-dev`
+    - arch: `pacman -Sy --noconfirm base-devel git lz4 util-linux-libs zlib`
+    - fedora: `yum group install -y "C Development Tools and Libraries" && yum install -y git lz4-devel libuuid-devel zlib-devel`
+    - redhat: `yum group install -y "Development Tools" && yum install -y git lz4-devel libuuid-devel zlib-devel`
+    - ubuntu: `apt install build-essential uuid-dev liblz4-dev zlib1g-dev`
+
+3. Enjoy all around best scheme
+4. [Star the project](https://github.com/letloop/cli/stargazers)
+
+## Usage
 
 - `letloop check [--fail-fast] LIBRARY`
 - `letloop compile PROGRAM.SCM A.OUT`
@@ -34,7 +48,7 @@ procedure name that starts with `~check`, such as
   (define ~check-earth-is-not-flat-000 (lambda () (assert #t))))
 ```
 
-You can check a single library with the following syntax:
+You can check one library with the following invokation:
 
 ```sh
 #;sh> letloop check $(pwd) srfi-167.scm
