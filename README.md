@@ -48,7 +48,7 @@ If no library is provided as command line argument, `loop check` will
 fallback to discovery based on directories, and will look for all
 libraries, for all available checks, and execute them.
 
-Use the flag `--fail-fast` to exit as soon as there is failure.
+Use the flag `--fail-fast` to exit as soon as there is a failure.
 
 ## `letloop compile PROGRAM.SCM`
 
