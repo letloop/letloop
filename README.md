@@ -60,14 +60,14 @@ Discover libraries, and execute their checks with code coverage.
 
 A procedure check must be a thunk exported by a library, with a
 procedure name that starts with `~check`, such as
-`~check-earth-is-not-flat-000`:
+`~check-000-earth-is-not-flat`:
 
 ```scheme
 (library (earth)
-  (export ~check-earth-is-not-flat-000)
+  (export ~check-000-earth-is-not-flat)
   (import (chezscheme))
 
-  (define ~check-earth-is-not-flat-000 (lambda () (assert #t))))
+  (define ~check-000-earth-is-not-flat (lambda () (assert #t))))
 ```
 
 You can check one library with the following invokation:
