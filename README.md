@@ -11,11 +11,33 @@ A *hyper than neat* Chez Scheme command line tool, with all goodies packed in.
 1. [Download the latest release for your favorite Linux distribution](https://github.com/letloop/cli/releases/latest/)
 2. Install system dependencies:
 
-    - alpine: `apk add build-base git lz4-dev libuuid util-linux-dev zlib-dev`
-    - arch: `pacman -Sy --noconfirm base-devel git lz4 util-linux-libs zlib`
-    - fedora: `yum group install -y "C Development Tools and Libraries" && yum install -y git lz4-devel libuuid-devel zlib-devel`
-    - redhat: `yum group install -y "Development Tools" && yum install -y git lz4-devel libuuid-devel zlib-devel`
-    - ubuntu: `apt install build-essential uuid-dev liblz4-dev zlib1g-dev`
+    - alpine: 
+    
+      ```shell
+      apk add build-base git lz4-dev libuuid util-linux-dev zlib-dev
+      ```
+      
+    - arch: 
+    
+      ```shell
+      pacman -Sy --noconfirm base-devel git lz4 util-linux-libs zlib
+      ```
+      
+    - fedora: 
+    
+      ```shell
+      yum group install -y "C Development Tools and Libraries" && yum install -y git lz4-devel libuuid-devel zlib-devel
+      ```
+      
+    - redhat: 
+      ```shell
+      yum group install -y "Development Tools" && yum install -y git lz4-devel libuuid-devel zlib-devel
+      ```
+    - ubuntu: 
+    
+      ```shell 
+      apt install build-essential uuid-dev liblz4-dev zlib1g-dev
+      ```
 
 3. Enjoy all around best scheme
 4. [Star the project](https://github.com/letloop/cli/stargazers)
