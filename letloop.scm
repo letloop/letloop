@@ -763,8 +763,6 @@
     (unless (null? extensions)
       (library-extensions extensions))
 
-    ;; TODO: discover libraries based on the variable directories
-
     (let* ((temporary-directory
             (make-temporary-directory
              (string-append "/tmp/letloop-check-"
