@@ -4,7 +4,7 @@
   <img src="https://raw.githubusercontent.com/letloop/letloop-cli/main/letloop-logo-wide.png" />
 </div>
 
-A *hyper than neat* Chez Scheme command line tool, with all goodies packed in.
+A *hyper* Chez Scheme command line tool, with all goodies packed in.
 
 ## Binary Installation
 
