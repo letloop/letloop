@@ -745,9 +745,9 @@
                          (let ((out ((car thunks))))
                            (if (and (not (eq? out (void)))
                                     out)
-                               (display "* SUCCESS\n")
+                               (display "** SUCCESS\n")
                                (begin
-                                 (display "* FAILED\n")
+                                 (display "** FAILED\n")
                                  (if ,fail-fast?
                                      (begin (newline)
                                             (exit 1))
