@@ -96,7 +96,7 @@
     (newline (current-error-port))
     (flush-output-port (current-error-port)))
   (car (reverse args)))
- 
+
 (define (string-join strings)
   (let loop ((strings strings)
              (out '()))
@@ -285,7 +285,7 @@
     (define kernel.o (include-chez-file "kernel.o"))
     (define petite.boot (include-chez-file "petite.boot"))
     (define scheme.boot (include-chez-file "scheme.boot"))
-    
+
     (define program.boot.scm
       '(let ([program-name
               (foreign-procedure "program_name" () string)])
@@ -315,7 +315,7 @@
           (if (char=? (string-ref string (- index 1)) #\/)
               (substring string index (string-length string))
               (loop (- index 1))))))
-    
+
     (define massage-standalone!
       (lambda (standalone)
         (unless (null? standalone)
@@ -341,7 +341,7 @@
               (set! optimize-level* (string->number (cdr keyword))))
              (else (errors (format #f "Dubious keyword: ~a" (car keyword))))))
           (massage-keywords! (cdr keywords)))))
-    
+
     (call-with-values (lambda () (command-line-parse arguments))
       (lambda (keywords standalone extra*)
         (massage-standalone! standalone)
@@ -389,7 +389,7 @@
               (put-bytevector port (caar todo))))
           (loop (cdr todo))))
 
-      
+
       (make-boot-file (string-append temporary-directory "/program.boot")
                       '()
                       (string-append temporary-directory "/petite.boot")
@@ -607,6 +607,7 @@
     (define errors (make-accumulator))
 
     (define fail-fast? #f)
+    (define dry-run? #f)
     (define extensions '())
     (define directories '())
     (define files '())
@@ -621,6 +622,7 @@
         (unless (null? keywords)
           (case (caar keywords)
             (--fail-fast (set! fail-fast? #t))
+            (--dry-run (set! dry-run? #t))
             (else (errors (format #f "Unkown keywords: ~a" (caar keywords))))))))
 
     (define massage-standalone!
@@ -655,7 +657,7 @@
                   (let ((exports (maybe-library-exports (cadr sexp))))
                     (if exports
                         (begin
-                          (pk 'maybe-read-library "valid" file 
+                          (pk 'maybe-read-library "valid" file
                           (reverse (map (lambda (x) (cons (cadr sexp) x)) exports))))
                         (begin
                           (pk 'maybe-read-library "no interesting exports")
@@ -774,23 +776,37 @@
                                                 files))))
                        (discover directories)))
            (program (build-check-program checks fail-fast?)))
-      
+
       (when (null? checks)
         (format #t "* Error, no checks found!\n")
         (exit 2))
-      
-      (call-with-output-file check
-        (lambda (port)
-          (let loop ((program program))
-            (unless (null? program)
-              (pretty-print (car program) port)
-              (loop (cdr program))))))
 
-      ;; TODO: why change the current-directory?
-      (current-directory temporary-directory)
-      (letloop-exec (list "--dev" "." check))
-      (format (current-output-port) "* Coverage profile can be found at: ~a/profile.html\n" temporary-directory))))
+      (if dry-run?
+          (let ((libraries (pk 'libraries (reverse (uniquify (map car checks)))))
+                (thunks (map cdr checks)))
 
+            (format #t "* Dry run from the following libraries:\n\n")
+            (for-each
+             (lambda (x)
+               (format #t "** ~a\n" x)) libraries)
+            (format #t "* Dry checks:\n\n")
+            (for-each
+             (lambda (thunk)
+               (format #t "** Dry checking `~a`:\n" (car thunks)))
+             thunks))
+
+          (begin
+            (call-with-output-file check
+              (lambda (port)
+                (let loop ((program program))
+                  (unless (null? program)
+                    (pretty-print (car program) port)
+                    (loop (cdr program))))))
+
+            ;; TODO: why change the current-directory?
+            (current-directory temporary-directory)
+            (letloop-exec (list "--dev" "." check))
+            (format (current-output-port) "* Coverage profile can be found at: ~a/profile.html\n" temporary-directory))))))
 
 ;; TODO: make it default to be more interoperable with R7RS code, put
 ;; it at startup time inside letloop-compile?
