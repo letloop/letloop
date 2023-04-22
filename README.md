@@ -56,7 +56,7 @@ libraries will be looked into.
 
 ## `letloop check [--fail-fast] LIBRARY`
 
-Discover libraries, and execute their checks.
+Discover libraries, and execute their checks with code coverage.
 
 A procedure check must be a thunk exported by a library, with a
 procedure name that starts with `~check`, such as
@@ -85,6 +85,9 @@ fallback to discovery based on directories, and will look for all
 libraries, for all available checks, and execute them.
 
 Use the flag `--fail-fast` to exit as soon as there is a failure.
+
+If `PROGRAM.SCM` exit successfully, exit code is zero, an html profile
+of the execution will be generated in `/tmp`.
 
 ## `letloop compile PROGRAM.SCM`
 
