@@ -1,12 +1,12 @@
 (library (check-success)
 
-  (export answer check~check-success-000)
+  (export answer ~check-000-check-success)
   (import (chezscheme))
 
   (define answer
     (lambda ()
       42))
 
-  (define check~check-success-000
+  (define ~check-000-check-success
     (lambda ()
       (assert (= (answer) 42)))))

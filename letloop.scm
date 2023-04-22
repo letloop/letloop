@@ -612,7 +612,6 @@
     (define files '())
     (define alloweds '())
 
-
     (define timestamp
       (lambda ()
         (number->string (time-second (current-time)))))
@@ -656,8 +655,8 @@
                   (let ((exports (maybe-library-exports (cadr sexp))))
                     (if exports
                         (begin
-                          (pk 'maybe-read-library "valid" file)
-                          (reverse (map (lambda (x) (cons (cadr sexp) x)) exports)))
+                          (pk 'maybe-read-library "valid" file 
+                          (reverse (map (lambda (x) (cons (cadr sexp) x)) exports))))
                         (begin
                           (pk 'maybe-read-library "no interesting exports")
                           '())))
@@ -768,14 +767,18 @@
              (string-append "/tmp/letloop-check-"
                             (timestamp))))
            (check (string-append temporary-directory "/check.scm"))
-           (program (build-check-program
-                     (or (and (not (null? files))
-                              (filter allow?
-                                      (apply append
-                                             (map maybe-read-library
-                                                  files))))
-                         (discover directories))
-                     fail-fast?)))
+           (checks (or (and (not (null? files))
+                            (filter allow?
+                                    (apply append
+                                           (map maybe-read-library
+                                                files))))
+                       (discover directories)))
+           (program (build-check-program checks fail-fast?)))
+      
+      (when (null? checks)
+        (format #t "* Error, no checks found!\n")
+        (exit 2))
+      
       (call-with-output-file check
         (lambda (port)
           (let loop ((program program))

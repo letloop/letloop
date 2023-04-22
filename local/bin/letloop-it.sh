@@ -70,6 +70,8 @@ tar xf rootfs.tar.xz
 DEBIAN_FRONTEND=noninteractive
 LD_PRELOAD=""
 
+# TODO: Why? It related to systemd-id128 call below
+
 rm -rf $(pwd)/etc/machine-id
 rm -rf $(pwd)/etc/resolv.conf
 cp /etc/resolv.conf $(pwd)/etc/resolv.conf
