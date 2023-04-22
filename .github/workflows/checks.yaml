@@ -18,5 +18,4 @@ jobs:
       - run: cd cli && ./venv $(pwd)/local/ letloop exec main.scm
       - run: cd cli && ./venv $(pwd)/local/ letloop compile main.scm && mv a.out main
       - run: cd cli && ./main
-      - run: cd cli && ./venv $(pwd)/local/ letloop check checks/check/ -- "(check-success)"
-      - run: cd cli && echo '! ./venv letloop check checks/check/ -- "(check-failure)"' | $SHELL
+      - run: cd cli && ./venv $(pwd)/local/ make check
