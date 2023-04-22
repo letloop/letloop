@@ -107,7 +107,7 @@ letloop exec --dev hello.scm -- --french --date=now Amir
 The flag `--dev` is an argument of `letloop exec`. Arguments of
 `hello.scm` are `--french`, `--date=now` and `Amir`.
 
-When the flag `--dev` is prodived `PROGRAM.SCM` will be executed
+When the flag `--dev` is provided `PROGRAM.SCM` will be executed
 in "development mode" with the following Chez parameters set:
 
 ```scheme
