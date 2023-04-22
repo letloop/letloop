@@ -11,7 +11,7 @@ A *hyper than neat* Chez Scheme command line tool, with all goodies packed in.
 1. [Download the latest release for your favorite Linux distribution](https://github.com/letloop/cli/releases/latest/)
 2. Install system dependencies:
 
-    - alpine: `apk build-base git lz4-dev libuuid util-linux-dev zlib-dev`
+    - alpine: `apk add build-base git lz4-dev libuuid util-linux-dev zlib-dev`
     - arch: `pacman -Sy --noconfirm base-devel git lz4 util-linux-libs zlib`
     - fedora: `yum group install -y "C Development Tools and Libraries" && yum install -y git lz4-devel libuuid-devel zlib-devel`
     - redhat: `yum group install -y "Development Tools" && yum install -y git lz4-devel libuuid-devel zlib-devel`
