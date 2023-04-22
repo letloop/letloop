@@ -718,34 +718,43 @@
         (define libraries (pk 'libraries (reverse (uniquify (map car spec)))))
         (define procedures (map cdr spec))
 
-        (pk 'program `((import (chezscheme) ,@libraries)
+        (pk 'program
+            `((import (chezscheme) ,@libraries)
 
-                       (define errored? #f)
+              (define errored? #f)
 
-                       (display "* Will run tests from the following libraries:\n")
-                       (for-each
-                        (lambda (x)
-                          (format #t "** ~a\n" x)) ',libraries)
+              (display "* Will run tests from the following libraries:\n")
+              (for-each
+               (lambda (x)
+                 (format #t "** ~a\n" x)) ',libraries)
 
-                       (newline)
-                       (let loop ((thunks (list ,@procedures)))
-                         (unless (null? thunks)
-                           (format #t "* Checking `~a`:\n" (car thunks))
-                           (guard (ex (else
-                                       (display "** FAILED!\n")
-                                       (if (condition? ex)
-                                           (display-condition ex)
-                                           (write ex))
-                                       (if ,fail-fast?
-                                           (begin (newline)
-                                                  (exit 1))
-                                           (begin (newline)
-                                                  (set! errored? #t)))))
-                                  ((car thunks))
-                                  (display "* SUCCESS\n"))
-                           (loop (cdr thunks))))
-                       (newline)
-                       (when errored? (exit 1))))))
+              (newline)
+              (let loop ((thunks (list ,@procedures)))
+                (unless (null? thunks)
+                  (format #t "* Checking `~a`:\n" (car thunks))
+                  (guard (ex (else
+                              (display "** ERROR!\n")
+                              (if (condition? ex)
+                                  (display-condition ex)
+                                  (write ex))
+                              (if ,fail-fast?
+                                  (begin (newline)
+                                         (exit 1))
+                                  (begin (newline)
+                                         (set! errored? #t)))))
+                         (let ((out ((car thunks))))
+                           (if (and (not (eq? out (void)))
+                                    out)
+                               (display "* SUCCESS\n")
+                               (begin
+                                 (display "* FAILED\n")
+                                 (if ,fail-fast?
+                                     (begin (newline)
+                                            (exit 1))
+                                     (set! errored? #t))))))
+                  (loop (cdr thunks))))
+              (newline)
+              (when errored? (exit 1))))))
 
     (call-with-values (lambda () (command-line-parse arguments))
       (lambda (keywords standalone extra)

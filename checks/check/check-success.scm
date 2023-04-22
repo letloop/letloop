@@ -9,4 +9,4 @@
 
   (define ~check-000-check-success
     (lambda ()
-      (assert (= (answer) 42)))))
+      (= (answer) 42))))
