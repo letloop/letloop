@@ -7,4 +7,4 @@ local/bin/letloop: letloop.scm letloop.md letloop.nfo
 	mv a.out letloop.exe
 
 check:
-	LETLOOP=$(LETLOOP) sh check.sh
+	LETLOOP=$(LETLOOP) sh make-check.sh
