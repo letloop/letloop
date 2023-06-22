@@ -16,7 +16,7 @@ jobs:
 
   build:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - distribution: ubuntu
