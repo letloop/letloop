@@ -24,6 +24,13 @@ directory where libraries will be looked into.
 
 ## Change Log
 
+### v8
+
+#### Libraries
+
+- `(letloop unknown)`: initial version of zero-knowledge password
+  verification;
+
 ### v7
 
 #### Primary
