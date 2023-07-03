@@ -1,9 +1,11 @@
-LETLOOP='scheme --program letloop.scm'
+SCHEME=scheme
+
+LETLOOP='$(SCHEME) --program letloop.scm'
 
 letloop: local/bin/letloop
 
 local/bin/letloop: letloop.scm letloop.md letloop.nfo
-	scheme --program letloop.scm compile letloop.scm
+	$(SCHEME) --program letloop.scm compile letloop.scm
 	mv a.out letloop.exe
 
 check:
