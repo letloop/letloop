@@ -818,10 +818,11 @@
 
     (command-line (cons program.scm extra))
 
-    (load-program program.scm)
-
     (when dev?
-      (profile-dump-html)))
+      (dynamic-wind
+        (lambda () (void))
+        (lambda () (load-program program.scm))
+        (lambda () (profile-dump-html)))))
 
   (define (letloop-repl arguments)
 
@@ -882,10 +883,7 @@
     (unless (null? extensions)
       (library-extensions extensions))
 
-    (when dev?
-      (generate-allocation-counts #t)
-      (generate-instruction-counts #t)
-      (debug-on-exception #t))
+    (dev! dev?)
 
     (let loop ()
       (display "\033[32m#;letl∞p #;\033[m ")
@@ -1134,7 +1132,8 @@
                       (pretty-print (car program) port)
                       (loop (cdr program))))))
 
-              ;; TODO: why change the current-directory?
+              ;; Change directory to TEMPORARY-DIRECTORY to produce
+              ;; the profile dump along the CHECK file.
               (current-directory temporary-directory)
               (letloop-exec (list "--dev" "." check))
               (format (current-output-port) "* Coverage profile can be found at: ~a/profile.html\n" temporary-directory)))))))
