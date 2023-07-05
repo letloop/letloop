@@ -11,6 +11,7 @@
 
 static const char *argv0;
 
+char letloopdir[] = "/tmp/letloop-XXXXXX";
 char bootfilename[] = "/tmp/chezschemebootXXXXXX";
 char schemefilename[] = "/tmp/schemeprogramXXXXXX";
 const char *cleanup_bootfile = 0;
@@ -21,6 +22,9 @@ const unsigned int scheme_boot_size = sizeof(scheme_boot);
 
 const char scheme_program[] = {~{0x~x,~}};
 const unsigned int scheme_program_size = sizeof(scheme_program);
+
+const char letloop_extra[] = {~{0x~x,~}};
+const unsigned long long letloop_extra_size = sizeof(letloop_extra);
 
 int setupterm(char *term, int fd, int *errret) {
 	return 0;
@@ -36,8 +40,15 @@ const char *program_name(void) {
   return argv0;
 }
 
+const char *letloop_directory(void) {
+  return letloopdir;
+}
+
 void custom_init(void) {
-  Sregister_symbol("program_name", (void*)program_name);
+  Sregister_symbol("program-name", (void*) program_name);
+  Sregister_symbol("letloop-extra", (void*) letloop_extra);
+  Sregister_symbol("letloop-extra-size", (void*) letloop_extra_size);
+  Sregister_symbol("letloop-directory", (void*) letloop_directory);
 }
 
 int run_program(int argc, const char **argv, const char *bootfilename, const char *schemefilename) {
@@ -69,6 +80,9 @@ int main(int argc, const char **argv) {
   int ret;
 
   atexit(cleanup);
+
+  char* tmp = mkdtemp(letloopdir);
+  assert(tmp != NULL);
 
   bootfd = maketempfile(bootfilename, scheme_boot, scheme_boot_size);
   cleanup_bootfile = bootfilename;

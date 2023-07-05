@@ -1,4 +1,6 @@
-letloop
+a.out
+codex.boot
+local/
 
 *.so
 *.wpo
