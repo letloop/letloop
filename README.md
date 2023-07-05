@@ -6,42 +6,6 @@
 
 A *hyper* Chez Scheme command line tool, with all goodies packed in.
 
-## Binary Installation
-
-1. [Download the latest release for your favorite Linux distribution](https://github.com/letloop/cli/releases/latest/)
-2. Install system dependencies:
-
-    - alpine: 
-    
-      ```shell
-      apk add build-base git lz4-dev libuuid util-linux-dev zlib-dev
-      ```
-      
-    - arch: 
-    
-      ```shell
-      pacman -Sy --noconfirm base-devel git lz4 util-linux-libs zlib
-      ```
-      
-    - fedora: 
-    
-      ```shell
-      yum group install -y "C Development Tools and Libraries" && yum install -y git lz4-devel libuuid-devel zlib-devel
-      ```
-      
-    - redhat: 
-      ```shell
-      yum group install -y "Development Tools" && yum install -y git lz4-devel libuuid-devel zlib-devel
-      ```
-    - ubuntu: 
-    
-      ```shell 
-      apt install build-essential uuid-dev liblz4-dev zlib1g-dev
-      ```
-
-3. Enjoy all around best scheme
-4. [Star the project](https://github.com/letloop/cli/stargazers)
-
 ## Usage
 
 - `letloop check [--fail-fast] LIBRARY`
@@ -49,10 +13,56 @@ A *hyper* Chez Scheme command line tool, with all goodies packed in.
 - `letloop exec PROGRAM.SCM [ -- ARGUMENT ...]`
 - `letloop repl`
 
-All subcommands take into consideration `EXTENSION ...` as part of the 
+All subcommands take into consideration `EXTENSION ...` as part of the
 library discovery machinery that rely on `DIRECTORY ...`. If no directory
 are provided, the current working directory is the only directory where
 libraries will be looked into.
+
+## Change Log
+
+### v7
+
+- Embed scheme libraries into letloop, and elf binaries produced by
+  `letloop compile`;
+- Add blake3 bindings
+- Add some libraries from SRFI process;
+- Add some libraries from R7RS aliasing libraries from SRFI;
+
+## Binary Installation
+
+1. [Download the latest release for your favorite Linux distribution](https://github.com/letloop/cli/releases/latest/)
+2. Install system dependencies:
+
+    - alpine:
+
+      ```shell
+      apk add build-base git lz4-dev libuuid util-linux-dev zlib-dev
+      ```
+
+    - arch:
+
+      ```shell
+      pacman -Sy --noconfirm base-devel git lz4 util-linux-libs zlib
+      ```
+
+    - fedora:
+
+      ```shell
+      yum group install -y "C Development Tools and Libraries" && yum install -y git lz4-devel libuuid-devel zlib-devel
+      ```
+
+    - redhat:
+      ```shell
+      yum group install -y "Development Tools" && yum install -y git lz4-devel libuuid-devel zlib-devel
+      ```
+    - ubuntu:
+
+      ```shell
+      apt install build-essential uuid-dev liblz4-dev zlib1g-dev
+      ```
+
+3. Enjoy all around best scheme
+4. [Star the project](https://github.com/letloop/cli/stargazers)
 
 ## `letloop check [--fail-fast] LIBRARY`
 
