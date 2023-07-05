@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -xe
+
 LETLOOP_ROOT=$1
 
 if [ -z ${LETLOOP_ROOT+x} ]; then
@@ -60,4 +62,6 @@ cp $LETLOOP_ROOT/main.c .
 
 cd $LETLOOP_ROOT && git config --global --add safe.directory /mnt
 
-$PREFIX/bin/scheme --compile-imported-libraries --libdirs $LETLOOP_ROOT --program $LETLOOP_ROOT/letloop.scm compile $LETLOOP_ROOT $LETLOOP_ROOT/letloop.scm && mv a.out $PREFIX/bin/letloop
+$PREFIX/bin/scheme --compile-imported-libraries --libdirs $LETLOOP_ROOT/lib --program $LETLOOP_ROOT/letloop.scm compile $LETLOOP_ROOT/lib/ $LETLOOP_ROOT/letloop.scm && mv a.out $PREFIX/bin/letloop
+cd $LETLOOP_ROOT
+LD_LIBRARY_PATH=$LETLOOP_ROOT/local/lib make LETLOOP=$PREFIX/bin/letloop check

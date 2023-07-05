@@ -123,7 +123,7 @@ jobs:
             version: 8
             arch: aarch64
             flavor: racket
-            
+
           - distribution: rockylinux
             version: 9
             arch: amd64
@@ -148,7 +148,7 @@ jobs:
             version: 36
             arch: amd64
             flavor: racket
-          
+
           - distribution: fedora
             version: 37
             arch: amd64
@@ -156,16 +156,6 @@ jobs:
 
           - distribution: fedora
             version: 37
-            arch: amd64
-            flavor: racket
-
-          - distribution: fedora
-            version: Rawhide
-            arch: amd64
-            flavor: cisco
-
-          - distribution: fedora
-            version: Rawhide
             arch: amd64
             flavor: racket
 
@@ -179,4 +169,3 @@ jobs:
       - run: cd cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh ${{ matrix.arch }} ${{ matrix.distribution }} ${{ matrix.version }} ${{ matrix.flavor }}
       - run: cd cli && sudo mv local/rootfs/${{ matrix.arch }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.flavor }}/usr/local/bin/letloop /tmp/letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}
       - run: cd cli && gh release upload $(git tag --points-at HEAD) /tmp/letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}
-
