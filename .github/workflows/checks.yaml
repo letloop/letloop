@@ -15,4 +15,4 @@ jobs:
       - run: gh repo clone letloop/cli -- --branch $BRANCH --depth 1
       - run: cd cli && make
       - run: cd cli && ./local/bin/letloop
-      - run: cd cli && make LETLOOP=$(pwd)/local/bin/letloop check
+      - run: cd cli && LETLOOP_ROOT=$(pwd) make LETLOOP=$(pwd)/local/bin/letloop check
