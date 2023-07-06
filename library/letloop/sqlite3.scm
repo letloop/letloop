@@ -238,7 +238,7 @@
   (define ~check-sqlite3-000
     (lambda ()
       (define sqlite3 (sqlite3-open
-                       (string-append (make-temporary-directory "letloop-sqlite3")
+                       (string-append (make-temporary-directory "/tmp/letloop-sqlite3")
                                       "/database.sqlite3")))
 
       (define ignore-create-table
