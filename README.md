@@ -4,9 +4,12 @@
   <img src="https://raw.githubusercontent.com/letloop/letloop-cli/main/letloop-logo-wide.png" />
 </div>
 
-A *hyper* Chez Scheme command line tool, with all goodies packed in.
+A Chez Scheme distribution with all goodies packed in.
 
-## Usage
+## Getting started
+
+`letloop` comes with a handy command line tool to ease your
+parenthetical journey. Here is a usage summary:
 
 - `letloop check [--fail-fast] LIBRARY`
 - `letloop compile PROGRAM.SCM A.OUT`
