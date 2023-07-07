@@ -31,6 +31,7 @@ libraries will be looked into.
 - Release debian bookworm, mint vera, and more fedora binaries;
 - Add some libraries from SRFI process;
 - Add some libraries from R7RS aliasing libraries from SRFI;
+- Create files in inside `/tmp/letloop/`, and cleanup whenever possible;
 
 ## Binary Installation
 

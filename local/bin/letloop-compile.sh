@@ -62,6 +62,6 @@ cp $LETLOOP_ROOT/main.c .
 
 cd $LETLOOP_ROOT && git config --global --add safe.directory /mnt
 
-$PREFIX/bin/scheme --compile-imported-libraries --libdirs $LETLOOP_ROOT/lib --program $LETLOOP_ROOT/letloop.scm compile $LETLOOP_ROOT/lib/ $LETLOOP_ROOT/letloop.scm && mv a.out $PREFIX/bin/letloop
-cd $LETLOOP_ROOT
-LD_LIBRARY_PATH=$LETLOOP_ROOT/local/lib ./venv $(pwd)/local make LETLOOP=$PREFIX/bin/letloop check
+make SCHEME=$PREFIX/bin/scheme
+mv local/bin/letloop $PREFIX/bin/letloop
+LD_LIBRARY_PATH=$LETLOOP_ROOT/local/lib ./venv $(pwd)/local make check

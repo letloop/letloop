@@ -9,6 +9,28 @@
 
   (define LETLOOP_DEBUG (getenv "LETLOOP_DEBUG"))
 
+  (define ftw
+    (lambda (directory)
+      (let loop ((paths (map (lambda (x) (string-append directory "/" x)) (directory-list directory)))
+                 (out '()))
+        (if (null? paths)
+            out
+            (if (file-directory? (car paths))
+                (loop (append (ftw (car paths)) (cdr paths))
+                      out)
+                (loop (cdr paths) (cons (car paths) out)))))))
+
+  (define ftw*
+    (lambda (directory)
+      (let loop ((paths (map (lambda (x) (string-append directory "/" x)) (directory-list directory)))
+                 (out '()))
+        (if (null? paths)
+            out
+            (if (file-directory? (car paths))
+                (loop (append (ftw* (car paths)) (cdr paths))
+                      (cons (car paths) out))
+                (loop (cdr paths) out))))))
+
   (meta define (pk* . args)
         (display ";;; " (current-error-port))
         (write args (current-error-port))
@@ -626,7 +648,7 @@
                   (fasl-write path+so+wpo port)
                   (bytevector->u8-list (read))))))
 
-          (let ((temporary-directory (make-temporary-directory "/tmp/letloop-compile")))
+          (let ((temporary-directory (make-temporary-directory "/tmp/letloop/compile")))
             (call-with-output-file (string-append temporary-directory "/program.boot.scm")
               (lambda (port)
                 (write program.boot.scm port)))
@@ -729,7 +751,10 @@
                                (string-join extra " ")
                                temporary-directory
                                temporary-directory
-                               "a.out"))))))
+                               "a.out"))
+              (for-each delete-file (ftw temporary-directory))
+              (for-each delete-directory (ftw* temporary-directory))
+              (delete-directory temporary-directory)))))
 
       (call-with-values (lambda () (command-line-parse arguments))
         (lambda (keywords standalone extra*)
@@ -818,11 +843,17 @@
 
     (command-line (cons program.scm extra))
 
-    (when dev?
-      (dynamic-wind
-        (lambda () (void))
-        (lambda () (load-program program.scm))
-        (lambda () (profile-dump-html)))))
+    (dynamic-wind
+      (lambda () (void))
+      (lambda () (load-program program.scm))
+      (lambda ()
+        (guard (ex (else #f))
+          (define dir ((foreign-procedure "letloop-directory" () string)))
+          (for-each delete-file (ftw dir))
+          (for-each delete-directory (ftw* dir))
+          (delete-directory dir))
+        (when dev?
+          (profile-dump-html)))))
 
   (define (letloop-repl arguments)
 
@@ -1006,17 +1037,6 @@
       (define discover
         (lambda (directories)
 
-          (define ftw
-            (lambda (directory)
-              (let loop ((paths (map (lambda (x) (string-append directory "/" x)) (directory-list directory)))
-                         (out '()))
-                (if (null? paths)
-                    out
-                    (if (file-directory? (car paths))
-                        (loop (append (ftw (car paths)) (cdr paths))
-                              out)
-                        (loop (cdr paths) (cons (car paths) out)))))))
-
           (define files (apply append (map ftw directories)))
 
           (filter allow? (apply append (map maybe-read-library files)))))
@@ -1095,7 +1115,7 @@
 
       (let* ((temporary-directory
               (make-temporary-directory
-               (string-append "/tmp/letloop-check-"
+               (string-append "/tmp/letloop/check-"
                               (timestamp))))
              (check (string-append temporary-directory "/check.scm"))
              (checks (or (and (not (null? files))

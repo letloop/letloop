@@ -1,19 +1,23 @@
 #include <assert.h>
-#include <fcntl.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdint.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <sys/types.h>
 
 #include "scheme.h"
 
+
 static const char *argv0;
 
-char letloopdir[] = "/tmp/letloop-XXXXXX";
-char bootfilename[] = "/tmp/chezschemebootXXXXXX";
-char schemefilename[] = "/tmp/schemeprogramXXXXXX";
+char letloopdir[] = "/tmp/letloop/exec-XXXXXX";
+char bootfilename[] = "/tmp/letloop/exec-XXXXXX/boot";
+char schemefilename[] = "/tmp/letloop/exec-XXXXXX/program";
 const char *cleanup_bootfile = 0;
 const char *cleanup_schemefile = 0;
 
@@ -64,9 +68,9 @@ void cleanup(void) {
   if (cleanup_schemefile) unlink(schemefilename);
 }
 
-int maketempfile(char *template, const char *contents, size_t size) {
+int makefile(char *filename, const char *contents, size_t size) {
   int fd;
-  fd = mkstemp(template);
+  fd = open(filename, O_CREAT | O_RDWR, 0755);
   assert(fd >= 0);
 
   assert(write(fd, contents, size) == size);
@@ -78,16 +82,29 @@ int main(int argc, const char **argv) {
   int bootfd;
   int schemefd;
   int ret;
+  int e;
+
+  struct stat sb;
 
   atexit(cleanup);
 
-  char* tmp = mkdtemp(letloopdir);
-  assert(tmp != NULL);
+  if (stat("/tmp/letloop", &sb) == 0) {
+    if(!S_ISDIR(sb.st_mode)) {
+      assert(unlink("/tmp/letloop") == 0);
+      assert(mkdir("/tmp/letloop", 0755) == 0);
+    }
+  } else {
+    assert(mkdir("/tmp/letloop", 0755) == 0);
+  }
 
-  bootfd = maketempfile(bootfilename, scheme_boot, scheme_boot_size);
+  assert(mkdtemp(letloopdir) != NULL);
+
+  assert(strncpy(bootfilename, letloopdir, strlen(letloopdir)) == bootfilename);
+  bootfd = makefile(bootfilename, scheme_boot, scheme_boot_size);
   cleanup_bootfile = bootfilename;
 
-  schemefd = maketempfile(schemefilename, scheme_program, scheme_program_size);
+  assert(strncpy(schemefilename, letloopdir, strlen(letloopdir)) == schemefilename);
+  schemefd = makefile(schemefilename, scheme_program, scheme_program_size);
   cleanup_schemefile = schemefilename;
 
   ret = run_program(argc, argv, bootfilename, schemefilename);

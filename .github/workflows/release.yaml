@@ -223,7 +223,7 @@ jobs:
             version: bookworm
             arch: aarch64
             flavor: racket
-1C
+
     runs-on: ubuntu-latest
     needs: create-release
     steps:
