@@ -64,6 +64,21 @@ jobs:
             arch: aarch64
             flavor: racket
 
+          - distribution: mint
+            version: vera
+            arch: amd64
+            flavor: cisco
+
+          - distribution: mint
+            version: vera
+            arch: amd64
+            flavor: racket
+
+          - distribution: mint
+            version: vera
+            arch: aarch64
+            flavor: racket
+
           - distribution: alpine
             version: 3.17
             arch: amd64

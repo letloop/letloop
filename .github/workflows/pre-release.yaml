@@ -167,6 +167,23 @@ jobs:
             arch: amd64
             flavor: racket
 
+
+          - distribution: mint
+            version: vera
+            arch: amd64
+            flavor: cisco
+
+          - distribution: mint
+            version: vera
+            arch: amd64
+            flavor: racket
+
+          - distribution: mint
+            version: vera
+            arch: aarch64
+            flavor: racket
+
+
     runs-on: ubuntu-latest
     steps:
       - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
