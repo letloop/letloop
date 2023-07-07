@@ -167,7 +167,6 @@ jobs:
             arch: amd64
             flavor: racket
 
-
           - distribution: mint
             version: vera
             arch: amd64
@@ -183,6 +182,15 @@ jobs:
             arch: aarch64
             flavor: racket
 
+          - distribution: debian
+            version: bookworm
+            arch: amd64
+            flavor: cisco
+
+          - distribution: debian
+            version: bookworm
+            arch: aarch64
+            flavor: racket
 
     runs-on: ubuntu-latest
     steps:
