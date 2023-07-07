@@ -166,6 +166,14 @@ jobs:
       - run: gh repo clone letloop/cli -- --branch $BRANCH --depth 1
       - run: cd cli && git fetch --tags
       - run: cd cli && git tag --points-at HEAD
+
+      # Compile, and check
       - run: cd cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local ./local/bin/letloop-it.sh ${{ matrix.arch }} ${{ matrix.distribution }} ${{ matrix.version }} ${{ matrix.flavor }}
-      - run: cd cli && sudo mv local/rootfs/${{ matrix.arch }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.flavor }}/usr/local/bin/letloop /tmp/letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}
-      - run: cd cli && gh release upload $(git tag --points-at HEAD) /tmp/letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}
+
+      # Publish the binary with a name that documents the deployment target
+      - run: cd cli && sudo mv local/rootfs/${{ matrix.arch }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.flavor }}/usr/local/bin/letloop letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}
+      - run: cd cli && gh release upload $(git tag --points-at HEAD) letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}
+
+      # Publish sha256 checksum
+      - run: cd cli && sha256sum letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }} > letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}.sha256
+      - run: cd cli && gh release upload $(git tag --points-at HEAD) letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}.sha256
