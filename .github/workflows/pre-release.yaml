@@ -72,6 +72,21 @@ jobs:
             arch: aarch64
             flavor: racket
 
+          - distribution: alpine
+            version: 3.18
+            arch: amd64
+            flavor: cisco
+
+          - distribution: alpine
+            version: 3.18
+            arch: amd64
+            flavor: racket
+
+          - distribution: alpine
+            version: 3.18
+            arch: aarch64
+            flavor: racket
+
           - distribution: archlinux
             version: current
             arch: amd64
