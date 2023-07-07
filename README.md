@@ -27,7 +27,8 @@ libraries will be looked into.
 
 - Embed scheme libraries into letloop, and elf binaries produced by
   `letloop compile`;
-- Add blake3 bindings
+- More robust, more efficient, and less noisy pre-release checks;
+- Release debian bookworm, mint vera, and more fedora binaries;
 - Add some libraries from SRFI process;
 - Add some libraries from R7RS aliasing libraries from SRFI;
 

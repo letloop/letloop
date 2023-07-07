@@ -79,24 +79,24 @@ cp /etc/resolv.conf $(pwd)/etc/resolv.conf
 PROOT="sudo systemd-nspawn --uuid=$(systemd-id128 new) -D $(pwd) --bind=$LETLOOP_ROOT:/mnt"
 
 case "$LETLOOP_DISTRO" in
-    "ubuntu"|"debian")
+    "debian"|"ubuntu"|"mint")
         $PROOT apt -qq update --yes
         $PROOT apt -qq upgrade --yes
-        $PROOT apt -qq install --yes git build-essential uuid-dev liblz4-dev zlib1g-dev > /dev/null
+        $PROOT apt -qq install --yes git build-essential uuid-dev liblz4-dev zlib1g-dev tcl > /dev/null
         ;;
     "alpine")
-        $PROOT apk add build-base git lz4-dev libuuid util-linux-dev zlib-dev
+        $PROOT apk add build-base git lz4-dev libuuid util-linux-dev zlib-dev tcl
         ;;
     "fedora"|"centos")
         $PROOT yum group install -y "C Development Tools and Libraries"
-        $PROOT yum install -y git lz4-devel libuuid-devel zlib-devel
+        $PROOT yum install -y git lz4-devel libuuid-devel zlib-devel tcl
         ;;
     "amazonlinux"|"rockylinux"|"oracle")
         $PROOT yum group install -y "Development Tools"
-        $PROOT yum install -y git lz4-devel libuuid-devel zlib-devel
+        $PROOT yum install -y git lz4-devel libuuid-devel zlib-devel tcl which
         ;;
     "archlinux")
-        $PROOT pacman -Sy --noconfirm base-devel git lz4 util-linux-libs zlib
+        $PROOT pacman -Sy --noconfirm base-devel git lz4 util-linux-libs zlib tcl
         ;;
     *)
         echo "distro not supported"
