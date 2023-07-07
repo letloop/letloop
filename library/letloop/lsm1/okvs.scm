@@ -161,7 +161,7 @@
           (let ((input (string-append prefix "-XXXXXX")))
             (mkdtemp input)))
 
-        (define tmp (make-temporary-directory "letloop-lsm-okvs"))
+        (define tmp (make-temporary-directory "/tmp/letloop-lsm"))
 
         (call-with-values (lambda () (proc tmp))
 
