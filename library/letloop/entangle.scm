@@ -6,12 +6,25 @@
           entangle-log
           entangle-run
           entangle-jiffy
+          entangle-parallel
           entangle-sleep-jiffies
           entangle-spawn
           entangle-spawn-threadsafe
           entangle-stop
           entangle-tcp-serve
+
+          entangle-open
+          entangle-close
+          entangle-bytes
+          entangle-pread
+          entangle-pwrite
+          entangle-sync
+
+          with-entangle
+
           ~check-entangle-000
+          ~check-entangle-001
+          ~check-entangle-002
           )
 
   (import (chezscheme)
@@ -99,7 +112,7 @@
 
   (define entangle-apply
     (lambda (entangle thunk)
-      (guard (ex (else (pk (apply format #f
+      (guard (ex (else (pk ex) (pk (apply format #f
                                   (condition-message ex)
                                   (condition-irritants ex)))))
         (call-with-entangle-prompt
@@ -127,9 +140,9 @@
           (lambda (thunks sleeping)
             (entangle-sleeping! entangle sleeping)
             (for-each (lambda (thunk) (entangle-apply entangle thunk)) (fxmapping-values thunks)))))
-      (entangle-thunks entangle)
-      (for-each (lambda (thunk) (entangle-apply entangle thunk)) (entangle-thunks entangle))
-      (entangle-thunks! entangle '())
+      (let ((thunks (entangle-thunks entangle)))
+        (entangle-thunks! entangle '())
+        (for-each (lambda (thunk) (entangle-apply entangle thunk)) thunks))
       ;; this `unless` condition is dubious
       (when (and (not (hashtable-empty? (entangle-events entangle)))
                  (entangle-running? entangle))
@@ -184,7 +197,8 @@
         (when (entangle-running? (entangle-current))
           (guard (ex (else (format #t "Exception ~a: ~a\n" (condition-message ex) (condition-irritants ex))))
             (entangle-run-once (entangle-current)))
-          (loop)))))
+          (loop)))
+      (entangle-current #f)))
 
   (define entangle-spawn
     (lambda (thunk)
@@ -208,6 +222,14 @@
                           (cons thunk (entangle-others (entangle-current)))))
       (entangle-write (entangle-writable (entangle-current))
                       (bytevector 20 06))))
+
+  (define entangle-parallel
+    (lambda (thunk)
+      (entangle-abort
+       (lambda (k)
+         (fork-thread (lambda () (call-with-values thunk
+                                   (lambda args
+                                     (entangle-spawn-threadsafe (lambda () (apply k args)))))))))))
 
   (define fcntl!
     (let ((func (foreign-procedure "fcntl" (int int int) int)))
@@ -532,12 +554,195 @@
 
       (values read close)))
 
+  (define entangle-open
+    (let ((open (foreign-procedure "open" (string int integer-32) int)))
+      (lambda (path options)
+
+        (define file-options->flags
+          (lambda (o)
+            (if (pair? o)
+                (apply fxlogior (map file-options->flags o))
+                (case o
+                  (entangle-file-append 1024)
+                  (entangle-file-create 64)
+                  (entangle-file-direct 65536)
+                  (entangle-file-read-only 0)
+                  (entangle-file-write-only 1)
+                  (entangle-file-read-write 2)
+                  (else (error 'letloop-entangle "Unknown entangle-file option" o))))))
+
+        (call-with-values
+            (lambda ()
+              (entangle-parallel
+               (lambda ()
+                 (call-with-errno (lambda () (open path
+                                                   (file-options->flags options)
+                                                   ;; what is 128, what is 256
+                                                   (fxlogior 128 256)))
+                   values))))
+          (lambda (out errno)
+            (if (fx=? out -1)
+                (error 'letloop-entangle "Failed to open file: ~a ~a ~a" path options (strerror errno))
+                out))))))
+
+  (define entangle-bytes
+    (let ((lseek (foreign-procedure "lseek" (int unsigned-64 int) unsigned-64)))
+      (lambda (fd)
+        (define SEEK_END 2)
+        (call-with-values (lambda ()
+                            (entangle-parallel
+                             (lambda ()
+                               (call-with-errno (lambda () (lseek fd 0 SEEK_END)) values))))
+          (lambda (out errno)
+            ;; otherwise out is the absolute offset from the beginning of the file
+            (if (= out (- (expt 2 64) 1))
+                (error 'letloop-entangle "Failed to seek to the end of file descriptor: ~a ~a" fd (strerror errno))
+                out))))))
+
+  (define entangle-sync
+    (let ((sync (foreign-procedure "sync_file_range" (int unsigned-64 unsigned-64 unsigned-32) int)))
+      (lambda (fd offset length)
+        ;; The magic 7 is: SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE | SYNC_FILE_RANGE_WAIT_AFTER
+        (entangle-parallel (lambda () (sync fd offset length 7))))))
+
+  (define bytevector-slice
+    (lambda (bv start end)
+      (unless (<= 0 start end (bytevector-length bv))
+        (error 'bytevector-slice "Invalid index start, or end" start end))
+      (let ((ret (make-bytevector (fx- end start))))
+        (bytevector-copy! bv start
+                          ret 0 (fx- end start))
+        ret)))
+
+  (define entangle-pread
+    (let ((pread (foreign-procedure "pread" (int void* size_t unsigned-64) ssize_t)))
+      (lambda (fd offset length)
+        (define buffer (make-bytevector length))
+        (call-with-values (lambda ()
+                            (entangle-parallel
+                             (lambda ()
+                               (call-with-errno (lambda () (with-lock (list buffer)
+                                                             (pread fd
+                                                                    (bytevector-pointer buffer)
+                                                                    length
+                                                                    offset)))
+                                 values))))
+          (lambda (out errno)
+            (if (fx=? out -1)
+                (error 'letloop-entangle "Failed to pread: ~a ~a" fd (strerror errno))
+                (if (fx=? out length)
+                    buffer
+                    (bytevector-slice buffer 0 out))))))))
+
+  (define entangle-pwrite
+    (let ((pwrite (foreign-procedure "pwrite" (int void* size_t unsigned-64) ssize_t)))
+      (lambda (fd offset bytevector)
+        (let loop ((bytevector bytevector))
+          (call-with-values (lambda ()
+                              (entangle-parallel
+                               (lambda ()
+                                 (call-with-errno (lambda () (with-lock (list bytevector)
+                                                               (pwrite fd
+                                                                       (bytevector-pointer bytevector)
+                                                                       (bytevector-length bytevector)
+                                                                       offset)))
+                                   values))))
+            (lambda (out errno)
+              (if (fx=? out -1)
+                  (error 'letloop-entangle "Failed to pwrite: ~a ~a" fd (strerror errno))
+                  (if (fx=? out 0)
+                      (error 'letloop-entangle "Failed to pwrite, nothing was written" fd)
+                      (unless (fx=? out (bytevector-length bytevector))
+                        (loop ((bytevector-slice bytevector out (bytevector-length bytevector)))))))))))))
+
+
+  (define-syntax with-jiffies
+    (syntax-rules ()
+      ((with-jiffies body ...)
+       (let ((start (current-jiffy)))
+         body ...
+         (- (current-jiffy) start)))))
+
   (define ~check-entangle-000
     (lambda ()
+      (< 3 (with-jiffies
+            (make-entangle)
+            (entangle-spawn (lambda ()
+                              (entangle-sleep-jiffies (* 4 (expt 10 9)))
+                              (entangle-stop)))
+            (entangle-run)))))
+
+  (define fib
+    (lambda (n)
+      (cond
+       ((= n 0) 0)
+       ((= n 1) 1)
+       (else (+ (fib (- n 1))
+                (fib (- n 2)))))))
+
+  (define-syntax with-entangle
+    (syntax-rules ()
+      ((with-entangle body ...)
+       (let ((entangle (make-entangle)))
+         (entangle-spawn (lambda () body ... (entangle-stop)))
+         (entangle-run)
+         #t))))
+
+  (define ~check-entangle-001
+    (lambda ()
+      ;; check that entangle-parallel let other lambda to run in the
+      ;; main thread.
+      (> (let ()
+          (define inc 0)
+          (define a #f)
+          (define b #f)
+          (make-entangle)
+          (entangle-spawn
+           (lambda ()
+             (let loop ()
+               (set! inc (+ inc 1))
+               (entangle-sleep-jiffies (expt 10 3))
+               (loop))))
+          (entangle-spawn
+           (lambda ()
+             (set! a (entangle-parallel (lambda () (fib 21))))
+             (set! b (entangle-parallel (lambda () (fib 21))))
+             (entangle-stop)))
+          (entangle-run)
+          inc)
+         (let ()
+           (define inc 0)
+           (define a #f)
+           (define b #f)
+           (make-entangle)
+           (entangle-spawn
+            (lambda ()
+              (let loop ()
+                (set! inc (+ inc 1))
+                (entangle-sleep-jiffies (expt 10 6))
+                (loop))))
+           (entangle-spawn
+            (lambda ()
+              (set! a (fib 21))
+              (set! b (fib 21))
+              (entangle-stop)))
+           (entangle-run)
+           inc))))
+
+  (define ~check-entangle-002
+    (lambda ()
+      (define expected (bytevector 1 2 3 4 5 6 7 8 9 10 11 12 13))
       (make-entangle)
-      (entangle-spawn (lambda ()
-                        (entangle-sleep-jiffies (* 9 (expt 10 9)))
-                        (entangle-stop)))
+      (entangle-spawn
+       (lambda ()
+         (define fd (entangle-open "check-entangle-002-0" (list 'entangle-file-create 'entangle-file-read-write)))
+         (assert (= 0 (entangle-bytes fd)))
+         (assert (= 0 (bytevector-length (entangle-pread fd 0 13))))
+         (entangle-pwrite fd 0 expected)
+         (entangle-sync fd 0 13)
+         (assert (= 13 (entangle-bytes fd)))
+         (assert (equal? expected (entangle-pread fd 0 13)))
+         (entangle-stop)))
       (entangle-run)
       #t))
 

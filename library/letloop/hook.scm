@@ -1,19 +1,20 @@
 (library (letloop hook)
   (export make-hook hook-add! hook-run)
-  (import (except (chezscheme) define-record-type)
-          (rename (letloop r999) (define-record-type* define-record-type)))
+  (import (chezscheme)
+          (letloop r999))
 
-  (define-record-type <hook>
-    (%make-hook procs arity)
+  (define-record-type* <hook>
+    (make-hook-base procs arity)
     hook?
     (procs hook-procs hook-procs!)
     (arity hook-arity hook-arity!))
 
-  (define (make-hook arity)
-    (%make-hook '() arity))
+  (define make-hook
+    (lambda (arity)
+      (make-hook-base '() arity)))
 
   (define (list->hook arity lst)
-    (%make-hook lst arity))
+    (make-hook-base lst arity))
 
   (define (list->hook! hook lst)
     (hook-procs! hook lst))

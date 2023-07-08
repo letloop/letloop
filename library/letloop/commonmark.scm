@@ -3,7 +3,7 @@
   (import (chezscheme) (letloop html))
 
 
-  (define llibcmark (load-shared-object "libcmark.so"))
+  (define libcmark (load-shared-object "libcmark.so"))
 
   (define commonmark-read
       ;; binding for: char *cmark_markdown_to_html(const char *text, size_t len, int options);

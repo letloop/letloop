@@ -14,8 +14,8 @@ if test -d "$(pwd)/.git"; then
         mkdir -p "$LETLOOP_PREFIX/bin"
         export LD_LIBRARY_PATH="$LETLOOP_PREFIX/lib/"
         export PATH="$LETLOOP_PREFIX/bin:$HOME/.local/bin:$PATH"
+        rm -rf /tmp/letloop/
         if [ ! "$@" ]; then
-
             echo "Entering letloop... There is $(make todo | grep TODO | wc -l) TODOs..."
             $SHELL
         else
