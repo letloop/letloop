@@ -233,7 +233,7 @@ jobs:
       - run: cd cli && git tag --points-at HEAD
 
       # Compile, and check
-      - run: cd cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local timeout 5400 ./local/bin/letloop-it.sh ${{ matrix.arch }} ${{ matrix.distribution }} ${{ matrix.version }} ${{ matrix.flavor }}
+      - run: cd cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local timeout 7200 ./local/bin/letloop-it.sh ${{ matrix.arch }} ${{ matrix.distribution }} ${{ matrix.version }} ${{ matrix.flavor }}
 
       # Publish the binary with a name that documents the deployment target
       - run: cd cli && sudo mv local/rootfs/${{ matrix.arch }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.flavor }}/usr/local/bin/letloop letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}
