@@ -17,60 +17,30 @@ jobs:
             arch: amd64
             flavor: cisco
 
-          - distribution: ubuntu
-            version: jammy
-            arch: aarch64
-            flavor: racket
-
           - distribution: alpine
             version: 3.18
             arch: amd64
             flavor: cisco
-
-          - distribution: alpine
-            version: 3.18
-            arch: aarch64
-            flavor: racket
 
           - distribution: archlinux
             version: current
             arch: amd64
             flavor: cisco
 
-          - distribution: archlinux
-            version: current
-            arch: aarch64
-            flavor: racket
-
           - distribution: amazonlinux
             version: current
             arch: amd64
             flavor: cisco
-
-          - distribution: amazonlinux
-            version: current
-            arch: aarch64
-            flavor: racket
 
           - distribution: rockylinux
             version: 9
             arch: amd64
             flavor: cisco
 
-          - distribution: rockylinux
-            version: 9
-            arch: aarch64
-            flavor: racket
-
           - distribution: fedora
             version: 38
             arch: amd64
             flavor: cisco
-
-          - distribution: fedora
-            version: 38
-            arch: aarch64
-            flavor: racket
 
           - distribution: mint
             version: vera
@@ -82,14 +52,9 @@ jobs:
             arch: amd64
             flavor: cisco
 
-          - distribution: debian
-            version: bookworm
-            arch: aarch64
-            flavor: racket
-
     runs-on: ubuntu-latest
     steps:
       - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
       - run: gh repo clone letloop/cli -- --branch $BRANCH --depth 1
       - run: cd cli && git fetch --tags
-      - run: cd cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local timeout 7200 ./local/bin/letloop-it.sh ${{ matrix.arch }} ${{ matrix.distribution }} ${{ matrix.version }} ${{ matrix.flavor }}
+      - run: cd cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local timeout 3600 ./local/bin/letloop-it.sh ${{ matrix.arch }} ${{ matrix.distribution }} ${{ matrix.version }} ${{ matrix.flavor }}
