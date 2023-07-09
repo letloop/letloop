@@ -735,11 +735,6 @@
 
                     (format port main.c boot program (or (loot*) (loot libraries))) port)))
 
-              ;; TODO: Maybe remove -fno-lto, see:
-              ;;
-              ;;   https://github.com/letloop/cli/issues/18
-              ;;
-
               ;; XXX: pass -fno-lto to disable link-time optimization, because
               ;; kernel.o may have been compiled with the different version of
               ;; GCC or LLVM that is not the current cc. It only works when
