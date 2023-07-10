@@ -32,6 +32,9 @@ libraries will be looked into.
 - Add some libraries from SRFI process;
 - Add some libraries from R7RS aliasing libraries from SRFI;
 - Create files in inside `/tmp/letloop/`, and cleanup whenever possible;
+- Add a subcommand to execute benchmarks: `letloop benchmark
+  LIBRARY.SCM THUNK [N]`;
+
 
 ## Binary Installation
 
@@ -68,6 +71,12 @@ libraries will be looked into.
 
 3. Enjoy all around best scheme
 4. [Star the project](https://github.com/letloop/cli/stargazers)
+
+## `letloop benchmark LIBRARY.SCM THUNK [N]`
+
+Display average nanoseconds spent running `THUNK` from
+`LIBRARY.SCM`. Spent time is averaged over `N` times. The default
+value of `N` is 10.
 
 ## `letloop check [--fail-fast] LIBRARY`
 

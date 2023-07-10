@@ -1,6 +1,7 @@
 #!chezscheme
 (library (letloop cli base)
-  (export letloop-check
+  (export letloop-benchmark
+          letloop-check
           letloop-compile
           letloop-repl
           letloop-exec
@@ -948,8 +949,117 @@
     (lambda (proc objs)
       (apply append (map proc objs))))
 
+  (define letloop-benchmark
+    (lambda (arguments)
+
+      (define errors (make-accumulator))
+
+      (define extensions '())
+      (define directories '())
+      (define files '())
+      (define unknown '())
+      (define N 10)
+
+      (define massage-standalone!
+        (lambda (standalone)
+          (unless (null? standalone)
+            (call-with-values (lambda () (guess (car standalone)))
+              (lambda (type string*)
+                (case type
+                  (directory (set! directories (cons string* directories)))
+                  (extension (set! extensions (cons string* extensions)))
+                  (file (set! files (cons string* files)))
+                  (unknown
+                   (if (string->number string*)
+                       (set! N (string->number string*))
+                       (set! unknown (cons string* unknown)))))))
+            (massage-standalone! (cdr standalone)))))
+
+      (define (maybe-library-exports library-name)
+        (guard (ex (else #f))
+          (eval `(library-exports ',library-name) (environment '(chezscheme) library-name))))
+
+      (define maybe-read-library
+        (lambda (file)
+          (pk 'maybe-read-library file)
+          (let ((sexp (guard (ex (else #f))
+                        (call-with-input-file file read))))
+            (if (not sexp)
+                (begin
+                  (pk 'maybe-read-library "File is unreadable as Scheme file" file)
+                  '())
+                (if (and (pair? sexp)
+                         (eq? (car sexp) 'library)
+                         (pair? (cdr sexp))
+                         (pair? (cadr sexp)))
+                    (let ((exports (maybe-library-exports (cadr sexp))))
+                      (if exports
+                          (begin
+                            (pk 'maybe-read-library "valid" file
+                                (reverse (map (lambda (x) (cons (cadr sexp) x)) exports))))
+                          (begin
+                            (pk 'maybe-read-library "no interesting exports")
+                            '())))
+                    ;; Oops!
+                    (begin
+                      (pk 'maybe-read-library "not a valid scheme library file" file)
+                      '()))))))
+
+      (define build-benchmark-program
+        (lambda (files unknown)
+          (let* ((file (car files))
+                 (unknown (string->symbol (car unknown)))
+                 (name+exports (file->library file))
+                 (name (car name+exports))
+                 (exports (cdr name+exports)))
+            `((import (chezscheme) (only ,name ,unknown)
+                      (only (scheme time) current-jiffy))
+
+              (define start (current-jiffy))
+
+              (let loop ((n ,N))
+                (unless (fxzero? n)
+                  (,unknown)
+                  (loop (fx- n 1))))
+
+              (format #t "Average nanoseconds spent per thunk ~a:\n~a\n"
+                      ,unknown
+                      (truncate (/ (- (current-jiffy) start) ,N)))))))
+
+      (call-with-values (lambda () (command-line-parse arguments))
+        (lambda (keywords standalone extra)
+          (massage-standalone! standalone)))
+
+      (maybe-display-errors-then-exit errors)
+      (library-directories directories)
+      (source-directories directories)
+
+      (unless (null? extensions)
+        (library-extensions extensions))
+
+      (let* ((temporary-directory
+              (make-temporary-directory
+               (string-append "/tmp/letloop/benchmark-"
+                              (timestamp))))
+             (benchmark (string-append temporary-directory "/benchmark.scm"))
+             (program (build-benchmark-program files unknown)))
+
+        (call-with-output-file benchmark
+          (lambda (port)
+            (let loop ((program program))
+              (unless (null? program)
+                (pretty-print (car program) port)
+                (loop (cdr program))))))
+
+        (letloop-exec (cons benchmark (reverse directories))))))
+
+  (define timestamp
+    (lambda ()
+      (number->string (time-second (current-time)))))
+
   (define letloop-check
     (lambda (arguments)
+
       (define errors (make-accumulator))
 
       (define fail-fast? #f)
@@ -959,17 +1069,13 @@
       (define files '())
       (define alloweds '())
 
-      (define timestamp
-        (lambda ()
-          (number->string (time-second (current-time)))))
-
       (define massage-keywords!
         (lambda (keywords)
           (unless (null? keywords)
             (case (caar keywords)
               (--fail-fast (set! fail-fast? #t))
               (--dry-run (set! dry-run? #t))
-              (else (errors (format #f "Unkown keywords: ~a" (caar keywords))))))))
+              (else (errors (format #f "Unknown keywords: ~a" (caar keywords))))))))
 
       (define massage-standalone!
         (lambda (standalone)
@@ -1031,9 +1137,7 @@
 
       (define discover
         (lambda (directories)
-
           (define files (apply append (map ftw directories)))
-
           (filter allow? (apply append (map maybe-read-library files)))))
 
       (define uniquify
