@@ -67,7 +67,7 @@
     (case-lambda
       ((bv start end)
        (unless (<= 0 start end (bytevector-length bv))
-         (error 'subbytes "Invalid indices" bv start end))
+         (error 'subbytes "Invalid indices: ~a ~a ~a" bv start end))
        (if (and (fxzero? start)
                 (fx=? end (bytevector-length bv)))
            bv

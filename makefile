@@ -3,6 +3,7 @@ SCHEME=scheme
 LETLOOP='letloop'
 
 letloop: local/bin/letloop ## Compile letloop into $(pwd)/local/bin/letloop
+	@echo What is done is not to be done!
 
 help: ## HELP!...
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort

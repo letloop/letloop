@@ -1,8 +1,5 @@
 #!/usr/bin/env sh
 
-set -e
-set -x
-
 if test -d "$(pwd)/.git"; then
     if [ ! "$LETLOOP_VENV" ]; then
         export LETLOOP_ROOT=$(pwd)
@@ -17,9 +14,9 @@ if test -d "$(pwd)/.git"; then
         mkdir -p "$LETLOOP_PREFIX/bin"
         export LD_LIBRARY_PATH="$LETLOOP_PREFIX/lib/"
         export PATH="$LETLOOP_PREFIX/bin:$HOME/.local/bin:$PATH"
-        export LD_PRELOAD=$(find $LETLOOP_PREFIX/lib/ -name "liburing.so" 2> /dev/null)
         if [ ! "$@" ]; then
-            echo "Entering letloop..."
+
+            echo "Entering letloop... There is $(make todo | grep TODO | wc -l) TODOs..."
             $SHELL
         else
             exec $@
