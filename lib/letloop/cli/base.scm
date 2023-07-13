@@ -142,17 +142,37 @@
       (syntax-case x ()
         [(k)
          (let ([fn (datum filename)])
-           (with-syntax ([exp (run/output "git describe --tags --dirty")])
+           (with-syntax ([exp (run/output "git describe --always --tags --dirty")])
+             #'exp))])))
+
+  (define-syntax include-git-branch
+    (lambda (x)
+      (syntax-case x ()
+        [(k)
+         (let ([fn (datum filename)])
+           (with-syntax ([exp (run/output "git branch --show-current")])
+             #'exp))])))
+
+  (define-syntax include-git-head
+    (lambda (x)
+      (syntax-case x ()
+        [(k)
+         (let ([fn (datum filename)])
+           (with-syntax ([exp (run/output "git rev-parse --short HEAD")])
              #'exp))])))
 
   ;; Include some files
 
   (define main.c (include-filename-as-string "main.c"))
 
-  (define git-describe (let ((out (include-git-describe)))
-                         (if (= (string-length out) 0)
-                             "dev"
-                             (substring out 0 (fx- (string-length out) 1)))))
+  (define letloop-tag (let ((describe (include-git-describe))
+                            (branch (include-git-branch)))
+                        (if (and (fxzero? (string-length describe))
+                                 (fxzero? (string-length branch)))
+                            (include-git-head)
+                            (string-append (substring branch 0 (fx- (string-length branch) 1))
+                                           "-"
+                                           (substring describe 0 (fx- (string-length describe) 1))))))
 
   (define-syntax include-date
     (lambda (x)
@@ -180,7 +200,7 @@
     (newline)
     (display usage)
     (newline)
-    (write `(tag ,git-describe))
+    (write `(tag ,letloop-tag))
     (newline)
     (write `(build-date ,build-date))
     (newline)
