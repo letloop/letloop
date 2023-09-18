@@ -1,4 +1,12 @@
-**Checklist**
+# Why?
+
+Peace.
+
+# How?
+
+Inner peace.
+
+# Checklist
 
 - [ ] Issue #0
 - [ ] Documentation
