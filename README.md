@@ -11,30 +11,38 @@ A Chez Scheme distribution with all goodies packed in.
 `letloop` comes with a handy command line tool to ease your
 parenthetical journey. Here is a usage summary:
 
+- `letloop benchmark LIBRARY.SCM THUNK [N]`
 - `letloop check [--fail-fast] LIBRARY`
 - `letloop compile PROGRAM.SCM A.OUT`
 - `letloop exec PROGRAM.SCM [ -- ARGUMENT ...]`
+- `letloop literally LIBRARY.MD`
 - `letloop repl`
 
-All subcommands take into consideration `EXTENSION ...` as part of the
-library discovery machinery that rely on `DIRECTORY ...`. If no directory
-are provided, the current working directory is the only directory where
-libraries will be looked into.
+Except `literally`, all subcommands take into consideration `EXTENSION
+...` as part of the library discovery machinery that rely on
+`DIRECTORY ...`. If no directory are provided, the current working
+directory is the only directory where libraries will be looked into.
 
 ## Change Log
 
 ### v7
 
+#### Primary
+
 - Embed scheme libraries into letloop, and elf binaries produced by
   `letloop compile`;
 - More robust, more efficient, and less noisy pre-release checks;
+
+#### Secondary
+
 - Release debian bookworm, mint vera, and more fedora binaries;
 - Add some libraries from SRFI process;
 - Add some libraries from R7RS aliasing libraries from SRFI;
 - Create files in inside `/tmp/letloop/`, and cleanup whenever possible;
 - Add a subcommand to execute benchmarks: `letloop benchmark
   LIBRARY.SCM THUNK [N]`;
-
+- Add a subcommand to produce libraries from markdown: `letloop literally
+  LIBRARY.SCM`;
 
 ## Binary Installation
 
