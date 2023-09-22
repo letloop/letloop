@@ -1192,10 +1192,10 @@
                   (unless (null? thunks)
                     (format #t "* Checking `~a`:\n" (car thunks))
                     (guard (ex (else
-                                (display "** ERROR!\n")
                                 (if (condition? ex)
                                     (display-condition ex)
                                     (write ex))
+                                (display "** ERROR!\n")
                                 (if ,fail-fast?
                                     (begin (newline)
                                            (exit 1))
