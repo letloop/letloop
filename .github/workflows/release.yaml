@@ -35,21 +35,6 @@ jobs:
             flavor: racket
 
           - distribution: ubuntu
-            version: bionic
-            arch: amd64
-            flavor: cisco
-
-          - distribution: ubuntu
-            version: bionic
-            arch: amd64
-            flavor: racket
-
-          - distribution: ubuntu
-            version: bionic
-            arch: aarch64
-            flavor: racket
-
-          - distribution: ubuntu
             version: focal
             arch: amd64
             flavor: cisco
@@ -161,21 +146,6 @@ jobs:
 
           - distribution: rockylinux
             version: 9
-            arch: aarch64
-            flavor: racket
-
-          - distribution: fedora
-            version: 36
-            arch: amd64
-            flavor: cisco
-
-          - distribution: fedora
-            version: 36
-            arch: amd64
-            flavor: racket
-
-          - distribution: fedora
-            version: 36
             arch: aarch64
             flavor: racket
 
