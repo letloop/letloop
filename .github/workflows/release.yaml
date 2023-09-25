@@ -133,6 +133,16 @@ jobs:
             version: bookworm
             arch: aarch64
             flavor: cisco
+            
+          - distribution: debian
+            version: bullseye
+            arch: amd64
+            flavor: cisco
+
+          - distribution: debian
+            version: bullseye
+            arch: aarch64
+            flavor: cisco
 
     runs-on: ubuntu-latest
     needs: create-release

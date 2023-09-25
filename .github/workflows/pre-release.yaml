@@ -48,7 +48,7 @@ jobs:
             flavor: cisco
 
           - distribution: debian
-            version: bookworm
+            version: bullseye
             arch: amd64
             flavor: cisco
 
