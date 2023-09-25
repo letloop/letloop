@@ -1,6 +1,7 @@
 #!chezscheme
 (import (chezscheme))
 (import (letloop cli base))
+(import (letloop literally))
 
 
 (when (null? (cdr (command-line)))
@@ -12,5 +13,6 @@
   ((check) (letloop-check (cddr (command-line))))
   ((compile) (letloop-compile (cddr (command-line))))
   ((exec) (letloop-exec (cddr (command-line))))
+  ((literally) (letloop-literally (caddr (command-line))))
   ((repl) (letloop-repl (cddr (command-line))))
   (else (letloop-usage) (exit 1)))

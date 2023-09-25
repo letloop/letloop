@@ -97,6 +97,7 @@ case "$LETLOOP_DISTRO" in
         ;;
     "archlinux")
         $PROOT pacman -Sy --noconfirm curl base-devel git lz4 util-linux-libs zlib tcl
+        $PROOT apt -qq install --yes git build-essential uuid-dev liblz4-dev zlib1g-dev tcl > /dev/null
         ;;
     *)
         echo "distro not supported"

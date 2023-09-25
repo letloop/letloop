@@ -26,10 +26,18 @@ directory where libraries will be looked into.
 
 ### v8
 
+- Focus on Debian, and its derivative Ubuntu. Feel free to dare to add
+  support, and maintain the support for your favorite distribution.
+
 #### Libraries
 
 - `(letloop unknown)`: initial version of zero-knowledge password
   verification;
+- Add sqlite3's lsm1 extension in `(letloop lsm1)`, with an okvs shim
+  in `(letloop lsm1 okvs)`;
+- Add sqlite3's lsm1 extension in `(letloop lsm1)`, with an okvs shim
+  in `(letloop lsm1 okvs)`;
+- Add blake3 bindings in `(letloop blake3)`
 
 ### v7
 
@@ -166,6 +174,10 @@ profile of the execution will be generated in `/tmp`.
 You can adjust optimization with the `--optimize-level=n` where `n`
 can be `0`, `1`, `2`, or `3`. Higher is harder to debug, unsafe, but
 faster.
+
+## `letloop literally LIBRARY.MD`
+
+Generate a Scheme library from `LIBRARY.MD`.
 
 ## `letloop repl`
 

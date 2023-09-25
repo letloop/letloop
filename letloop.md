@@ -4,6 +4,7 @@ Usage:
   letloop check [--fail-fast] LIBRARY ...
   letloop compile PROGRAM.SCM
   letloop exec PROGRAM.SCM [ -- ARGUMENT ...]
+  letloop literally LIBRARY.MD
   letloop repl
 
 All subcommands can use directories, and extension of libraries as

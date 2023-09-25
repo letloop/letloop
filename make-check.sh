@@ -84,3 +84,11 @@ then
 else
     exit 1
 fi
+
+$LETLOOP benchmark lib/ checks/check/ checks/check/check-success.scm ~benchmark-000
+if [ $? -eq 0 ]
+then
+    echo success
+else
+    exit 1
+fi
