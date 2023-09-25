@@ -82,22 +82,21 @@ case "$LETLOOP_DISTRO" in
     "debian"|"ubuntu"|"mint")
         $PROOT apt -qq update --yes
         $PROOT apt -qq upgrade --yes
-        $PROOT apt -qq install --yes curl git build-essential uuid-dev liblz4-dev zlib1g-dev tcl > /dev/null
+        $PROOT apt -qq install --yes curl cmake git build-essential uuid-dev liblz4-dev zlib1g-dev tcl > /dev/null
         ;;
     "alpine")
-        $PROOT apk add build-base curl git lz4-dev libuuid util-linux-dev zlib-dev tcl
+        $PROOT apk add build-base curl cmake git lz4-dev libuuid util-linux-dev zlib-dev tcl
         ;;
     "fedora"|"centos")
         $PROOT yum group install -y "C Development Tools and Libraries"
-        $PROOT yum install -y curl git lz4-devel libuuid-devel zlib-devel tcl
+        $PROOT yum install -y curl cmake git lz4-devel libuuid-devel zlib-devel tcl
         ;;
     "amazonlinux"|"rockylinux"|"oracle")
         $PROOT yum group install -y "Development Tools"
-        $PROOT yum install -y curl git lz4-devel libuuid-devel zlib-devel tcl which
+        $PROOT yum install -y curl cmake git lz4-devel libuuid-devel zlib-devel tcl which
         ;;
     "archlinux")
-        $PROOT pacman -Sy --noconfirm curl base-devel git lz4 util-linux-libs zlib tcl
-        $PROOT apt -qq install --yes git build-essential uuid-dev liblz4-dev zlib1g-dev tcl > /dev/null
+        $PROOT pacman -Sy --noconfirm curl cmake base-devel git lz4 util-linux-libs zlib tcl
         ;;
     *)
         echo "distro not supported"
