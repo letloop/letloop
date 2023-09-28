@@ -1,0 +1,249 @@
+/* flexbox cheatsheet: https://bit.ly/1xEYMhF */
+
+/* universal box sizing with inheritance */
+/* https://css-tricks.com/box-sizing/ */
+
+@font-face {
+    font-family: 'Libre Baskerville';
+    src: url('/static/LibreBaskerville-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: 'Source Code Pro';
+    src: url('/static/SourceCodePro-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'League Gothic';
+    src: url('/static/leaguegothic/leaguegothic-regular-webfont.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+sup, *, *:before, *:after {
+    -webkit-box-sizing: inherit;
+    -moz-box-sizing: inherit;
+    box-sizing: inherit;
+    font-family: 'Libre Baskerville', Georgia, serif;
+}
+
+body, html {
+    padding: 0;
+    margin: 0;
+}
+
+h1, h1 a, h2, h2 a, h3, h3 a {
+    font-family: 'League Gothic', Helvetica, Verdana, sans !important;
+    font-weight: normal;
+    font-size: 1.7em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Libre Baskerville', Georgia, serif;
+}
+
+blockquote {
+    color: hsla(0, 0%, 0%, 0.7);
+    font-size: 1em;
+    border-left: 1px solid hsla(0, 0%, 0%, 0.9);
+    margin: 0px;
+    padding: 0px;
+    margin-left: 10px;
+    padding-left: 10px;
+}
+
+
+/* BASICS */
+
+div.sourceCode {
+    box-shadow: 1px 1px 4px hsla(0, 0%, 0%, 0.4);
+    border-radius: 3px;
+}
+
+pre {
+    // background: url('/static/bg.png') ;
+    // color: hsla(0, 0%, 100%, 0.95);
+    overflow-x: scroll;
+    padding: 15px;
+}
+
+code, pre code span {
+    font-family: 'Source Code Pro', monospace, mono;
+}
+
+p code {
+    padding: 2px;
+    border: 1px solid lightgray;
+    margin: 2px;
+    border-radius: 2px;
+}
+
+body {
+    color: hsla(0, 0%, 20%, 1);
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 22px;
+}
+
+#header p {
+    padding-bottom: 3em;
+}
+
+#header a:link, #header a:active, #header a:visited, #footer a:link, #footer a:active, #footer a:visited {
+    color: #ffffff;
+}
+
+#header a:hover, #footer a:hover {
+    color: #3399FF;
+}
+
+
+a:link, a:active, a:visited {
+    color: #3399FF;
+}
+
+a:hover {
+    color: black;
+}
+
+/* ROOT */
+#stars {
+    z-index: -1;
+    position: fixed;
+}
+
+
+#header, #footer {
+    margin: 2em auto;
+    width: 830px;
+    font-size: 1em;
+    background: hsla(0, 0%, 0%, 0.9);
+    color: white;
+    padding: 0.2em 3em;
+}
+
+#header img {
+    padding: 3em;
+}
+
+#header {
+    text-align: center;
+}
+
+#header > h1 {
+    font-size: 3em;
+    margin-left: 0em;
+}
+
+#header > center {
+    margin-top: 0em;
+    padding-bottom: 3em;
+}
+
+#header > h1 > a, #header > h2 > a {
+    text-decoration: none;
+    color: white;
+}
+
+#header > h1:before, #header > h2:before {
+    content: '';
+    margin: 0px;
+}
+
+@media (max-width: 999px) {
+    #header, #footer {
+        padding: 0px 0px;
+        width: 100%;
+        margin: 5px;
+        padding: 5px;
+        font-size: 1em;
+    }
+}
+
+#image {
+    max-height: 777px;
+    overflow: hidden;
+}
+
+#root {
+    width: 777px;
+    margin: auto;
+    line-height: 1.6em;
+    margin-top: 100px;
+    background: white;
+    padding: 15px;
+}
+
+#root p {
+    text-align: justify;
+}
+
+h1:before {
+    content: "# ";
+    margin-left: -1em;
+}
+
+h2:before {
+    content: "## ";
+    margin-left: -2em;
+}
+
+h3:before {
+    content: "### ";
+    margin-left: -3em;
+}
+
+figure {
+    margin: 0px;
+    overflow: hidden;
+}
+
+figure > img {
+    max-width: 90%;
+    min-width: 777px;
+}
+
+center > img {
+    max-width: 90%;
+    min-width: 745px;
+}
+
+@media (max-width: 999px) {
+    #header, #root, #footer {
+        padding: 0px 0px;
+        width: 90%;
+        margin: 15px;
+        padding: 15px;
+        font-size: 1em;
+    }
+
+    #image {
+        width: 100%;
+    }
+
+    h1:before {
+        content: "# ";
+        margin-left: -0em;
+    }
+
+    h2:before {
+        content: "## ";
+        margin-left: -0em;
+    }
+
+    h3:before {
+        content: "### ";
+        margin-left: -0em;
+    }
+
+}

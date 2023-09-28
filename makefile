@@ -85,3 +85,7 @@ local/lib/libcmark.so:
 	mkdir -p local/src
 	cd local/src && git clone --depth=1 https://github.com/commonmark/cmark
 	cd local/src/cmark && make -j$(nproc) && make && cp build/src/libcmark.so* $(PWD)/local/lib/
+
+fbbg:
+	python3 fbbg.py
+	python3 -m http.server

@@ -1,0 +1,4 @@
+---
+title:
+class: index
+---
