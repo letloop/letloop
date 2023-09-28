@@ -82,7 +82,7 @@ case "$LETLOOP_DISTRO" in
     "debian"|"ubuntu"|"mint")
         $PROOT apt -qq update --yes
         $PROOT apt -qq upgrade --yes
-        $PROOT apt -qq install --yes curl cmake git build-essential uuid-dev liblz4-dev zlib1g-dev tcl > /dev/null
+        $PROOT apt -qq install --yes python-is-python3 curl cmake git build-essential uuid-dev liblz4-dev zlib1g-dev tcl > /dev/null
         ;;
     "alpine")
         $PROOT apk add build-base curl cmake git lz4-dev libuuid util-linux-dev zlib-dev tcl
