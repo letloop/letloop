@@ -34,7 +34,7 @@ xxx: ## We are all born under the eye of the wandering star
 
 check: ## Hit the ground running...
 	LD_LIBRARY_PATH=$(PWD)/local/lib/ LETLOOP=$(LETLOOP) sh make-check.sh
-	LD_LIBRARY_PATH=$(PWD)/local/lib/ $(LETLOOP) check lib/
+	LD_LIBRARY_PATH=$(PWD)/local/lib/ $(LETLOOP) check --fail-fast lib/
 
 local/lib/libargon2.so.1: argon2
 
