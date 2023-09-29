@@ -30,11 +30,10 @@ blake3: local/lib/libblake3.so
 todo: ## So say we all!
 	@grep -nR --color=always -B 2 -A 2 TODO library/
 
-xxx: ## We are all born under the eye of the wandering star
+xxx: ## For those born under the eye of a wandering star...
 	@grep -nR --color=always -B 2 -A 2 XXX library/
 
-check: clean ## Hit the ground running...
-	echo LETLOOP=$(LETLOOP)
+check: clean ## Hit the ground running!
 	LD_LIBRARY_PATH=$(PWD)/local/lib/ LETLOOP=$(LETLOOP) sh make-check.sh
 	LD_LIBRARY_PATH=$(PWD)/local/lib/ $(LETLOOP) check --fail-fast library/
 
