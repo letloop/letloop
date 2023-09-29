@@ -43,7 +43,7 @@ fi
 echo "* Testing letoop compile, and libraries embedding 000"
 
 EXPECTED=ce623db0344861af51e4a4f95709686b
-GIVEN=$(cat examples/quotes.json | $LETLOOP exec lib/ examples/make-check-000.scm |md5sum | cut -d " " -f1)
+GIVEN=$(cat examples/quotes.json | $LETLOOP exec library/ examples/make-check-000.scm |md5sum | cut -d " " -f1)
 if [ "x$GIVEN" = "x$EXPECTED" ]
 then
     echo success
@@ -77,7 +77,7 @@ else
     exit 1
 fi
 
-$LETLOOP benchmark lib/ checks/check/ checks/check/check-success.scm ~benchmark-000
+$LETLOOP benchmark library/ checks/check/ checks/check/check-success.scm ~benchmark-000
 if [ $? -eq 0 ]
 then
     echo success
@@ -85,7 +85,7 @@ else
     exit 1
 fi
 
-$LETLOOP benchmark lib/ checks/check/ checks/check/check-success.scm ~benchmark-000
+$LETLOOP benchmark library/ checks/check/ checks/check/check-success.scm ~benchmark-000
 if [ $? -eq 0 ]
 then
     echo success
