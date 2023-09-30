@@ -1,10 +1,10 @@
-# `letloop/cli`
+# letloop
 
 <div align=center>
   <img src="https://raw.githubusercontent.com/letloop/letloop-cli/main/letloop-logo-wide.png" />
 </div>
 
-A Chez Scheme distribution with all goodies packed in.
+A Chez Scheme distribution with many goodies packed in.
 
 ## Getting started
 
