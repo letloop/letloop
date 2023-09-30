@@ -13,7 +13,7 @@ local/bin/letloop: letloop.scm letloop.md letloop.nfo
 	find library/ -name "*.wpo" | xargs rm -rf
 	find library/ -name "*.so" | xargs rm -rf
 	mkdir -p /tmp/letloop/
-	$(SCHEME) --libdirs lib --compile-imported-libraries --program letloop.scm compile lib letloop.scm
+	$(SCHEME) --libdirs library/ --compile-imported-libraries --program letloop.scm compile library letloop.scm
 	mv a.out local/bin/letloop
 
 local/lib/libblake3.so:
