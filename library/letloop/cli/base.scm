@@ -1196,6 +1196,7 @@
                                 (if (condition? ex)
                                     (display-condition ex)
                                     (write ex))
+                                (newline)
                                 (display "** ERROR!\n")
                                 (if ,fail-fast?
                                     (begin (newline)
@@ -1205,8 +1206,10 @@
                       (let ((out ((car thunks))))
                         (if (and (not (eq? out (void)))
                                  out)
+                            (newline)
                             (display "** SUCCESS\n")
                             (begin
+                              (newline)
                               (display "** FAILED\n")
                               (if ,fail-fast?
                                   (begin (newline)
