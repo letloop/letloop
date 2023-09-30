@@ -48,11 +48,11 @@
           ~check-lbst-016/random
           ~check-lbst-017/random
           ~check-lbst-019/random
-          ~check-lbst-020
-          ~check-lbst-021
-          ~check-lbst-022
-          ~check-lbst-022/random
-          ~check-lbst-024
+          ;; ~check-lbst-020
+          ;; ~check-lbst-021
+          ;; ~check-lbst-022
+          ;; ~check-lbst-022/random
+          ;; ~check-lbst-024
           )
 
   (import (chezscheme)

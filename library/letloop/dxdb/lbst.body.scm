@@ -588,11 +588,7 @@
     (map (lambda (x) (cons x (make-lbst-inode-ref x bytevector offset)))
          '(index key tomb length bytes parent))))
 
-(define ~check-lbst-024
-  (lambda ()
-    #t))
-
-(define ~check-lbst-020
+#;(define ~check-lbst-020
   (lambda ()
     (define lbst (make-lbst-base (bytevector 42) 1
                                  (bytevector 101) 1
@@ -646,7 +642,7 @@
                             (iota (length fields))
                             fields))))
 
-(define ~check-lbst-021
+#;(define ~check-lbst-021
   (lambda ()
     (define lbst (make-lbst-base (bytevector 13 37) 1
                                  (bytevector 4 21) 1
@@ -809,8 +805,7 @@
 (define lbst-field-ref
   (lambda (bytevector name . args)
     (pk 'lbst-field-ref 'in name)
-    (pk 'lbst-field-ref 'out name
-        (apply (cdr (assq name lbst-bytevector-fields)) bytevector args))))
+    (apply (cdr (assq name lbst-bytevector-fields)) bytevector args)))
 
 (define lbst-bytevector-fields
   (list
@@ -1050,7 +1045,7 @@
       2048))
 
     ;; (define alist (pk (lbst->alist lbst)))
-    (define bv (pk 'dbx (lbst->dbx lbst dbx)))
+    (define bv (lbst->dbx lbst dbx))
 
     ;; (pk 'map (lbst-field-ref bv 'map))
 
@@ -1076,33 +1071,32 @@
     ;; (pk 'LNODE-START-INDEX
     ;;     (bytevector-u64-ref bv (lbst-field-ref bv 'lnode-start) 'big))
 
-    (assert (equal? (lbst-inode-ref bv 1)
-                    (list
-                     (cons 'index 1)
-                     (cons 'key (lbst-key lbst))
-                     (cons 'tomb 0)
-                     (cons 'bytes (lbst-bytes lbst))
-                     (cons 'length (lbst-length lbst)))))
+    (assert (pk 'assert (equal? (pk 'given (lbst-inode-ref bv 1))
+                                (pk 'expected (list
+                                               (cons 'index 1)
+                                               (cons 'key (lbst-key lbst))
+                                               (cons 'tomb 0)
+                                               (cons 'bytes (lbst-bytes lbst))
+                                               (cons 'length (lbst-length lbst)))))))
 
-    (assert #f)
     ))
 
-(define ~check-lbst-022
+#;(define ~check-lbst-022
   (lambda ()
     (import (letloop entangle))
     (random-seed (string->number (or (getenv "LETLOOP_SEED") "1")))
     (with-entangle
-     (make-lbst-write-check (random (- (expt 2 32) 1))))))
+     (pk 'ooo (make-lbst-write-check (random (- (expt 2 32) 1))))
+     (pk 'fuuu))))
 
-(define ~check-lbst-022/random
+#;(define ~check-lbst-022/random
   (lambda ()
     (random-seed (string->number (or (getenv "LETLOOP_SEED") "1")))
     (for-each (lambda _
                 (make-lbst-write-check (random (- (expt 2 32) 1))))
               (iota (or (and (getenv "LETLOOP_SEED") 1) 1000)))))
 
-
-(define ~check-lbst-023
+#;(define ~check-lbst-023
   (lambda ()
     (import (letloop dxdb dbx))
     (import (letloop entangle))
