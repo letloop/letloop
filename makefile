@@ -42,7 +42,7 @@ argon2:
 	rm -rf local/src/argon2
 	mkdir -p local/src/
 	git clone --depth=1 https://github.com/P-H-C/phc-winner-argon2 local/src/argon2
-	cd local/src//argon2 && make -j$(nproc)
+	cd local/src//argon2 && make -j$(shell nproc --ignore 1)
 	mkdir -p local/lib
 	cp local/src/argon2/libargon2.so.1 local/lib/
 
@@ -50,7 +50,7 @@ local/lib/termbox2.so:
 	rm -rf local/src/termbox2
 	mkdir -p local/src
 	cd local/src/ && git clone https://github.com/termbox/termbox2
-	cd local/src/termbox2/ && make -j$(nproc)
+	cd local/src/termbox2/ && make -j$(shell nproc --ignore 1)
 	mkdir -p local/lib
 	cp --dereference local/src/termbox2/libtermbox2.so local/lib/
 
@@ -64,7 +64,7 @@ local/lib/lsm.so:
 	mkdir -p local/src
 	cd local/src && git clone --depth=1 https://github.com/sqlite/sqlite
 	cd local/src/sqlite && cp ../../MakefileLSM .
-	cd local/src/sqlite && make -j$(nproc) -f MakefileLSM lsm.so
+	cd local/src/sqlite && make -j$(shell nproc --ignore 1) -f MakefileLSM lsm.so
 	mkdir -p local/lib/
 	cd local/src/sqlite && cp lsm.so ../../lib/
 
@@ -76,7 +76,7 @@ local/lib/sqlite3.so:
 	rm -rf local/src/sqlite
 	mkdir -p local/src
 	cd local/src && git clone --depth=1 https://github.com/sqlite/sqlite
-	cd local/src/sqlite && ./configure --prefix=$(PWD)/local/ && make -j$(nproc) && make install
+	cd local/src/sqlite && ./configure --disable-tcl --prefix=$(PWD)/local/ && make -j$(shell nproc --ignore 1) && make install
 
 cmark: local/lib/libcmark.so
 
@@ -84,7 +84,7 @@ local/lib/libcmark.so:
 	rm -rf local/src/cmark
 	mkdir -p local/src
 	cd local/src && git clone --depth=1 https://github.com/commonmark/cmark
-	cd local/src/cmark && make -j$(nproc) && make && cp build/src/libcmark.so* $(PWD)/local/lib/
+	cd local/src/cmark && make -j$(shell nproc --ignore 1) && make && cp build/src/libcmark.so* $(PWD)/local/lib/
 
 fbbg:
 	python3 fbbg.py
