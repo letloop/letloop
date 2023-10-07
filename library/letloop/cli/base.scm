@@ -1206,8 +1206,9 @@
                       (let ((out ((car thunks))))
                         (if (and (not (eq? out (void)))
                                  out)
-                            (newline)
-                            (display "** SUCCESS\n")
+                            (begin
+                              (newline)
+                              (display "** SUCCESS\n"))
                             (begin
                               (newline)
                               (display "** FAILED\n")
