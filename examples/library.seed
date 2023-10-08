@@ -1,0 +1,56 @@
+(define quote
+  (vau args _ (car args)))
+
+(define let
+  (vau (bindings . body)  foobar
+    (define mylambda (eval (list* lambda (map car bindings) body) foobar))
+    (define objects (map (lambda (x) (car (cdr x))) bindings))
+    (eval (list* mylambda objects) foobar)))
+
+(define and
+  (vau (a . args) env
+    (if (not (eval a env))
+        #f
+        (if (null? args)
+            #t
+            (apply and env args)))))
+
+(define string-upper (alien string-upcase))
+(define string-lower (alien string-downcase))
+
+(define or
+  (vau (a . args) env
+    (if (eval a env)
+        #t
+        (if (null? args)
+            #f
+            (apply or env args)))))
+
+(define cond
+  (vau (clause . clauses) env
+    (define predicate (car clause))
+    (define production (pk 'production (cdr clause)))
+
+    (pk 'predicate predicate)
+    (if (eq? predicate 'else)
+        (eval (list* sequence production) env)
+        (if (pk (eval predicate env))
+            (eval (list* sequence production) env)
+            (if (null? clauses)
+                (error 'cond "no condition is met")
+                (apply cond env clauses))))))
+    
+(define match
+  (vau (exp clause . clauses) env
+    (define obj (eval exp env))
+    (define pattern (car clause))
+    (define production (car (cdr clause)))
+
+    (define env* (match-exec pattern exp))
+
+    (if env
+        (eval production
+              (environment-cons* env env*))
+        (if (null? clauses)
+            (error 'match "no match :(")
+            (apply match env obj clauses)))))

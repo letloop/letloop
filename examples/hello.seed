@@ -1,0 +1,28 @@
+(define string-upper (alien string-upcase))
+(define string-lower (alien string-downcase))
+(define string->list (alien string->list))
+(define list->string (alien list->string))
+(define reverse (alien reverse))
+
+(define display (alien display))
+(define newline (alien newline))
+(define write (alien write))
+
+(define print
+  (lambda (message)
+    (display message)
+    (newline)))
+
+(define print*
+  (vau (exp) env
+    (display "> ") (write exp)
+    (newline)
+    (print (eval exp env))))
+
+(print* (string-upper "ⴰⵣⵓⵍ ⴼⴻⵍⴰⵡⴻⵏ"))
+(newline)
+(print* (string-upper "Approchez, et soyez aussi bon que mon coeur."))
+(newline)
+(print* (string-upper "اقترب وكن لطيفا مثل قلبي"))
+(newline)
+(print* (string-upper "Come to me."))

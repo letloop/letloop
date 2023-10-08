@@ -2,6 +2,8 @@
 ((scheme-mode . ((indent-tabs-mode . nil)
                  (tab-width . 2)
                  (eval . (progn
+                           (put 'vau 'scheme-indent-function 2)
+                           (put 'make-object-ground! 'scheme-indent-function 1)
                            (put 'do-times 'scheme-indent-function 1)
                            (put 'call-with-temporary-filepath 'scheme-indent-function 1)
                            (put 'call/errno* 'scheme-indent-function 1)
