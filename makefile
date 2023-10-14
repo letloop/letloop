@@ -10,8 +10,7 @@ help: ## HELP!...
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
 
 local/bin/letloop: letloop.scm letloop.md letloop.nfo
-	find library/ -name "*.wpo" | xargs rm -rf
-	find library/ -name "*.so" | xargs rm -rf
+	make clean
 	mkdir -p /tmp/letloop/
 	$(SCHEME) --libdirs library/ --compile-imported-libraries --program letloop.scm compile library letloop.scm
 	mv a.out local/bin/letloop
@@ -89,3 +88,10 @@ local/lib/libcmark.so:
 fbbg:
 	python3 fbbg.py
 	python3 -m http.server
+
+nix:  ## Compile letloop with nix
+	nix-shell --packages pkgconfig gcc stdenv curl cmake chez git lz4.dev libuuid.dev zlib.dev tcl --run make 
+
+clean: ## Safe clean up
+	find library/ -name "*.wpo" | xargs rm -rf
+	find library/ -name "*.so" | xargs rm -rf
