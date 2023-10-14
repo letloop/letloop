@@ -90,7 +90,7 @@ fbbg:
 	python3 -m http.server
 
 nix:  ## Compile letloop with nix
-	nix-shell --packages pkgconfig gcc stdenv curl cmake chez git lz4.dev libuuid.dev zlib.dev tcl --run make 
+	nix-shell --packages pkgconfig gcc stdenv curl cmake chez git lz4.dev libuuid.dev zlib.dev tcl
 
 clean: ## Safe clean up
 	find library/ -name "*.wpo" | xargs rm -rf
