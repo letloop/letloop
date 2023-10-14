@@ -10,7 +10,7 @@
   (import (chezscheme)
           (letloop r999)
           (letloop entangle)
-          (letloop dxdb dbx)
+          (letloop dxdb notebook)
           (letloop byter))
 
   (define bytetrie-null (- (expt 2 64) 1))

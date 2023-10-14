@@ -60,7 +60,7 @@
           (letloop r999)
           (letloop match)
           (letloop byter)
-          (letloop dxdb dbx)
+          (letloop dxdb notebook)
           (letloop dxdb shims))
 
   (include "letloop/dxdb/lbst.body.scm")

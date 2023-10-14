@@ -666,8 +666,8 @@
 
     (f (lbst-start lbst) seed* proc)))
 
-(define lbst->dbx
-  (lambda (lbst dbx)
+(define lbst->notebook
+  (lambda (lbst notebook)
 
     #;(define x (pk 'chapter-x (make-dbx-chapter-x dbx)))
 
@@ -1045,7 +1045,7 @@
       2048))
 
     ;; (define alist (pk (lbst->alist lbst)))
-    (define bv (lbst->dbx lbst dbx))
+    (define bv (lbst->notebook lbst dbx))
 
     ;; (pk 'map (lbst-field-ref bv 'map))
 
