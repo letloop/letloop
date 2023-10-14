@@ -31,7 +31,7 @@ todo: ## So say we all!
 xxx: ## We are all born under the eye of the wandering star
 	@grep -nR --color=always -B 2 -A 2 XXX library/
 
-check: ## Hit the ground running...
+check: clean ## Hit the ground running...
 	LD_LIBRARY_PATH=$(PWD)/local/lib/ LETLOOP=$(LETLOOP) sh make-check.sh
 	LD_LIBRARY_PATH=$(PWD)/local/lib/ $(LETLOOP) check --fail-fast library/
 
