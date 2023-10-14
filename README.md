@@ -51,6 +51,11 @@ The following flags are available:
 - Add lsm1 bindings
 - Add sqlite3 bindings
 - Add commonmark bindings
+- `(letloop unknown)`: initial version of zero-knowledge password
+  verification;
+- Add sqlite3's lsm1 extension in `(letloop lsm1)`, with an okvs shim
+  in `(letloop lsm1 okvs)`;
+- Add blake3 bindings in `(letloop blake3)`
 
 ### v7
 
