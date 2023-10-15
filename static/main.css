@@ -5,7 +5,7 @@
 
 @font-face {
     font-family: 'Libre Baskerville';
-    src: url('/static/LibreBaskerville-Regular.ttf') format('truetype');
+    src: url('LibreBaskerville-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -13,14 +13,14 @@
 
 @font-face {
     font-family: 'Source Code Pro';
-    src: url('/static/SourceCodePro-Regular.ttf') format('truetype');
+    src: url('SourceCodePro-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'League Gothic';
-    src: url('/static/BebasNeue-Regular.ttf') format('truetype');
+    src: url('BebasNeue-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -86,7 +86,7 @@ div.sourceCode {
 }
 
 pre {
-    // background: url('/static/bg.png') ;
+    // background: url('bg.png') ;
     // color: hsla(0, 0%, 100%, 0.95);
     overflow-x: scroll;
     padding: 15px;
