@@ -70,22 +70,27 @@
         (accumulator (format #f "</~a>" tag)))))
 
   (define html-write
-    (lambda (object accumulator)
+    (case-lambda
+     ((object accumulator)
       (cond
        ((string? object) (accumulator (string->html-string object)))
        ((number? object) (accumulator (number->string object)))
        (else
         (match object
-               ((,tag (@ ,attributes ...) ,elements ...)
-                (html-write-tag-start tag attributes accumulator)
-                (for-each (lambda (element) (html-write element accumulator))
-                          elements)
-                (html-write-tag-end tag accumulator))
-               ((,tag ,elements ...)
-                (html-write-tag-start tag '() accumulator)
-                (for-each (lambda (element) (html-write element accumulator))
-                          elements)
-                (html-write-tag-end tag accumulator)))))))
+          ((,tag (@ ,attributes ...) ,elements ...)
+           (html-write-tag-start tag attributes accumulator)
+           (for-each (lambda (element) (html-write element accumulator))
+                     elements)
+           (html-write-tag-end tag accumulator))
+          ((,tag ,elements ...)
+           (html-write-tag-start tag '() accumulator)
+           (for-each (lambda (element) (html-write element accumulator))
+                     elements)
+           (html-write-tag-end tag accumulator))))))
+     ((object)
+      (define out (make-accumulator))
+      (html-write object out)
+      (out (eof-object)))))
 
   (define html-read html->sxml)
 
@@ -99,41 +104,34 @@
 
   (define ~check-letloop-html-write-0
     (lambda ()
-      (let ((accumulator (make-accumulator))
-            (html `(h1 "hello" (b "world"))))
-        (html-write html accumulator)
+      (define html `(h1 "hello" (b "world")))
 
-        (assert
-         (string=? "<h1>hello<b>world</b></h1>"
-                   (accumulator (eof-object)))))))
+      (assert
+       (string=? "<h1>hello<b>world</b></h1>"
+                 (html-write html)))))
 
   (define ~check-letloop-html-write-1
     (lambda ()
-      (let ((accumulator (make-accumulator))
-            (html `(h1 "<&>!")))
-        (html-write html accumulator)
+      (define html `(h1 "<&>!"))
 
-        (assert
-         (string=? "<h1>&lt;&amp;&gt;!</h1>"
-                   (accumulator (eof-object)))))))
+      (assert
+       (string=? "<h1>&lt;&amp;&gt;!</h1>"
+                 (html-write html)))))
 
   (define ~check-letloop-html-write-2
     (lambda ()
-      (let ((accumulator (make-accumulator))
-            (html `(a (@ (href "https://hyper.dev"))
-                      "hello you")))
-        (html-write html accumulator)
-        (assert
-         (string=? "<a href=\"https://hyper.dev\">hello you</a>"
-                   (accumulator (eof-object)))))))
-
+      (define html `(a (@ (href "https://hyper.dev"))
+                       "hello you"))
+      (assert
+       (string=? "<a href=\"https://hyper.dev\">hello you</a>"
+                 (html-write html)))))
+                 
   (define ~check-letloop-html-write-3
     (lambda ()
-      (let ((accumulator (make-accumulator))
-            (html `(p "echo" (br) "bravo")))
-        (html-write html accumulator)
-        (assert
-         (string=? "<p>echo<br/>bravo</p>"
-                   (accumulator (eof-object)))))))
-
+      (define html `(p "echo" (br) "bravo"))
+      
+      (assert
+       (string=? "<p>echo<br/>bravo</p>"
+                 (html-write html)))))
+      
   )
