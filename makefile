@@ -89,7 +89,7 @@ www:
 	$(LETLOOP) exec library/ make-www.scm
 
 nix:  ## Compile letloop with nix
-	nix-shell --packages pkgconfig gcc stdenv curl cmake chez git lz4.dev libuuid.dev zlib.dev tcl pandoc $(EXTRA)
+	nix-shell --packages pkgconfig gcc stdenv rlwrap curl cmake chez git lz4.dev libuuid.dev zlib.dev tcl pandoc $(EXTRA)
 
 clean: ## Safe clean up
 	find library/ -name "*.wpo" | xargs rm -rf
