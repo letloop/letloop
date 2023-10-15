@@ -4,14 +4,14 @@
         <meta charset="utf-8" />
         <meta name="generator" content="pandoc" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-        <title>hyper.dev · (import (letloop unknown))</title>
+        <title>hyper.dev · </title>
         <link rel="alternate" type="application/rss+xml" href="/feed.xml">
         <link rel="alternate" type="application/atom+xml" href="/rss.xml">
         <link rel="stylesheet" href="/static/main.css">
         <link rel="stylesheet" href="/static/highlight.css">
-        <meta key="date" value="2023-09-29"/>
-        <meta key="title" value="(import (letloop unknown))"/>
-        <meta key="abstract" value="zzzz"/>
+        <meta key="date" value=""/>
+        <meta key="title" value=""/>
+        <meta key="abstract" value=""/>
         <style>
          code{white-space: pre-wrap;}
          span.smallcaps{font-variant: small-caps;}
@@ -89,87 +89,55 @@
         <div id=header>
           <p><a href="/"><img width=666px src="/letloop-wave-white.png" alt="a wave leading into the future"/></a></p>
           <p><a href="/about/">A parenthetical language for programming systems</a></p>
-          <h1><a href="#root">(import (letloop unknown))</a></h1>
-          <p>zzzz</p>
-          <p>2023-09-29</p>
+          <h1><a href="#root"></a></h1>
+          <p></p>
+          <p></p>
 
         </div>
         <div id=banner>
              <img width=960px src="">
         </div>
         <div id=root>
-          <h1><a href="">(import (letloop unknown))</a></h1>
-          <p>zzzz</p>
-          <p>2023-09-29</p>
-<h2
-id="import-letloop-unknown"><code>(import (letloop unknown))</code></h2>
-<h3 id="protocol">Protocol</h3>
-<h4 id="registration">Registration</h4>
-<ol>
-<li>The client compute a verifier based on a salt, identity, and
-password using the procedure <code>unknown-compute-verifier</code></li>
-<li>The client send to the server the salt, identity, and verifier;</li>
-<li>The server stores the triplet: identity, password, salt.</li>
-</ol>
-<h4 id="authentication">Authentication</h4>
-<ol>
-<li>The client initiates authentication by sending its identifier;</li>
-<li>The server replies with the salt associated with that
-identifier;</li>
-<li>The client compute a value called <code>A</code> and send it to the
-server;</li>
-<li>The server compute a value called <code>B</code> and send it to the
-client;</li>
-<li>At this point, client, and server should have the same shared secret
-called <code>K</code>;</li>
-<li>The server sends <code>M2</code> to proove it knows
-<code>K</code></li>
-<li>The client sends <code>M1</code> to proove it knows
-<code>K</code></li>
-</ol>
+          <h1><a href=""></a></h1>
+          <p></p>
+          <p></p>
+<h2 id="letloop-sqlite3"><code>(letloop sqlite3)</code></h2>
+<h3 id="abstract">Abstract</h3>
+<p>SQLite3 library is a database that implements SQL query language
+on-top of a robust, and well tested storage backend.</p>
+<p>At this time, it is only possible to bind a variable to a bytevector,
+and query integers and bytevectors.</p>
+<h3 id="sqlite3-open-filename"><code>(sqlite3-open filename)</code></h3>
+<p>Open a database at <code>FILENAME</code>; return a handle.</p>
 <h3
-id="make-unknown-client-verifier-parameter-salt-identity-password-bytevector"><code>(make-unknown-client-verifier parameter salt identity password) → bytevector?</code></h3>
-<p>Client, and server must use the same <code>PARAMETER</code>. Returns
-a bytevector that must be sent to the server with <code>SALT</code>, and
-<code>IDENTITY</code> for registering the client.</p>
+id="sqlite3-close-database"><code>(sqlite3-close database)</code></h3>
+<p>Close <code>DATABASE</code>.</p>
 <h3
-id="make-unknown-server-parameter-nonce-salt-identity-verifier"><code>(make-unknown-server parameter nonce salt identity verifier)</code></h3>
-<p>Return an object <code>unknown-server</code>, that can be used to
-compute the objects necessary to authenticate a client.</p>
+id="sqlite3-prepare-database-sql"><code>(sqlite3-prepare database sql)</code></h3>
+<p>In <code>DATABASE</code>, prepare a query <code>SQL</code>; return a
+handle over the prepared query, called a <code>statement</code>.</p>
 <h3
-id="make-unknown-client-parameter-nonce-salt-identity-password"><code>(make-unknown-client parameter nonce salt identity password)</code></h3>
-<p>Return an object <code>unknown-client</code>, that can be used to
-compute the objects necessary to authenticate with a server.</p>
+id="sqlite3-reset-statement"><code>(sqlite3-reset statement)</code></h3>
+<p>Reset a <code>STATEMENT</code>.</p>
 <h3
-id="unknown-server-a-server-a"><code>(unknown-server-A! server A)</code></h3>
-<p>Associate <code>A</code> with the server. It is then possible to call
-<code>unknown-server-K</code>, <code>unknown-server-M2</code>, and
-<code>unknown-server-check-M1</code>.</p>
+id="sqlite3-bind-blob-statement-index-bytevector"><code>(sqlite3-bind-blob statement index bytevector)</code></h3>
+<p>Against <code>STATEMENT</code> bind at the variable positioned at
+<code>INDEX</code> the value <code>BYTEVECTOR</code>. The first variable
+in the query associated with <code>STATEMENT</code> has the index one
+(<code>1</code>).</p>
 <h3
-id="unknown-client-b-client-b"><code>(unknown-client-B! client B)</code></h3>
-<p>Associate <code>B</code> with the client. It is then possible to call
-<code>unknown-client-K</code>, <code>unknown-client-M2</code>, and
-<code>unknown-client-check-M1</code>.</p>
+id="sqlite3-step-statement"><code>(sqlite3-step statement)</code></h3>
+<p>Step throught the rows result of the query associated with
+<code>STATEMENT</code>, return <code>#true</code> if there is more rows,
+otherwise return <code>#false</code>.</p>
 <h3
-id="unknown-server-k-server"><code>(unknown-server-K server)</code></h3>
-<p>Return the wanna be shared secret.</p>
+id="sqlite3-column-blob-statement-index"><code>(sqlite3-column-blob statement index)</code></h3>
+<p>Inside <code>STATEMENT</code>, retrieve the value positioned at
+<code>INDEX</code> as a <code>bytevector</code>.</p>
 <h3
-id="unknown-server-m2-server"><code>(unknown-server-M2 server)</code></h3>
-<p>Return <code>M2</code> that must be sent to the client.</p>
-<h3
-id="unknown-server-check-m1-server-m1"><code>(unknown-server-check-M1? server M1)</code></h3>
-<p>Verify that the value sent by the client <code>M1</code> is
-valid.</p>
-<h3
-id="unknown-client-k-client"><code>(unknown-client-K client)</code></h3>
-<p>Return the wanna be shared secret.</p>
-<h3
-id="unknown-client-m1-client"><code>(unknown-client-M1 client)</code></h3>
-<p>Return <code>M2</code> that must be sent to the client.</p>
-<h3
-id="unknown-client-check-m2-client-m2"><code>(unknown-client-check-M2? client M2)</code></h3>
-<p>Verify that the value sent by the server <code>M2</code> is
-valid.</p>
+id="sqlite3-column-int-statement-index"><code>(sqlite3-column-int statement index)</code></h3>
+<p>Inside <code>STATEMENT</code>, retrieve the value positioned at
+<code>INDEX</code> as an integer.</p>
         </div>
         <div id=footer>
             <p><a href="mailto:amirouche@hyper.dev">Hire me</a>.

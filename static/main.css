@@ -20,7 +20,7 @@
 
 @font-face {
     font-family: 'League Gothic';
-    src: url('/static/leaguegothic/leaguegothic-regular-webfont.ttf') format('truetype');
+    src: url('/static/BebasNeue-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -43,15 +43,29 @@ body, html {
     margin: 0;
 }
 
-h1, h1 a, h2, h2 a, h3, h3 a {
-    font-family: 'League Gothic', Helvetica, Verdana, sans !important;
-    font-weight: normal;
-    font-size: 1.7em;
+div#header h1 a {
+    decoration: none;
+}
+
+div#header h1:before {
+    content: '';
+}
+
+h1, h1 a, h1 code {
+    font-size: 3em;
+    line-height: 1em;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: 'League Gothic', sans;
+    font-size: 1.3em;
 }
+
+h1, h1 a, h2, h2 a, h3, h3 a, h1 code, h2 code, h3 code {
+    font-family: 'League Gothic', Helvetica, Verdana, sans !important;
+    font-weight: normal;
+}
+
 
 blockquote {
     color: hsla(0, 0%, 0%, 0.7);
@@ -92,7 +106,8 @@ p code {
 body {
     color: hsla(0, 0%, 20%, 1);
     font-family: 'Libre Baskerville', Georgia, serif;
-    font-size: 22px;
+    font-size: 18px;
+    line-height: 1.6em;
 }
 
 #header p {
@@ -104,12 +119,12 @@ body {
 }
 
 #header a:hover, #footer a:hover {
-    color: #3399FF;
+    color: black;  /* #3399FF; */
 }
 
 
 a:link, a:active, a:visited {
-    color: #3399FF;
+    color: #333;  /* #3399FF; */
 }
 
 a:hover {
@@ -123,13 +138,29 @@ a:hover {
 }
 
 
-#header, #footer {
+#banner, #header, #footer {
     margin: 2em auto;
-    width: 830px;
+    max-width: 830px;
     font-size: 1em;
     background: hsla(0, 0%, 0%, 0.9);
     color: white;
     padding: 0.2em 3em;
+}
+
+#header {
+    margin: auto;
+}
+
+#banner {
+    padding: 0;
+    margin-top: 0;
+    overflow: hidden;
+    background: none;
+}
+
+#banner img {
+    margin-top: 0px;
+    max-width: 830px;
 }
 
 #header img {
@@ -138,6 +169,7 @@ a:hover {
 
 #header {
     text-align: center;
+    height: 90vh;
 }
 
 #header > h1 {
@@ -191,15 +223,23 @@ a:hover {
 h1:before {
     content: "# ";
     margin-left: -1em;
+    font-size: 2.5em;
 }
 
 h2:before {
     content: "## ";
     margin-left: -2em;
+    font-size: 1em;
 }
 
 h3:before {
     content: "### ";
+    margin-left: -3em;
+    font-size: 1em;
+}
+
+h4:before {
+    content: "#### ";
     margin-left: -3em;
 }
 

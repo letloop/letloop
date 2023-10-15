@@ -85,12 +85,11 @@ local/lib/libcmark.so:
 	cd local/src && git clone --depth=1 https://github.com/commonmark/cmark
 	cd local/src/cmark && make -j$(shell nproc --ignore 1) && make && cp build/src/libcmark.so* $(PWD)/local/lib/
 
-fbbg:
-	python3 fbbg.py
-	python3 -m http.server
+www:
+	$(LETLOOP) exec library/ make-www.scm
 
 nix:  ## Compile letloop with nix
-	nix-shell --packages pkgconfig gcc stdenv curl cmake chez git lz4.dev libuuid.dev zlib.dev tcl
+	nix-shell --packages pkgconfig gcc stdenv curl cmake chez git lz4.dev libuuid.dev zlib.dev tcl pandoc $(EXTRA)
 
 clean: ## Safe clean up
 	find library/ -name "*.wpo" | xargs rm -rf

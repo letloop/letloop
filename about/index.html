@@ -4,14 +4,15 @@
         <meta charset="utf-8" />
         <meta name="generator" content="pandoc" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-        <title>hyper.dev · (import (letloop unknown))</title>
+        <title>hyper.dev · about</title>
         <link rel="alternate" type="application/rss+xml" href="/feed.xml">
         <link rel="alternate" type="application/atom+xml" href="/rss.xml">
         <link rel="stylesheet" href="/static/main.css">
         <link rel="stylesheet" href="/static/highlight.css">
         <meta key="date" value="2023-09-29"/>
-        <meta key="title" value="(import (letloop unknown))"/>
-        <meta key="abstract" value="zzzz"/>
+        <meta key="title" value="about"/>
+        <meta key="abstract" value="letloop is a loop that is getting
+started"/>
         <style>
          code{white-space: pre-wrap;}
          span.smallcaps{font-variant: small-caps;}
@@ -89,8 +90,8 @@
         <div id=header>
           <p><a href="/"><img width=666px src="/letloop-wave-white.png" alt="a wave leading into the future"/></a></p>
           <p><a href="/about/">A parenthetical language for programming systems</a></p>
-          <h1><a href="#root">(import (letloop unknown))</a></h1>
-          <p>zzzz</p>
+          <h1><a href="#root">about</a></h1>
+          <p>letloop is a loop that is getting started</p>
           <p>2023-09-29</p>
 
         </div>
@@ -98,78 +99,37 @@
              <img width=960px src="">
         </div>
         <div id=root>
-          <h1><a href="">(import (letloop unknown))</a></h1>
-          <p>zzzz</p>
+          <h1><a href="">about</a></h1>
+          <p>letloop is a loop that is getting started</p>
           <p>2023-09-29</p>
-<h2
-id="import-letloop-unknown"><code>(import (letloop unknown))</code></h2>
-<h3 id="protocol">Protocol</h3>
-<h4 id="registration">Registration</h4>
-<ol>
-<li>The client compute a verifier based on a salt, identity, and
-password using the procedure <code>unknown-compute-verifier</code></li>
-<li>The client send to the server the salt, identity, and verifier;</li>
-<li>The server stores the triplet: identity, password, salt.</li>
-</ol>
-<h4 id="authentication">Authentication</h4>
-<ol>
-<li>The client initiates authentication by sending its identifier;</li>
-<li>The server replies with the salt associated with that
-identifier;</li>
-<li>The client compute a value called <code>A</code> and send it to the
-server;</li>
-<li>The server compute a value called <code>B</code> and send it to the
-client;</li>
-<li>At this point, client, and server should have the same shared secret
-called <code>K</code>;</li>
-<li>The server sends <code>M2</code> to proove it knows
-<code>K</code></li>
-<li>The client sends <code>M1</code> to proove it knows
-<code>K</code></li>
-</ol>
-<h3
-id="make-unknown-client-verifier-parameter-salt-identity-password-bytevector"><code>(make-unknown-client-verifier parameter salt identity password) → bytevector?</code></h3>
-<p>Client, and server must use the same <code>PARAMETER</code>. Returns
-a bytevector that must be sent to the server with <code>SALT</code>, and
-<code>IDENTITY</code> for registering the client.</p>
-<h3
-id="make-unknown-server-parameter-nonce-salt-identity-verifier"><code>(make-unknown-server parameter nonce salt identity verifier)</code></h3>
-<p>Return an object <code>unknown-server</code>, that can be used to
-compute the objects necessary to authenticate a client.</p>
-<h3
-id="make-unknown-client-parameter-nonce-salt-identity-password"><code>(make-unknown-client parameter nonce salt identity password)</code></h3>
-<p>Return an object <code>unknown-client</code>, that can be used to
-compute the objects necessary to authenticate with a server.</p>
-<h3
-id="unknown-server-a-server-a"><code>(unknown-server-A! server A)</code></h3>
-<p>Associate <code>A</code> with the server. It is then possible to call
-<code>unknown-server-K</code>, <code>unknown-server-M2</code>, and
-<code>unknown-server-check-M1</code>.</p>
-<h3
-id="unknown-client-b-client-b"><code>(unknown-client-B! client B)</code></h3>
-<p>Associate <code>B</code> with the client. It is then possible to call
-<code>unknown-client-K</code>, <code>unknown-client-M2</code>, and
-<code>unknown-client-check-M1</code>.</p>
-<h3
-id="unknown-server-k-server"><code>(unknown-server-K server)</code></h3>
-<p>Return the wanna be shared secret.</p>
-<h3
-id="unknown-server-m2-server"><code>(unknown-server-M2 server)</code></h3>
-<p>Return <code>M2</code> that must be sent to the client.</p>
-<h3
-id="unknown-server-check-m1-server-m1"><code>(unknown-server-check-M1? server M1)</code></h3>
-<p>Verify that the value sent by the client <code>M1</code> is
-valid.</p>
-<h3
-id="unknown-client-k-client"><code>(unknown-client-K client)</code></h3>
-<p>Return the wanna be shared secret.</p>
-<h3
-id="unknown-client-m1-client"><code>(unknown-client-M1 client)</code></h3>
-<p>Return <code>M2</code> that must be sent to the client.</p>
-<h3
-id="unknown-client-check-m2-client-m2"><code>(unknown-client-check-M2? client M2)</code></h3>
-<p>Verify that the value sent by the server <code>M2</code> is
-valid.</p>
+<p>A modern programming language that embodies a latent typing system,
+emphasizes functional programming principles, and relies on parentheses
+for code structuring is a testament to the fusion of timeless concepts
+with innovative design. This language fosters a paradigm shift by
+prioritizing the expressiveness and conciseness of code, empowering
+developers to write elegant, readable, and maintainable software. With
+its latent typing, it allows for dynamic flexibility, enabling rapid
+development without sacrificing type safety. The predominantly
+functional approach encourages immutability, higher-order functions, and
+pure functions, promoting code that is free from side effects and easier
+to reason about. The use of parentheses, reminiscent of Lisp, lends
+itself to a uniform, s-expression-based syntax that simplifies parsing
+and manipulation, facilitating metaprogramming and macros. This
+language, a culmination of good ideas from various programming
+paradigms, strives to strike a balance between pragmatism and elegance,
+serving as a versatile tool for tackling a wide range of software
+challenges.</p>
+<p>Moreover, this modern programming language also places a strong
+emphasis on memory efficiency and CPU performance. Through its latent
+typing system, it optimizes memory allocation by allowing developers to
+define data structures that fit the exact needs of their application,
+reducing unnecessary overhead. Additionally, its functional paradigm and
+efficient use of parentheses contribute to improved CPU performance by
+encouraging parallelism and minimizing extraneous computations,
+resulting in code that runs swiftly and smoothly. These combined
+features make it a compelling choice for developing high-performance,
+memory-conscious applications, ensuring that both computational and
+resource constraints are addressed with grace and efficiency.</p>
         </div>
         <div id=footer>
             <p><a href="mailto:amirouche@hyper.dev">Hire me</a>.
