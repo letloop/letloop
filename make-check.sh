@@ -4,6 +4,8 @@ set -x
 
 ROOT=$(pwd)
 
+echo '(scheme-version)' | letloop repl
+
 $LETLOOP check checks/check/ checks/check/check-error.scm
 if [ $? -eq 0 ]
 then
