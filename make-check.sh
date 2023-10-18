@@ -2,7 +2,9 @@
 
 set -ex
 set -x
-set -o pipefail
+
+# XXX: Illegal according to github actions.
+# set -o pipefail
 
 ROOT=$(pwd)
 
