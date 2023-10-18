@@ -29,7 +29,7 @@ if [ "x$LETLOOP_FLAVOR" = "xcisco" ]; then
     rm -rf $LETLOOP_PREFIX/src/chez/cisco
     mkdir -p $LETLOOP_PREFIX/src/chez/cisco
 
-    git clone --depth=1 https://github.com/cisco/ChezScheme/ $LETLOOP_PREFIX/src/chez/cisco/
+    git clone --filter=blob:none --depth=1 https://github.com/cisco/ChezScheme/ $LETLOOP_PREFIX/src/chez/cisco/
 
     PREFIX=$LETLOOP_PREFIX
     mkdir -p $PREFIX
