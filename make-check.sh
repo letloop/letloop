@@ -1,6 +1,5 @@
 #!/usr/bin/sh
 
-set -ex
 set -x
 
 # XXX: Illegal according to github actions.
