@@ -1,0 +1,4 @@
+
+# vector->pseudo-random-generator
+
+

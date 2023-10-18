@@ -1,0 +1,4 @@
+
+# magnitude-squared
+
+
