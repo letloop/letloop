@@ -1,6 +1,8 @@
 #!/usr/bin/sh
 
+set -ex
 set -x
+set -o pipefail
 
 ROOT=$(pwd)
 
