@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -xe
+set +o pipefail
 
 LETLOOP_ROOT=$1
 
