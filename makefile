@@ -10,6 +10,7 @@ help: ## HELP!...
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
 
 local/bin/letloop: letloop.scm letloop.md letloop.nfo
+	echo $(SCHEME)
 	make clean
 	mkdir -p /tmp/letloop/
 	$(SCHEME) --libdirs library/ --compile-imported-libraries --program letloop.scm compile library letloop.scm
