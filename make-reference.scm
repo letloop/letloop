@@ -8,23 +8,25 @@
     (write args)
     (newline)
     (car (reverse args))))    
-
-(define drop-while
-  (lambda (objects predicate?)
-    (let loop ((objects objects))
-      (if (null? objects)
-          (list)
-          (if (predicate? (car objects))
-              (loop (cdr objects))
-              objects)))))
-
-(define boring?
-  (lambda (object)
-    (or (null? object)
-        (char=? (car object) #\-))))
  
 (define normalized
   (lambda (name)
+
+
+    (define drop-while
+      (lambda (objects predicate?)
+        (let loop ((objects objects))
+          (if (null? objects)
+              (list)
+              (if (predicate? (car objects))
+                  (loop (cdr objects))
+                  objects)))))
+
+    (define boring?
+      (lambda (object)
+        (or (null? object)
+            (char=? (car object) #\-))))
+    
     (define chars (string->list (string-downcase (symbol->string name))))
     (let loop ((chars chars)
                (out '()))

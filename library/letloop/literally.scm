@@ -95,7 +95,6 @@
 
       (define exports (append public-procedures tildes))
 
-
       `(library ,name
          (export ,@exports)
 

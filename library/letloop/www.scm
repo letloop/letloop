@@ -1,5 +1,6 @@
 (library (letloop www)
   (export www-request www-host-read www-uri-read www-query-read
+          www-form-urlencoded-read
           ~check-www-000 ~check-www-001 ~check-www-002 ~check-www-002-bis
           ~check-www-003)
   (import (chezscheme) (letloop http) (letloop match) (scheme generator))

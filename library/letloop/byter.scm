@@ -3,6 +3,11 @@
   (export byter-write
           byter-read
           byter-compare
+          byter-next-prefix
+          byter-slice
+          byter-append
+          byter-concatenate
+          byter-split
           ~check-byter-000
           ~check-byter-001
           ~check-byter-002
@@ -19,6 +24,7 @@
           ~check-byter-100
           ~check-byter-101
           ~check-byter-102
+          ~check-byter-103
           ~check-byter-998/seed
           ~check-byter-998/random
           ~check-byter-999/seed
@@ -52,22 +58,12 @@
       ;; increment first byte, reverse and return the bytevector
       (u8-list->bytevector (reverse (cons (fx+ 1 (car bytes)) (cdr bytes))))))
 
-  (define (byter-append . bvs)
-    (let* ((total (apply fx+ (map bytevector-length bvs)))
-           (out (make-bytevector total)))
-      (let loop ((bvs bvs)
-                 (index 0))
-        (unless (null? bvs)
-          (bytevector-copy! (car bvs) 0 out index (bytevector-length (car bvs)))
-          (loop (cdr bvs) (fx+ index (bytevector-length (car bvs))))))
-      out))
-
   ;; TODO: rename bytevector-slice, and move to (letloop bytevector)
   (define subbytes
     (case-lambda
       ((bv start end)
        (unless (<= 0 start end (bytevector-length bv))
-         (error 'subbytes "Invalid indices: ~a ~a ~a" bv start end))
+         (error 'subbytes "Invalid indices: ~a ~a ~a" bv start end (bytevector-length bv)))
        (if (and (fxzero? start)
                 (fx=? end (bytevector-length bv)))
            bv
@@ -77,6 +73,37 @@
              ret)))
       ((bv start)
        (subbytes bv start (bytevector-length bv)))))
+
+  (define byter-slice subbytes)
+
+  (define byter-concatenate
+    (lambda (bvs)
+      (let* ((total (apply fx+ (map bytevector-length bvs)))
+             (out (make-bytevector total)))
+        (let loop ((bvs bvs)
+                   (index 0))
+          (unless (null? bvs)
+            (bytevector-copy! (car bvs) 0 out index (bytevector-length (car bvs)))
+            (loop (cdr bvs) (fx+ index (bytevector-length (car bvs))))))
+        out)))
+
+  (define byter-append
+    (lambda args
+      (byter-concatenate args)))
+
+  (define byter-split
+    (lambda (bytevector length)
+      (let loop ((start 0)
+                 (out '()))
+        (if (<= (- (bytevector-length bytevector) start) length)
+            (reverse
+             (cons (byter-append (byter-slice bytevector start (bytevector-length bytevector))
+                                 (make-bytevector (- length
+                                                     (- (bytevector-length bytevector) start))
+                                                  0))
+                   out))
+            (loop (+ start length)
+                  (cons (byter-slice bytevector start (+ start length)) out))))))
 
   (define byter-false #x00)
   (define byter-true #x01)
@@ -586,6 +613,16 @@
       (define expected (cons (list->vector base) base))
       (equal? (byter-read (byter-write expected)) expected)))
 
+  (define ~check-byter-103
+    (lambda ()
+      (for-each (lambda (i)
+                  (define base (make-bytevector 4096))
+                  (define expected (+ (random 2048) 1))
+                  (for-each (lambda (x) (assert (= expected (bytevector-length x))))
+                            (byter-split base expected)))
+                (iota 128))
+      #t))
+
   (define random-object-max-complexity (expt 10 4))
 
   (define random-object-complexity (make-parameter random-object-max-complexity))
@@ -756,4 +793,6 @@
                     (lambda (seed other)
                       (let ((comparator (make-comparator object other)))
                         (assert (comparator (byter-write object) (byter-write other)))
-                        (loop (fx- i 1)))))))))))))
+                        (loop (fx- i 1))))))))))))
+
+  )
