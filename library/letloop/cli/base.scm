@@ -146,6 +146,15 @@
            (with-syntax ([exp (run/output "git describe --always --tags --dirty")])
              #'exp))])))
 
+  (define-syntax include-scheme-version
+    (lambda (x)
+      (syntax-case x ()
+        ((k)
+         (with-syntax ((exp (scheme-version)))
+                      #'exp)))))
+
+  (define letloop-scheme-version (include-scheme-version))
+
   (define-syntax include-git-branch
     (lambda (x)
       (syntax-case x ()
@@ -200,6 +209,8 @@
     (newline)
     (newline)
     (display usage)
+    (newline)
+    (write `(scheme ,letloop-scheme-version))
     (newline)
     (write `(tag ,letloop-tag))
     (newline)
