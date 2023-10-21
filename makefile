@@ -11,6 +11,7 @@ help: ## HELP!...
 
 local/bin/letloop: letloop.scm letloop.md letloop.nfo
 	echo $(SCHEME)
+	$(SCHEME) --version
 	make clean
 	mkdir -p /tmp/letloop/
 	$(SCHEME) --libdirs library/ --compile-imported-libraries --program letloop.scm compile library letloop.scm
