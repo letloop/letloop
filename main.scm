@@ -155,7 +155,15 @@
                       (loop (cdr chars) (cons (list #\-) out)))))))))
 
 
-(define code "define freedom ....")
+(define code "# Library `(tools)`
+
+## Procedure `(main)`
+
+```scheme
+(define main (lambda () \"echo alpha bravo symbolic wiki\"))
+```
+
+")
 
 (define frob
   (lambda (code)
