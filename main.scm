@@ -155,7 +155,7 @@
                       (loop (cdr chars) (cons (list #\-) out)))))))))
 
 
-(define code "(define freedom ....")
+(define code "define freedom ....")
 
 (define frob
   (lambda (code)
@@ -182,6 +182,7 @@
     (define target (massage code))
     (define i (eval target myenv))
     (define main (eval 'main myenv))
+
     main))
 
 (define handle
