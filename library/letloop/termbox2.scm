@@ -80,7 +80,7 @@
            (syntax-rules ()
              ((keyword args ...) body))))))
 
-    (define libtermbox (load-shared-object "./local/lib/libtermbox2.so"))
+    (define libtermbox (load-shared-object "libtermbox2.so.2"))
 
     ;; ffi helpers
 

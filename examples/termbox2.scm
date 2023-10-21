@@ -36,10 +36,12 @@
       (if (key? event)
           (begin
             (dg 'key (key->alist event))
-            (when (equal? (key-key event) #\q)
+            (when (and (equal? (key-key event) #\q)
+                       (key-ctrl? event))
               (set! continue? #f)))))
     (set! message (string-append "You typed something... " (number->string count)))
-    (when continue?
-      (loop (fx+ count 1)))))
+    (if continue?
+        (loop (fx+ count 1))
+        (tb-shutdown))))
 
 (main)
