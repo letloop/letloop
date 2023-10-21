@@ -80,7 +80,7 @@
            (syntax-rules ()
              ((keyword args ...) body))))))
 
-    (define libtermbox (load-shared-object "libtermbox2.so.2"))
+    (define libtermbox (load-shared-object "libtermbox2.so"))
 
     ;; ffi helpers
 
@@ -218,9 +218,9 @@
           (key ,(key-key x)))))
 
     (define (char-event->key mode key)
-      (let ((CTRL? (fx= (fxlogand mode TB-MOD-CTRL) TB-MOD-CTRL))
-            (ALT? (fx= (fxlogand mode TB-MOD-ALT) TB-MOD-ALT))
-            (SHIFT? (fx= (fxlogand mode TB-MOD-SHIFT) TB-MOD-SHIFT)))
+      (let ((CTRL? (fx=? (fxlogand mode TB-MOD-CTRL) TB-MOD-CTRL))
+            (ALT? (fx=? (fxlogand mode TB-MOD-ALT) TB-MOD-ALT))
+            (SHIFT? (fx=? (fxlogand mode TB-MOD-SHIFT) TB-MOD-SHIFT)))
         (switch key
                 (TB-KEY-F1 (make-key CTRL? ALT? SHIFT? 'F1))
                 (TB-KEY-F2 (make-key CTRL? ALT? SHIFT? 'F2))
@@ -275,7 +275,7 @@
                 (TB-KEY-CTRL-X (make-key #t ALT? SHIFT? #\x))
                 (TB-KEY-CTRL-Y (make-key #t ALT? SHIFT? #\y))
                 (TB-KEY-CTRL-Z (make-key #t ALT? SHIFT? #\z))
-                (TB-KEY-ESC (make-key #t ALT? SHIFT? 'escape))
+                (TB-KEY-ESC (make-key #f ALT? SHIFT? 'escape))
                 ;; not sure what it is and clash with TB-KEY-ESC
                 ;; (TB-KEY-CTRL-LSQ-BRACKET (make-key #t ALT? SHIFT? 'F1))
                 ;; clash with TB-KEY-CTRL-ESC
