@@ -2,6 +2,7 @@
 (import (chezscheme))
 (import (letloop match))
 (import (letloop lsm1 okvs))
+(import (letloop commonmark))
 (import (letloop entangle))
 (import (letloop http))
 (import (letloop html))
@@ -39,7 +40,7 @@
     `(html
       (@ (lang "en"))
       (head
-       (meta (@ (charset "utf-8")))getb
+       (meta (@ (charset "utf-8")))
        (meta (@ (name "viewport")
                 (content "width=device-width, initial-scale=1")))
        (link (@ (href "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css")
@@ -63,8 +64,6 @@
     (pk (literally (open-input-string string)))))
 
 (define message "Hello, World!")
-
-
 
 (define index-body
   `(body (h1 "be.hyper.dev")
@@ -201,8 +200,18 @@
         (lambda (method uri version headers body)
           (call-with-values (lambda () (www-uri-read uri))
             (lambda (path query fragment)
-              (match (cons method path)
+              (match (pk 'request (cons method path))
+
                 ((GET "u" ,pretty-name ,uid)
+                 (http-response-write
+                  write "HTTP/1.1" 200 "Found" '()
+                  (string->utf8
+                   (html-write
+                    (render "be.hyper.dev"
+                            `(body
+                              ,@(cdr (pk (html-read (commonmark-read code))))))))))
+
+                ((GET "u" ,pretty-name ,uid "editor")
                  (http-response-write
                   write "HTTP/1.1" 200 "Found" '()
                   (string->utf8
@@ -226,7 +235,7 @@
                                      ,code)
                                     (button (@ (class "form-control"))
                                             "Save, please!"))))))))
-                ((GET "u" ,pretty-name ,uid ,apply)
+                ((GET "u" ,pretty-name ,uid "apply")
                  (http-response-write
                   write "HTTP/1.1" 200 "Found" '()
                   (string->utf8
@@ -234,20 +243,20 @@
                     (render "be.hyper.dev"
                             `(body
                               ,((frob (literally-read code)))))))))
-                ((POST "u" ,pretty-name ,uid)
+                ((POST "u" ,pretty-name ,uid "editor")
                  (set! code
                    (cdr (assq 'code
                               (www-form-urlencoded-read
                                (utf8->string
                                 (generator->bytevector body))))))
 
-                 (http-redirect write (string-append "/u/" pretty-name "/" uid)))
+                 (http-redirect write (string-append "/u/" pretty-name "/" uid "/editor/")))
                 ((GET)
                  (http-response-write
                   write "HTTP/1.1" 200 "Found" '()
                   (string->utf8
                    (html-write
-                    (render "be.hyper.dev"                           
+                    (render "be.hyper.dev"
                             index-body)))))
                 ((POST)
                  (define pretty-name
@@ -257,8 +266,7 @@
                                 (utf8->string
                                  (generator->bytevector body)))))))
                  (define uid (number->string (random (expt 2 64)) 36))
-
-                 (http-redirect write (string-append "/u/" pretty-name "/" uid)))
+                 (http-redirect write (string-append "/u/" pretty-name "/" uid "/editor/")))
                 (,_
                  (http-response-write write "HTTP/1.1" 404 "Found" '()
                                       (string->utf8

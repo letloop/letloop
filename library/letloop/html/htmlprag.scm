@@ -1,3 +1,4 @@
+#!chezscheme
 ;; (htmlprag) -- pragmatic parsing of real-world HTML
 ;; Copyright (C) 2003-2004 Neil W. Van Dyke <neil at neilvandyke.org>
 ;; Modified 2004 by Andy Wingo to fit in with guile-lib.
@@ -263,7 +264,7 @@
 ;; one the author knows of, so we'll probably go back to just using literal
 ;; @code{@@} symbols.
 
-(define htmlprag-internal:at (string->symbol "*"))
+(define htmlprag-internal:at (string->symbol "@"))
 
 ;;; @section SHTML and SXML
 
