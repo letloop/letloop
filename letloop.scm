@@ -2,7 +2,6 @@
 (import (chezscheme))
 (import (letloop cli base))
 (import (letloop literally))
-(import (letloop seed))
 
 
 (when (null? (cdr (command-line)))
@@ -16,5 +15,4 @@
   ((exec) (letloop-exec (cddr (command-line))))
   ((literally) (letloop-literally (caddr (command-line))))
   ((repl) (letloop-repl (cddr (command-line))))
-  ((seed) (seed-load (cddr (command-line))))
   (else (letloop-usage) (exit 1)))
