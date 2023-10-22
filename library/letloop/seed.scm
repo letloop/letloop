@@ -1,5 +1,5 @@
 (library (letloop seed)
-  (export seed-load)
+  (export seed-load seed-eval make-seed-environment)
   (import (chezscheme) (letloop r999) (letloop match))
   ;; TODO: use env's eval everywhere
 
@@ -12,10 +12,17 @@
       (car (reverse args))))
 
   (define-record-type* <operative>
-    (make-operative meta)
+    (make-operative~ meta source env)
     object-operative?
-    (meta operative-meta))
+    (meta operative-meta)
+    (source operative-source)
+    (env operative-env))
 
+  (define make-operative
+    (case-lambda
+     ((meta) (make-operative~ meta #f #f))
+     ((meta source env) (make-operative~ meta source env))))
+  
   (define-record-type* <environment>
     (make-environment~ env)
     object-environment?~
@@ -35,8 +42,9 @@
       (or (object-applicative? x) (object-operative? x))))
 
   (define make-applicative
-    (lambda (meta)
-      (make-applicative~ (make-operative meta))))
+    (case-lambda
+     ((meta) (make-applicative~ (make-operative meta)))
+     ((meta source env) (make-applicative~ (make-operative meta source env)))))
 
   (define object-environment-ref
     (lambda (env symbol)
@@ -62,7 +70,6 @@
        (else (error 'object "combiner not found" name)))))
 
   (define (meta-eval exp env)
-
     (cond
      ((symbol? exp) (object-environment-ref env exp))
      ((number? exp) exp)
@@ -120,6 +127,17 @@
       (set-box! object-ground
                 (set! (unbox object-ground) key value))
       value))
+
+  (define object-sum
+    (make-object-ground! 'sum
+      (make-applicative
+       (lambda (env args)
+         (define combiner (car args))
+         (assert (combiner? combiner))
+         (if (object-applicative? combiner)
+             (object-sum (unwrap combiner))
+             (cons (operative-source combiner)
+                   (operative-env combiner)))))))                          
 
   (define object-environment-cons*
     (make-object-ground! 'environment-cons*
@@ -222,6 +240,7 @@
     (make-object-ground! 'vau
       (make-operative
        (lambda (static-env args)
+         (define source args)
          (match (cdr args)
            ((,dynamic-env-name ,body ...)
             (if (symbol? (car args))
@@ -232,7 +251,9 @@
                       (let* ((alist (list (cons formal args)
                                           (cons dynamic-env-name dynamic-env)))
                              (env* (environment-cons static-env alist)))
-                        (meta-eval `(sequence ,@body) env*))))))
+                        (meta-eval `(sequence ,@body) env*)))
+                    source
+                    static-env)))
                 (call-with-values (lambda () (arguments-with-rest? (car args)))
                   (lambda (rest? positionals rest)
                     (if rest?
@@ -241,12 +262,16 @@
                            (let* ((alist (cons (cons dynamic-env-name dynamic-env)
                                                (parse-arguments-with-rest positionals rest args*)))
                                   (env* (environment-cons static-env alist)))
-                             (meta-eval `(sequence ,@body) env*))))
+                             (meta-eval `(sequence ,@body) env*)))
+                         source
+                         static-env)
                         (make-operative
                          (lambda (dynamic-env args*)
                            (let* ((alist (map cons args args*))
                                   (env* (environment-cons static-env alist)))
-                             (meta-eval `(sequence ,@body) env*))))))))))))))
+                             (meta-eval `(sequence ,@body) env*)))
+                         source
+                         static-env)))))))))))
 
   (define object-lambda
     (make-object-ground! 'lambda
@@ -404,14 +429,14 @@
          (let ((proc (eval proc (environment library))))
            (make-applicative
             (lambda (env args) (apply proc args))))))))
+  
+  (define (make-seed-environment)
+    (make-environment~ (list (box (list)) object-ground)))
 
-  (define object-eval/ground-environment-filenames
+  (define seed-load
     (lambda (filenames)
 
-      (define (make-ground-environment)
-        (make-environment~ (list (box (list)) object-ground)))
-
-      (define ground (make-ground-environment))
+      (define ground (make-seed-environment))
 
       (let loop ((filenames filenames))
         (unless (null? filenames)
@@ -425,4 +450,9 @@
                     (loop))))))
           (loop (cdr filenames))))))
 
-  (define seed-load object-eval/ground-environment-filenames))
+  (define seed-eval
+    (case-lambda
+     ((exp) (meta-eval exp (make-seed-environment)))
+     ((exp env) (meta-eval exp env))))
+  
+  )
