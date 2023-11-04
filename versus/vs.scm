@@ -80,7 +80,7 @@
   (lambda (exp)
     (if (pair? exp)
         `(div.parents
-          (div.editor
+          #;(div.editor
            (a href "" "🌱")
            (a href "" "↕️")
            (a href "" "🗑️"))
@@ -89,7 +89,7 @@
                     `(div.operands
                       ,@(map exp-html-base (cdr exp))))))
         (if (symbol? exp)
-            ;; TODO: add string?
+            ;; TODO: add string
             `(div.datum (div.symbol ,(symbol->string exp)))
             `(div.datum (div.symbol ,(number->string exp)))))))
 
@@ -102,6 +102,7 @@
         (a href "" "kdem 🚀"))))))
 
 (define root (getelem "#root"))
+
 (define other (exp-html '(define exp-html
                            (lambda (exp)
                              (element-new
@@ -110,45 +111,8 @@
 
 
 (element-insert! root other)
- 
-(define other (exp-html '(define exp-replace 
-                           (lambda (exp path object)
-                             (exp-remove
-                              (exp-add exp path object)
-                              (let ((rpath (reverse path)))
-                                (reverse (cons (+ 1 (car rpath))
-                                               (cdr rpath)))))))))
 
-(element-insert! root other)
 
-(define other (exp-html
-               '(define exp-add
-                  (lambda (exp path object)
-                    (when (null? path)
-                      (error 'exp-add "invalid path 0" path))
-                    (let ((target (car path)))
-                      (let loop ((out '())
-                                 (index 0)
-                                 (exp exp))
-                        (if (= index target)
-                            (if (null? (cdr path))
-                                (append (reverse out)
-                                        (list object)
-                                        exp)
-                                (if (pair? (car exp))
-                                    (append (reverse out)
-                                            (list (exp-add (car exp) (cdr path) object))
-                                            (cdr exp))
-                                    (error 'exp-add "invalid path 1" path)))
-                            (loop (cons (car exp) out)
-                                  (+ index 1)
-                                  (cdr exp)))))))))
-
-(element-insert! root other)
-
-(define other (exp-html
-               '(define lhaja
-                  (lambda (n)
-                    (arnu ima vava nek)))))
-                  
-(element-insert! root other)
+(element-insert! root
+                 (element-new
+                  `(div.line (div.editor (a href "" "define")))))

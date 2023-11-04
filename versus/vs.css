@@ -13,7 +13,7 @@
 }
 
 body {
-    padding: 50px 0px;
+    padding: 50px;
     font-family: 'Coco Gothic', sans;
     font-size: 24px;
 }
@@ -49,19 +49,19 @@ p code {
     font-size: 0.5em;
     position: relative;
     top: -10px;
-
 }
 
 .parents > .datum:first-child > .symbol {
     position: sticky;
     top: 15px;
+    color: hsla(200, 100%, 50%, 1);
 }
 
 .editor > a {
     display: block;
     text-decoration: none;
     margin: 5px;
-    padding: 0px 4px;
+    padding: 10px 14px;
     border: 1px solid black;
     margin: 2px;
     border-radius: 5px;
@@ -71,7 +71,7 @@ p code {
 }
 
 .editor > a:hover {
-    background: pink;
+    background: hsla(200, 80%, 80%, 1);
 }
 
 .line {
