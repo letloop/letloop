@@ -1,12 +1,12 @@
-(define string-upper (alien string-upcase))
-(define string-lower (alien string-downcase))
-(define string->list (alien string->list))
-(define list->string (alien list->string))
-(define reverse (alien reverse))
+(define string-upper (xeno string-upcase))
+(define string-lower (xeno string-downcase))
+(define string->list (xeno string->list))
+(define list->string (xeno list->string))
+(define reverse (xeno reverse))
 
-(define display (alien display))
-(define newline (alien newline))
-(define write (alien write))
+(define display (xeno display))
+(define newline (xeno newline))
+(define write (xeno write))
 
 (define print
   (lambda (message)

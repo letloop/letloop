@@ -15,8 +15,8 @@
             #t
             (apply and env args)))))
 
-(define string-upper (alien string-upcase))
-(define string-lower (alien string-downcase))
+(define string-upper (xeno string-upcase))
+(define string-lower (xeno string-downcase))
 
 (define or
   (vau (a . args) env

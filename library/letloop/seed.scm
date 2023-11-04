@@ -413,8 +413,8 @@
        (lambda (env args)
          (apply eq? args)))))
 
-  (define object-alien
-    (make-object-ground! 'alien
+  (define object-xeno
+    (make-object-ground! 'xeno
       (make-operative
        (lambda (env args)
          (define library #f)
