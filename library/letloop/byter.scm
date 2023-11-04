@@ -8,6 +8,7 @@
           byter-append
           byter-concatenate
           byter-split
+          byter-random
           ~check-byter-000
           ~check-byter-001
           ~check-byter-002
@@ -76,6 +77,10 @@
 
   (define byter-slice subbytes)
 
+  (define byter-random
+    (lambda (length)
+      (u8-list->bytevector (map (lambda x (random 256)) (iota length)))))
+  
   (define byter-concatenate
     (lambda (bvs)
       (let* ((total (apply fx+ (map bytevector-length bvs)))

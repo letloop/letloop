@@ -137,6 +137,9 @@
 
   (define argon2id-encode
     (lambda (salt password)
+      ;; TODO: update cost based on latest password saas news
+      
+      ;; XXX: The user will need to re-set its password to be secure.
       (define cost-iterations 2)
       (define cost-memory 102400)
       (define parallelism 8)
