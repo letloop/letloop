@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Bootstrap demo</title>
+        <link href="/bootstrap.min.css" rel="stylesheet">
+        <link href="/vs.css" rel="stylesheet">
+    </head>
+    <body>
+        <div id=header>
+            <h1>vs scheme</h1>
+        </div>
+        <div id=root>
+            <!-- <div class="line input">
+                 <div class=parents>
+                 <div class=editor>
+                 <a href=""><div>➕</div></a><a href=""><div>➖</div></a><a href=""><div>🚀</div></a>
+                 </div>
+                 <div class=datum>ila</div>
+                 <div class=datum>haja</div>
+                 <div class=parents>
+                 <div class=editor>
+                 <a href=""><div>➕</div></a><a href=""><div>➖</div></a><a href=""><div>🚀</div></a>
+                 </div>
+
+                 <div class=datum>lambda</div>
+                 <div class=parents>
+                 <div class=editor>
+                 <a href=""><div>➕</div></a><a href=""><div>➖</div></a><a href=""><div>🚀</div></a>
+                 </div>
+
+                 <div class=datum>a</div>
+                 <div class=datum>b</div>
+                 <div class=datum>c</div>                            
+                 </div>
+                 <div class=parents>
+                 <div class=editor>
+                 <a href=""><div>➕</div></a><a href=""><div>➖</div></a><a href=""><div>🚀</div></a>
+                 </div>
+
+                 <div class=datum>arnu</div>
+                 <div class=datum>a</div>
+                 <div class=datum>b</div>
+                 <div class=datum>c</div>
+                 <div class=datum>39</div>                            
+                 </div>
+                 </div>
+
+                 </div>
+                 </div>
+                 <div class="line input">
+                 <div class=parents>
+                 <div class=editor>
+                 <a href=""><div>➕</div></a><a href=""><div>➖</div></a><a href=""><div>🚀</div></a>
+                 </div>
+
+                 <div class=datum>arnu</div>
+                 <div class=datum>40</div>
+                 <div class=parents>
+                 <div class=editor>
+                 <a href=""><div>➕</div></a><a href=""><div>➖</div></a><a href=""><div>🚀</div></a>
+                 </div>
+
+                 <div class=datum>arnu</div>
+                 <div class=datum>0</div>
+                 <div class=datum>1</div>
+                 <div class=datum>1</div>
+                 </div>
+                 </div>
+                 </div> -->
+        </div>
+        <script type="text/javascript" src="biwascheme.js"></script>
+        <script type="text/javascript">
+         var onError = function(e){ console.error(e); }
+         var biwa = new BiwaScheme.Interpreter(onError)
+         fetch("/vs.scm").then(function(response) {
+             response.text().then(function(text) {
+                 biwa.evaluate(text, function(result) {
+                     console.log(result);  // => 3
+                 });
+             })
+         });
+        </script>
+    </body>
+</html>
