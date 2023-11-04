@@ -22,7 +22,7 @@
     (case-lambda
      ((meta) (make-operative~ meta #f #f))
      ((meta source env) (make-operative~ meta source env))))
-  
+
   (define-record-type* <environment>
     (make-environment~ env)
     object-environment?~
@@ -137,7 +137,7 @@
          (if (object-applicative? combiner)
              (object-sum (unwrap combiner))
              (cons (operative-source combiner)
-                   (operative-env combiner)))))))                          
+                   (operative-env combiner)))))))
 
   (define object-environment-cons*
     (make-object-ground! 'environment-cons*
@@ -374,7 +374,7 @@
          (display (car args))
          (newline)
          (flush-output-port)))))
- 
+
   (define object-exit
     (make-object-ground! 'exit
       (make-applicative
@@ -429,7 +429,7 @@
          (let ((proc (eval proc (environment library))))
            (make-applicative
             (lambda (env args) (apply proc args))))))))
-  
+
   (define (make-seed-environment)
     (make-environment~ (list (box (list)) object-ground)))
 
@@ -454,5 +454,5 @@
     (case-lambda
      ((exp) (meta-eval exp (make-seed-environment)))
      ((exp env) (meta-eval exp env))))
-  
+
   )
