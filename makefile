@@ -57,6 +57,10 @@ local/lib/termbox2.so:
 
 termbox2: local/lib/termbox2.so
 
+seed: seed.scm clean local/bin/letloop
+	letloop compile library/ seed.scm
+	mv a.out local/bin/seed
+
 lsm1: local/lib/lsm.so
 
 local/lib/lsm.so:
