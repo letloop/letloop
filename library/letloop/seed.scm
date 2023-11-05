@@ -1,6 +1,7 @@
 (library (letloop seed)
   (export seed-load seed-eval make-seed-environment)
   (import (chezscheme) (letloop r999) (letloop match))
+
   ;; TODO: use env's eval everywhere
 
   (define pk
@@ -441,6 +442,29 @@
 
   (define (make-seed-environment)
     (make-environment~ (list (box (list)) object-ground)))
+
+  (define-record-type* <capsule>
+    (make-capsule type object)
+    capsule?
+    (type capsule-type)
+    (object capsule-object))
+
+  (define capsule
+    (make-object-ground! 'capsule
+      (make-applicative
+       (lambda (_ args)
+         (define name (car args))
+         (list
+          ;; encapsule
+          (make-applicative (lambda (env args)
+                              (make-capsule name (car args))))
+          (make-applicative (lambda (env args)
+                              (and (capsule? (car args))
+                                   (eq? name
+                                        (capsule-type (car args))))))
+          (make-applicative (lambda (env args)
+                              (assert (eq? name (capsule-type (car args))))
+                              (capsule-object (car args)))))))))
 
   (define seed-load
     (lambda (filenames)

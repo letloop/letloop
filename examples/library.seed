@@ -1,14 +1,23 @@
+(define posix-environment (xeno getenv))
 (define reverse (xeno reverse))
 (define print (xeno (lambda args (write args) (newline) (flush-output-port))))
+(define flush-output-port (xeno flush-output-port))
 
-(define pk (xeno (lambda args
-                   (display ";;;; ")
-                   (write args)
-                   (newline)
-                   (car (reverse args)))))
+(define pk
+  (xeno (lambda args
+          (display ";; ")
+          (write args)
+          (newline)
+          (flush-output-port)
+          (car (reverse args)))))
 
 (define quote
   (vau args _ (car args)))
+
+(define assert
+  (vau x+ env
+    (unless (eval (car x+) env)
+      (print "Malfunction need input." (cdr x+)))))
 
 (define let-binding
   (vau (bindings . body) env
@@ -44,6 +53,13 @@
 (define - (xeno -))
 (define zero? (xeno zero?))
 
+(define unless
+  (vau (test . body) env
+      (eval (list if (not test)
+                   (list* sequence body)
+                   #f)
+            env)))
+
 (define when
   (vau (test . body) env
       (eval (list if test
@@ -56,8 +72,7 @@
     (let ((abc 42))
       (let loop ((abc abc))
         (when (not (zero? abc))
-          (pk abc)
-          (loop (- abc 1)))))))
+          (loop (pk (- abc 1))))))))
 
 (define and
   (vau (a . args) env
@@ -83,7 +98,6 @@
     (define predicate (car clause))
     (define production (pk 'production (cdr clause)))
 
-    (pk 'predicate predicate)
     (if (eq? predicate 'else)
         (eval (list* sequence production) env)
         (if (pk (eval predicate env))
@@ -100,9 +114,7 @@
       (vau (clause . clauses)
         (define pattern (car clause))
         (define production (car (cdr clause)))
-
         (define env* (match-exec pattern exp))
-
         (if env*
             (eval production
                   (environment-cons* env env*))
@@ -111,3 +123,30 @@
                 (apply match env obj clauses)))))
 
     (apply aux clause clauses)))
+
+(define for-each
+  (lambda (p x*)
+    (let loop ((x* x*))
+      (unless (null? x*)
+        (p (car x*))
+        (loop (cdr x*))))))
+
+(define call-with-values
+  (lambda (x seed)
+    (define B<3 (x))
+    (seed (car B<3) (car (cdr B<3)) (car (cdr (cdr B<3))))))
+
+(define ~check-capsule
+  (lambda ()
+    (pk ~check-capsule)
+    (call-with-values (lambda () (capsule 'life))
+      (lambda (enlive life? inlife)
+        (define life-love (pk 'enlive (enlive 'love)))
+        (assert (pk 'love life-love))
+        (assert (pk 'life? (life? (pk life-love))))
+        (assert (pk 'inlife (inlife life-love)))))))
+
+
+(when (posix-environment "DEBUG")
+  (~check-let)
+  (~check-capsule))
