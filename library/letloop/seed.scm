@@ -283,7 +283,14 @@
              (lambda (env args)
                (let* ((alist (map cons formals args))
                       (env* (environment-cons env alist)))
-                 (meta-eval `(sequence ,@body) env*))))))))))
+                 (meta-eval `(sequence ,@body) env*)))))
+           ((,formal ,body ...)
+            (make-applicative
+             (lambda (env args)
+               (let* ((alist (list (cons formal args)))
+                      (env* (environment-cons env alist)))
+                 (meta-eval `(sequence ,@body) env*)))))
+           (,else (error 'seed "Can't build lambda")))))))
 
   (define object-eval
     (make-object-ground! 'eval
