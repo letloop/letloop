@@ -338,7 +338,7 @@
                                         d
                                         (meta-eval o env)))
            ((,target ,d ,o)
-            (object-environment-define! target
+            (object-environment-define! (meta-eval target env)
                                         d
                                         (meta-eval o env))))))))
 
