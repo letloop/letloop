@@ -51,11 +51,13 @@
                    #f)
             env)))
 
-(let ((abc 42))
-  (let loop ((abc abc))
-    (when (not (zero? abc))
-      (pk abc)
-      (loop (- abc 1)))))
+(define ~check-let
+  (lambda ()
+    (let ((abc 42))
+      (let loop ((abc abc))
+        (when (not (zero? abc))
+          (pk abc)
+          (loop (- abc 1)))))))
 
 (define and
   (vau (a . args) env
