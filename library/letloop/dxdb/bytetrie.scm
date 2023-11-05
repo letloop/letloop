@@ -134,8 +134,8 @@
       #t))
 
   (define bytetrie-write
-    (lambda (b dbx)
-      (define xxx (dbx-chapter-x-accumulator dbx))
+    (lambda (b notebook)
+      (define xxx (make-notebook-chapter-x notebook))
       (bytetrie-write-accumulator b xxx)))
 
   (define ~check-bytetrie-002
@@ -251,8 +251,8 @@
           (apply values args)))))
 
   (define bytetrie-ref
-    (lambda (dbx x key)
-      (define bv (dbx-chapter-x dbx x))
+    (lambda (notebook x key)
+      (define bv (notebook-chapter-x-ref notebook x))
       #f))
 
   (define ~check-bytetrie-001
@@ -279,11 +279,11 @@
                                  (cdr x)))
                 bvs)
 
-      (call-with-temporary-filepath "dbx-check"
+      (call-with-temporary-filepath "notebook-check"
         (lambda (filepath)
           (with-entangle
-           (let* ((dbx (make-dbx filepath 1024))
-                  (x (bytetrie-write b dbx)))
-             (pk (dbx-chapter-x dbx x))))))))
+           (let* ((notebook (make-notebook filepath 1024))
+                  (x (bytetrie-write b notebook)))
+             (pk (make-notebook-chapter-x notebook x))))))))
 
   )
