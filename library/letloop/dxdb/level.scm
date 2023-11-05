@@ -1,7 +1,7 @@
-;; XXX: This is draft.
+;; TODO: XXX: This is draft.
 (library (letloop dxdb level)
 
-  (export make-level
+  (export #;make-level
           ;; level-maybe-contains?
           ;; level-ref
           ;; level-query
@@ -18,7 +18,7 @@
           (letloop r999)
           (scheme hash-table))
 
-  (define-record-type* <bytetrie>
+  (define-record-type* <letloop-level-bytetrie>
     (make-bytetrie-base hash-table key value)
     bytetrie?
     (hash-table bytetrie-hash-table)
