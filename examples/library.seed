@@ -43,14 +43,19 @@
 (define match
   (vau (exp clause . clauses) env
     (define obj (eval exp env))
-    (define pattern (car clause))
-    (define production (car (cdr clause)))
 
-    (define env* (match-exec pattern exp))
+    (define aux
+      (vau (clause . clauses)          
+        (define pattern (car clause))
+        (define production (car (cdr clause)))
 
-    (if env
-        (eval production
-              (environment-cons* env env*))
-        (if (null? clauses)
-            (error 'match "no match :(")
-            (apply match env obj clauses)))))
+        (define env* (match-exec pattern exp))
+
+        (if env*
+            (eval production
+                  (environment-cons* env env*))
+            (if (null? clauses)
+                (error 'match "no match :(")
+                (apply match env obj clauses)))))
+
+    (apply aux clause clauses)))
