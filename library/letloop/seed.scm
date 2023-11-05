@@ -191,10 +191,12 @@
   (define object-apply
     (make-object-ground! 'apply
       (make-applicative
-       (lambda (env args)
+       (lambda (_ args)
          (match args
-           ((,proc ,env ,args)
-            (apply (unwrap* proc) env (list args))))))))
+           ((,proc ,env ,args ... (,objects ...))
+            ((unwrap* proc) env (append args objects)))
+           ((,proc ,env ,args ... ,object)
+            ((unwrap* proc) env (append args (list object)))))))))
 
   (define object-error
     (make-object-ground! 'error
