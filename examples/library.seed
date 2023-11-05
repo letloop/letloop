@@ -39,13 +39,13 @@
             (if (null? clauses)
                 (error 'cond "no condition is met")
                 (apply cond env clauses))))))
-    
+
 (define match
   (vau (exp clause . clauses) env
     (define obj (eval exp env))
 
     (define aux
-      (vau (clause . clauses)          
+      (vau (clause . clauses)
         (define pattern (car clause))
         (define production (car (cdr clause)))
 
