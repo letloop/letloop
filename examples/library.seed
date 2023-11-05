@@ -1,11 +1,61 @@
+(define reverse (xeno reverse))
+(define print (xeno (lambda args (write args) (newline) (flush-output-port))))
+
+(define pk (xeno (lambda args
+                   (display ";;;; ")
+                   (write args)
+                   (newline)
+                   (car (reverse args)))))
+
 (define quote
   (vau args _ (car args)))
 
-(define let
-  (vau (bindings . body)  foobar
-    (define mylambda (eval (list* lambda (map car bindings) body) foobar))
+(define let-binding
+  (vau (bindings . body) env
+    (define mylambda (eval (list* lambda (map car bindings) body) env))
     (define objects (map (lambda (x) (car (cdr x))) bindings))
-    (eval (list* mylambda objects) foobar)))
+    (eval (list* mylambda objects) env)))
+
+
+(define let-loop
+  (vau (name bindings . body) env
+    (define proc (eval (list* 'lambda
+                              (map car bindings)
+                              body) env))
+    (define env*
+      (make-environment env
+                        (list (cons name
+                                    proc))))
+
+    (eval (list* name
+                 (map (lambda (x) (car (cdr x)))
+                      bindings))
+          env*)))
+
+(define pair? (xeno pair?))
+
+(define let
+  (vau (some . rest) env
+    (if (pair? some)
+        (apply let-binding env some rest)
+        (apply let-loop env some rest))))
+
+(define + (xeno +))
+(define - (xeno -))
+(define zero? (xeno zero?))
+
+(define when
+  (vau (test . body) env
+      (eval (list if test
+                   (list* sequence body)
+                   #f)
+            env)))
+
+(let ((abc 42))
+  (let loop ((abc abc))
+    (when (not (zero? abc))
+      (pk abc)
+      (loop (- abc 1)))))
 
 (define and
   (vau (a . args) env
