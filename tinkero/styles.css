@@ -1,0 +1,139 @@
+/* flexbox cheatsheet: https://bit.ly/1xEYMhF */
+
+/* universal box sizing with inheritance */
+/* https://css-tricks.com/box-sizing/ */
+
+html {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  -webkit-box-sizing: inherit;
+  -moz-box-sizing: inherit;
+  box-sizing: inherit;
+}
+
+
+/* BASICS */
+
+body {
+    font-family: sans;
+    font-size: 18px;
+    color: white;
+}
+
+h1 {
+    font-family: 'League Gothic', Impact, sans-serif, sans;
+    font-weight: normal;
+    color: white;
+    text-align: left;
+    font-size: 2em;
+}
+
+h2, h3, h4, h5, h6 {
+    font-family: 'League Gothic', Impact, sans-serif, sans;
+    font-weight: normal;
+    color: white;
+    text-align: left;
+    margin: 0px;
+}
+
+p {
+    margin: 0px;
+    line-height: 1.6em;
+}
+
+code {
+    background: hsla(0, 0%, 100%, 0.1);
+    padding: 3px;
+    border-radius: 3px;
+}
+
+
+
+a:link,
+a:visited,
+a:active {
+    color: white;
+    text-decoration: none;
+    border-bottom: 1px solid white;
+}
+
+a:hover {
+    color: #3498db;
+    border-bottom: 1px solid #3498db;
+}
+
+
+/* FORM */
+
+form p.error {
+    background: hsla(0, 90.5%, 41.2%, 0.3);;
+    margin-top: -15px;
+    padding: 5px;
+}
+
+
+textarea, input[type="text"], input[type="password"]  {
+    border: 0px;
+    border: 1px solid hsla(0, 0%, 100%, 0.3);
+    background: transparent;
+    margin-bottom: 15px;
+    padding: 15px;
+}
+
+input[type="submit"] {
+    background: hsla(0, 0%, 100%, 0.1);
+    border: 1px solid hsla(0, 0%, 100%, 0.3);
+    box-shadow: 1px 1px 2px black;
+    margin-bottom: 15px;
+    padding: 15px;
+}
+
+input[type="submit"]:hover {
+    background: hsla(0, 0%, 100%, 0.3);
+}
+
+
+/* BACKGROUND */
+
+#background video {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -100;
+    transform: translateX(-50%) translateY(-50%);
+    background: url(video/poster.jpeg) no-repeat;
+    background-size: cover;
+}
+
+@media screen and (max-device-width: 800px) {
+    body { background: url(video/poster.jpeg) #000 no-repeat center center fixed;}
+    #background { display: none; }
+}
+
+/* OVERLAY */
+
+#overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -99;
+    transform: translateX(-50%) translateY(-50%);
+    background: url(video/overlay.png);
+}
+
+/* ROOT */
+
+#root > h1 {
+    padding: 15px;
+}

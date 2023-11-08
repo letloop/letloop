@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="alternate" type="application/rss+xml" title="hyperdev.fr" href="http://localhost:8000/feed.xml" />
+    <link rel="stylesheet" href="/normalize.css">
+    <link rel="stylesheet" href="/styles.css">
+    <title></title>
+  </head>
+  <body>
+    <div id="background">
+      <video autoplay loop poster="/static/video/poster.jpeg">
+	<source src="/video/space.ogv" type="video/ogg"/>
+	<source src="/video/space.mp4" type="video/mp4"/>
+	<source src="/video/space.webm" type="video/webm"/>
+      </video>
+    </div>
+    <div id="overlay">
+    </div>
+    <div id="root">
+      <h1><a href="http://localhost:8000">hyperdev.fr</a></h1>
+      <ul>
+	<li><a href="http://localhost:8000/blog/diy-graph-database-in-python.html">2017/03/01 - Do It Yourself: a Graph Database in Python</a></li>
+	<li><a href="http://localhost:8000/blog/diy-a-search-engine-in-gnu-guile.html">2017/02/01 - Do It Yourself: a search engine in Scheme Guile</a></li>
+	<li><a href="http://localhost:8000/blog/diy-ai.html">2017/01/01 - Do It Yourself: an Artificial Intelligence</a></li>
+      </ul>
+    </div>
+    <script type="text/javascript" src="biwascheme.js"></script>
+    <script type="text/javascript">
+      var onError = function(e){ console.error(e); }
+      var biwa = new BiwaScheme.Interpreter(onError)
+      fetch("/scheme.scm").then(function(response) {
+          response.text().then(function(text) {
+              biwa.evaluate(text, function(result) {
+                  console.log(result);  // => 3
+              });
+          })
+      });
+    </script>
+  </body>
+</html>
