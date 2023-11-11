@@ -2,7 +2,7 @@
 title: An Ordered Key-Value Store by the makers of SQLite
 banner: https://hyper.dev/static/okdb.png
 date: 2023-10-15
-abstract: Started as a new backend for SQLite, it can be embedded in your Scheme program expose a simple, and but powerful storage programming interface.
+abstract: Started as a new backend for SQLite, it can be embedded in your Scheme program for use as a simple, and but powerful storage programming interface.
 ---
 
 # `(import (letloop lsm1))`
