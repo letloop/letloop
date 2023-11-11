@@ -777,7 +777,7 @@
       (equal? (map car expected)
               (map car (generator->list (okvs-zigzag okvsx (bytevector 00) (bytevector-max (okvs-key-max-length (make-okvs)))))))))
 
-  (define* check-okvs-zigzag-cursor-fuzz
+  (define check-okvs-zigzag-cursor-fuzz
     (lambda (make-okvs)
       (do-times (if (getenv "LETLOOP_SEED") 1 (expt 10 2))
         (define seed (random-seed

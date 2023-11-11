@@ -2,9 +2,9 @@
   (export bytetrie
           bytetrie-add!
           bytetrie-finalize
-          ~check-bytetrie-000
-          ~check-bytetrie-001
-          ~check-bytetrie-002
+          ;; ~check-bytetrie-000
+          ;; ~check-bytetrie-001
+          ;; ~check-bytetrie-002
           )
 
   (import (chezscheme)

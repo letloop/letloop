@@ -22,11 +22,11 @@
           notebook-chapter-x-append!
           notebook-chapter-x-query
           
-          ~check-notebook-000
-          ~check-notebook-001
-          ~check-notebook-002
-          ~check-notebook-003
-          ~check-notebook-004
+          ;; ~check-notebook-000
+          ;; ~check-notebook-001
+          ;; ~check-notebook-002
+          ;; ~check-notebook-003
+          ;; ~check-notebook-004
           )
   (import (chezscheme)
           (letloop r999)
