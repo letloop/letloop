@@ -25,9 +25,9 @@
     (define objects (map (lambda (x) (car (cdr x))) bindings))
     (eval (list* mylambda objects) env)))
 
-
 (define let-loop
   (vau (name bindings . body) env
+    ;; co-recursive definition
     (define proc (eval (list* 'lambda
                               (map car bindings)
                               body) env))
@@ -145,7 +145,6 @@
         (assert (pk 'love life-love))
         (assert (pk 'life? (life? (pk life-love))))
         (assert (pk 'inlife (inlife life-love)))))))
-
 
 (when (posix-environment "DEBUG")
   (~check-let)

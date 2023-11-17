@@ -1,0 +1,56 @@
+(define reverse (xeno reverse))
+(define display (xeno display))
+(define newline (xeno newline))
+(define list (xeno list))
+(define zero? (xeno zero?))
+
+(define quote (vau (x) env x))
+
+(define foo 'foo)
+
+(define pk
+  (lambda args
+    (display args)
+    (newline)
+    (car (reverse args))))
+
+(define capsule/cx (capsule 'cx))
+
+(define cx-encapsuler
+  (lambda args
+    ((car capsule/cx) args)))
+
+(define cx-capsule?
+  (lambda (object)
+    ((car (cdr capsule/cx)) object)))
+
+(define cx-decapsule
+  (lambda (object)
+    ((car (cdr (cdr capsule/cx))) object)))
+
+(define foobar (pk (cx-encapsuler 'foo 'bar 'qux)))
+
+(pk (cx-capsule? foobar))
+(pk (cx-decapsule foobar))
+
+(define iota
+  (lambda (n)
+    (let loop ((n n)
+               (out (list)))
+      (if (zero? n)
+          out
+          (loop (- n 1) (cons (- n 1) out))))))
+
+(pk (iota 5))
+
+(define ziota
+  (lambda (n)
+    (let loop ((n n)
+               (i 0))
+      (pk 'loop n i)
+      (lambda ()
+        (pk 'lambda n i)
+        (cons i (loop (- n 1) (+ i 1)))))))
+
+(define z (ziota 10))
+(define z0 (pk (z)))

@@ -279,17 +279,17 @@
   (define object-lambda
     (make-object-ground! 'lambda
       (make-operative
-       (lambda (_ args)
+       (lambda (env args)
          (match args
            (((,formals ...) ,body ...)
             (make-applicative
-             (lambda (env args)
+             (lambda (_ args)
                (let* ((alist (map cons formals args))
                       (env* (environment-cons env alist)))
                  (meta-eval `(sequence ,@body) env*)))))
            ((,formal ,body ...)
             (make-applicative
-             (lambda (env args)
+             (lambda (_ args)
                (let* ((alist (list (cons formal args)))
                       (env* (environment-cons env alist)))
                  (meta-eval `(sequence ,@body) env*)))))
