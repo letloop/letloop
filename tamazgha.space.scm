@@ -1,0 +1,147 @@
+(import (chezscheme))
+(import (letloop termbox2))
+
+
+(define termbox-print
+  (lambda (line string color)
+    (dg 'ooops line string color)
+    (let loop ((index 0)
+               (chars (string->list string)))
+      (unless (null? chars)
+        (tb-change-cell index line (char->integer (car chars)) color TB-DEFAULT)
+        (loop (fx+ index 1) (cdr chars))))))
+
+(define continue? #t)
+
+(define %error (open-file-output-port "out.log"
+                                      (file-options no-fail)
+                                      (buffer-mode line)
+                                      (native-transcoder)))
+
+(define (dg . rest)
+  (write rest %error) (newline %error)
+  (car (reverse rest)))
+
+(define amawal
+  (list
+   (list "🚰" "eau" "water" "aman" "ⴰⵎⴰⵊ")
+   (list "🚪" "porte" "door" "tabburt" "ⵜⴰⵀⵀⴻⵔⵜ")
+   (list "👨‍👩‍👦‍👦" "famille" "famila" "tawacult" "ⵜⴰⵡⴰⵛⴻⵏⵜ")
+   (list "⛰️" "montagne" "moutain" "adrar" "ⴰⴷⵔⴰⵔ")
+   (list "🥾" "chaussure" "boot" "asbbadd" "ⴰⵙⴻⴱⴱⴰⴹ")
+   (list "🔥" "feu" "fire" "times" "ⵜⵉⵎⴻⵙ")
+   (list "🖐" "main" "hand" "afus" "ⴰⴼⵓⵙ")
+   (list "👨" "homme" "man" "argaz" "ⴰⵔⴳⴰⵣ")
+   (list "👉" "la-bas" "there" "dihin" "ⴷⵉⵀⵉⵏ")
+   (list "🌃" "nuit" "night" "idd" "ⵉⴹ")
+   (list "🕊" "paix" "peace" "lehna" "ⵍⴰⵀⵊⴰ")
+   (list "☮️" "paix" "peace" "lehna" "ⵍⴰⵀⵊⴰ")
+   (list "🌧" "pluie" "rain" "lahwa" "ⵍⴰⵀⵡⴰ")
+   (list "🥜" "cacahuete" "peanut" "kawkaw" "ⴽⴰⵡⴽⴰⵡ")
+   (list "🐱" "chat" "cat" "amchiche" "ⴰⵎⵛⵉⵛ")
+   (list "🕑" "deux" "two" "sin" "ⵙⵉⵏ")
+   (list "🥵" "chaleur" "hot" "lhamou" "ⵍⵃⴰⵎⵓ")
+   (list "👃" "nez" "nose" "anzaren" "ⴰⵏⵣⴰⵔⴻⵏ")
+   (list "🍋" "citron" "lemon" "lqares" "ⵍⵇⴰⵕⵓⵙ")
+   (list "🐌" "escargot" "snail" "ararouss" "ⴰⵄⴰⵕⵓⵙ")
+   (list "😄" "rire" "laugh" "tadssa" "ⵜⴰⴹⵚⴰ")
+   ))
+
+
+(define tifinagh
+  (lambda ()
+    (map (lambda (x) (list (string->list (car x)) (cadr x)))
+         (list (list "ya" "ⴰ")
+               (list "yab" "ⴱ")
+               (list "yach" "ⵛ")
+               (list "yad" "ⴷ")
+               (list "yadd" "ⴹ")
+               (list "yey" "ⴻ")
+               (list "yaf" "ⴼ")
+               (list "yag" "ⴳ")
+               (list "yah" "ⵀ")
+               (list "yi" "ⵉ")
+               (list "yaj" "ⵊ")
+               (list "yak" "ⴽ")
+               (list "yal" "ⵍ")
+               (list "yam" "ⵎ")
+               (list "yan" "ⵏ")
+               (list "yaa" "ⵄ")
+               (list "yahh" "ⵃ")
+               (list "yaq" "ⵇ")
+               (list "yar" "ⵔ")
+               (list "yarr" "ⵕ")
+               (list "yas" "ⵙ")
+               (list "yass" "ⵚ")
+               (list "yat" "ⵜ")
+               (list "yatt" "ⵟ")
+               (list "you" "ⵓ")
+               (list "yagh" "ⵖ")
+               (list "yaw" "ⵡ")
+               (list "yakh" "ⵅ")
+               (list "yay" "ⵢ")
+               (list "yaz" "ⵣ")
+               (list "yazz" "ⵥ")))))
+
+(define choice
+  (lambda (objects)
+    (list-ref objects (random (length objects)))))
+
+(define welcome "Welcome to termbox typer! Type Ctrl + Q to quit.")
+(define message " Type any key...")
+(define message2 "")
+(define tifi (choice (tifinagh)))
+(define entry '())
+
+(define new-question
+  (lambda (key)
+    (set! message2 "")
+    (set! entry '())
+    (set! tifi (choice (tifinagh)))
+    (set! message (format #f "The letter is `~a` it is typed `~a`. Please type it?" (cadr tifi) (car tifi)))
+    (set! callback ask)))
+
+(define ask
+  (lambda (key)
+    (set! message2 "")
+    (cond
+     ((and (key? key) (or (eq? (key-key key) 'backspace)
+                          (eq? (key-key key) 'backspace2)))
+      (set! entry
+            (if (null? entry)
+                '()
+                (cdr entry))))
+     ((and (key? key) (eq? (key-key key) #\space))
+       (if (equal? (reverse entry) (car tifi))
+           (begin
+             (set! message "You win. Type any key to continue...")
+             (set! callback new-question))
+           (set! message2 "Oops... That is wrong, use backspace to delete previous key")))
+      (else (set! entry (cons (key-key key) entry))))))
+        
+
+(define callback new-question)
+    
+(define (main)
+  (tb-init)
+  ;; (tb-select-output-mode TB-INIT)
+  (let loop ((count 0))
+    (tb-clear)
+    (tb-hide-cursor)
+    (termbox-print 1 welcome TB-YELLOW)
+    (termbox-print 3 message TB-GREEN)
+    (termbox-print 5 message2 TB-BLUE)
+    (unless (null? entry)
+      (termbox-print 6 (format #f "entry> ~a" (reverse entry)) TB-BLUE))
+    (tb-present)
+    (let ((event (tb-poll-event)))
+      (if (and (key? event)
+               (equal? (key-key event) #\q)
+               (key-ctrl? event))
+          (set! continue? #f)
+          (begin
+            (callback event)
+            (loop (fx+ count 1)))))))
+        
+(tb-shutdown)
+(main)
