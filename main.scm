@@ -58,7 +58,6 @@
        (script (@ (type "text/javascript")
                   (src "https://hyper.dev/static/stars.js")))))))
 
-
 (define literally-read
   (lambda (string)
     (pk (literally (open-input-string string)))))
@@ -119,7 +118,6 @@
 (define normalized
   (lambda (name)
 
-
     (define drop-while
       (lambda (objects predicate?)
         (let loop ((objects objects))
@@ -171,7 +169,6 @@
 (define make-application
   (lambda (code)
 
-
     (define massage
       (lambda (exp)
         (match exp
@@ -202,7 +199,7 @@
             (lambda (path query fragment)
               (match (pk 'request (cons method path))
 
-                ((GET "u" ,pretty-name ,uid)
+                ((GET "u" ,pretty-name ,uid "view")
                  (http-response-write
                   write "HTTP/1.1" 200 "Found" '()
                   (string->utf8
@@ -243,14 +240,26 @@
                     (render "be.hyper.dev"
                             `(body
                               ,((frob (literally-read code)))))))))
-                ((POST "u" ,pretty-name ,uid "editor")
+                
+                ((POST "u" ,pretty-name ,uid "edit")
                  (set! code
                    (cdr (assq 'code
                               (www-form-urlencoded-read
                                (utf8->string
                                 (generator->bytevector body))))))
 
-                 (http-redirect write (string-append "/u/" pretty-name "/" uid "/editor/")))
+                 (http-redirect write (string-append "/u/" pretty-name "/" uid "/edit/")))
+
+                
+                ((POST "u" ,pretty-name ,uid "edit")
+                 (set! code
+                   (cdr (assq 'code
+                              (www-form-urlencoded-read
+                               (utf8->string
+                                (generator->bytevector body))))))
+
+                 (http-redirect write (string-append "/u/" pretty-name "/" uid "/edit/")))
+                
                 ((GET)
                  (http-response-write
                   write "HTTP/1.1" 200 "Found" '()
@@ -266,7 +275,7 @@
                                 (utf8->string
                                  (generator->bytevector body)))))))
                  (define uid (number->string (random (expt 2 64)) 36))
-                 (http-redirect write (string-append "/u/" pretty-name "/" uid "/editor/")))
+                 (http-redirect write (string-append "/u/" pretty-name "/" uid "/edit/")))
                 (,_
                  (http-response-write write "HTTP/1.1" 404 "Found" '()
                                       (string->utf8
@@ -279,9 +288,9 @@
 
 (define main
   (lambda ()
-    (call-with-values (lambda () (entangle-tcp-serve "0.0.0.0" port))
+    (call-with-values (lambda () (entangle-tcp-serve "0.0.0.0" 9999))
       (lambda (accept close)
-        (format #t "HTTP server running at http://127.0.0.1:~a\n" port)
+        (format #t "HTTP server running at http://127.0.0.1:~a\n" 9999)
         (let loop ()
           (guard (ex (else
                       (pk 'accept (apply format #f
@@ -294,8 +303,6 @@
                                   (handle read write close))))))
           (loop))))))
 
-
-(define port (string->number (cadr (command-line))))
 
 (make-entangle)
 (entangle-spawn main)
