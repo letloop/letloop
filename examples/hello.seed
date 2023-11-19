@@ -1,28 +1,29 @@
-(define text-upper (xeno string-upcase))
-(define text-lower (xeno string-downcase))
-(define text->list (xeno string->list))
-(define list->text (xeno list->string))
-(define reverse (xeno reverse))
+(sequence
+  (define text-upper (xeno string-upcase))
+  (define text-lower (xeno string-downcase))
+  (define text->list (xeno string->list))
+  (define list->text (xeno list->string))
+  (define reverse (xeno reverse))
 
-(define display (xeno display))
-(define newline (xeno newline))
-(define write (xeno write))
+  (define display (xeno display))
+  (define newline (xeno newline))
+  (define write (xeno write))
 
-(define print
-  (lambda (message)
-    (display message)
-    (newline)))
+  (define print
+    (lambda (message)
+      (display message)
+      (newline)))
 
-(define print*
-  (vau (exp) env
-    (display "> ") (write exp)
-    (newline)
-    (print (eval exp env))))
+  (define print*
+    (vau (exp) env
+      (display "> ") (write exp)
+      (newline)
+      (print (eval exp env))))
 
-(print* (text-upper "ⴰⵣⵓⵍ ⴼⴻⵍⴰⵡⴻⵏ"))
-(newline)
-(print* (text-upper "Approchez, et soyez aussi bon que mon coeur."))
-(newline)
-(print* (text-upper "اقترب وكن لطيفا مثل قلبي"))
-(newline)
-(print* (text-upper "Come to me."))
+  (print* (text-upper "ⴰⵣⵓⵍ ⴼⴻⵍⴰⵡⴻⵏ"))
+  (newline)
+  (print* (text-upper "Approchez, et soyez aussi bon que mon coeur."))
+  (newline)
+  (print* (text-upper "اقترب وكن لطيفا مثل قلبي"))
+  (newline)
+  (print* (text-upper "Come to me.")))

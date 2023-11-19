@@ -40,15 +40,15 @@
 
   (define combiner?
     (lambda (x)
-      (or (object-applicative? x) (object-operative? x))))
-
+      (or (object-applicative? x) (object-operative? x)))
+)
   (define make-applicative
     (case-lambda
      ((meta) (make-applicative~ (make-operative meta)))
      ((meta source env) (make-applicative~ (make-operative meta source env)))))
 
-  (define object-environment-ref
-    (lambda (env symbol)
+  (define object-environment-ref~
+    (lambda (who env symbol)
       (let loopx ((frames (environment-env 'ref env)))
         (when (null? frames)
           (error 'object "symbol not found" symbol))
@@ -59,6 +59,10 @@
                   (cdar frame)
                   (loopy (cdr frame))))))))
 
+  (define object-environment-ref
+    (lambda (who env symbol)
+      (unbox (object-environment-ref~ who env symbol))))
+  
   (define meta-apply
     (lambda (name combiner args env)
       (cond
@@ -72,7 +76,7 @@
 
   (define (meta-eval exp env)
     (cond
-     ((symbol? exp) (object-environment-ref env exp))
+     ((symbol? exp) (object-environment-ref 'meta-eval env exp))
      ((number? exp) exp)
      ((boolean? exp) exp)
      ((string? exp) exp)
@@ -82,29 +86,22 @@
                   (cdr exp)
                   env))
      (else exp)))
-
-  (define object-environment-set!
-    (lambda (env symbol object)
-      (define frame (car (environment-env 'set env)))
-
-      (define set!
-        (lambda (alist key value)
-          (define item (assq key alist))
-          (if (not (pair? item))
-              (error 'object "Can not set variable that is not defined in scope" symbol)
-              (and (set-cdr! item value)
-                   alist))))
-
-      (set-box! frame (set! (unbox frame) symbol object))))
-
+    
   (define object-environment-define!
     (lambda (env symbol object)
-      (define frame (car (environment-env 'define env)))
-      (set-box! frame (cons (cons symbol object) (unbox frame)))))
+      (define box (object-environment-ref~ 'define! env symbol))
+      (set-box! box object)))
+
+  (define object-environment-set! object-environment-define!)
 
   (define (make-environment alist)
-    (make-environment~ (list (box (list)) (box alist))))
+    (make-environment~ (list (box (list)) (box (map (lambda (x) (cons (car x) (box (cdr x)))) alist)))))
 
+  (define object-environment-allocate
+    (lambda (env symbol)
+      (define frame (car (environment-env 'allocate env)))
+      (set-box! frame (cons (cons symbol (box (void))) (unbox frame)))))
+  
   (define (environment-cons env alist)
     (make-environment~ (cons (box alist) (environment-env 'cons env))))
 
@@ -126,7 +123,7 @@
                    alist))))
 
       (set-box! object-ground
-                (set! (unbox object-ground) key value))
+                (set! (unbox object-ground) key (box value)))
       value))
 
   (define object-sum
@@ -140,6 +137,18 @@
              (cons (operative-source combiner)
                    (operative-env combiner)))))))
 
+  (define object-box
+    (make-object-ground! 'box
+      (make-applicative
+       (lambda (env args)
+         (box (car args))))))
+  
+  (define object-unbox
+    (make-object-ground! 'unbox
+      (make-applicative
+       (lambda (env args)
+         (unbox (car args))))))
+  
   (define object-environment-cons*
     (make-object-ground! 'environment-cons*
       (make-applicative (lambda (env args) (apply environment-cons* args)))))
@@ -236,7 +245,7 @@
           (reverse (cons (cons rest args) out)))
          (else (loop (cdr positionals) (cdr args)
                      (cons (cons (car positionals)
-                                 (car args))
+                                 (box (car args)))
                            out)))))))
 
   (define object-vau
@@ -251,8 +260,8 @@
                   ((,formal ,dynamic-env-name ,body ...)
                    (make-operative
                     (lambda (dynamic-env args)
-                      (let* ((alist (list (cons formal args)
-                                          (cons dynamic-env-name dynamic-env)))
+                      (let* ((alist (list (cons formal (box args))
+                                          (cons dynamic-env-name (box dynamic-env))))
                              (env* (environment-cons static-env alist)))
                         (meta-eval `(sequence ,@body) env*)))
                     source
@@ -262,7 +271,7 @@
                     (if rest?
                         (make-operative
                          (lambda (dynamic-env args*)
-                           (let* ((alist (cons (cons dynamic-env-name dynamic-env)
+                           (let* ((alist (cons (cons dynamic-env-name (box dynamic-env))
                                                (parse-arguments-with-rest positionals rest args*)))
                                   (env* (environment-cons static-env alist)))
                              (meta-eval `(sequence ,@body) env*)))
@@ -284,13 +293,13 @@
            (((,formals ...) ,body ...)
             (make-applicative
              (lambda (_ args)
-               (let* ((alist (map cons formals args))
+               (let* ((alist (map (lambda (x y) (cons x (box y))) formals args))
                       (env* (environment-cons env alist)))
                  (meta-eval `(sequence ,@body) env*)))))
            ((,formal ,body ...)
             (make-applicative
              (lambda (_ args)
-               (let* ((alist (list (cons formal args)))
+               (let* ((alist (list (cons formal (box args))))
                       (env* (environment-cons env alist)))
                  (meta-eval `(sequence ,@body) env*)))))
            (,else (error 'seed "Can't build lambda")))))))
@@ -299,9 +308,18 @@
     (make-object-ground! 'eval
       (make-applicative (lambda (env args) (apply meta-eval args)))))
 
+  (define meta-boxes
+    (lambda (env exp)
+      (for-each
+       (lambda (x)
+         (match x
+           ((define ,name ,object) (object-environment-allocate env name))))
+       exp)))
+
   (define object-sequence
     (make-object-ground! 'sequence
       (make-operative (lambda (env args)
+                        (meta-boxes env args)
                         (let loop ((args args))
                           (let ((out (meta-eval (car args) env)))
                             (if (null? (cdr args))
