@@ -208,7 +208,7 @@
                             `(body
                               ,@(cdr (pk (html-read (commonmark-read code))))))))))
 
-                ((GET "u" ,pretty-name ,uid "editor")
+                ((GET "u" ,pretty-name ,uid "edit")
                  (http-response-write
                   write "HTTP/1.1" 200 "Found" '()
                   (string->utf8
@@ -222,7 +222,21 @@
                                      (@
                                       (href
                                        ,(format #f
-                                               "/u/~a/~a1/apply/" pretty-name uid)))
+                                               "/u/~a/~a/view/" pretty-name uid)))
+                                     "view")
+                                    " "
+                                    (a
+                                     (@
+                                      (href
+                                       ,(format #f
+                                               "/u/~a/~a/edit/" pretty-name uid)))
+                                     "edit")
+                                    " " 
+                                    (a
+                                     (@
+                                      (href
+                                       ,(format #f
+                                               "/u/~a/~a/apply/" pretty-name uid)))
                                       "apply")
                                     (textarea
                                      (@ (rows 43)
