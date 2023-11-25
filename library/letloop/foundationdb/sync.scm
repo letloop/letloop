@@ -227,12 +227,13 @@
            ((keyword args ...) body ...))))))
 
   (define-syntax-rule (do-times n body ...)
-    (let loop ((index n))
-      (when (= (modulo index 100) 0)
-        (pk 'body ... index))
-      (unless (zero? index)
-        body ...
-        (loop (- index 1)))))
+    (begin
+      (let loop ((index n))
+        (when (= (modulo index 100) 0)
+          (unless (zero? index)
+            body ...
+            (loop (- index 1)))))
+      #t))
 
   (define ~check-letloop-foundationdb-sync-001
     (lambda ()
