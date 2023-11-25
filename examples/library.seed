@@ -1,151 +1,162 @@
-(define posix-environment (xeno getenv))
-(define reverse (xeno reverse))
-(define print (xeno (lambda args (write args) (newline) (flush-output-port))))
-(define flush-output-port (xeno flush-output-port))
+(sequence
+  (define posix-environment (xeno getenv))
+  (define reverse (xeno reverse))
+  (define print (xeno (lambda args (write args) (newline) (flush-output-port))))
+  (define flush-output-port (xeno flush-output-port))
 
-(define pk
-  (xeno (lambda args
-          (display ";; ")
-          (write args)
-          (newline)
-          (flush-output-port)
-          (car (reverse args)))))
+  (define pk
+    (xeno (lambda args
+            (display ";; ")
+            (write args)
+            (newline)
+            (flush-output-port)
+            (car (reverse args)))))
 
-(define quote
-  (vau args _ (car args)))
+  (define quote
+    (vau args _ (car args)))
 
-(define assert
-  (vau x+ env
-    (unless (eval (car x+) env)
-      (print "Malfunction need input." (cdr x+)))))
+  (define assert
+    (vau x+ env
+      (unless (eval (car x+) env)
+        (print "Malfunction need input." (cdr x+)))))
 
-(define let-binding
-  (vau (bindings . body) env
-    (define mylambda (eval (list* lambda (map car bindings) body) env))
-    (define objects (map (lambda (x) (car (cdr x))) bindings))
-    (eval (list* mylambda objects) env)))
+  (define let-binding
+    (vau (bindings . body) env
+      (define mylambda (eval (list* lambda (map car bindings) body) env))
+      (define objects (map (lambda (x) (car (cdr x))) bindings))
+      (eval (list* mylambda objects) env)))
 
-(define let-loop
-  (vau (name bindings . body) env
-    ;; co-recursive definition
-    (define proc (eval (list* 'lambda
-                              (map car bindings)
-                              body) env))
-    (define env*
-      (make-environment env
-                        (list (cons name
-                                    proc))))
+  (define let-loop
+    (vau (name bindings . body) env
+      (sequence
+        (define proc (eval (list* 'lambda
+                                  (map car bindings)
+                                  body) env*))
+        (define env*
+          (make-environment env
+                            (list (cons name
+                                        proc))))
+        (pk 'fufufufu (environment-current))
+        (eval (pk 'youpi (list* name
+                                (map (lambda (x) (car (cdr x)))
+                                     bindings)))
+              env*))))
 
-    (eval (list* name
-                 (map (lambda (x) (car (cdr x)))
-                      bindings))
-          env*)))
+  (define pair? (xeno pair?))
 
-(define pair? (xeno pair?))
+  (define let
+    (vau (some . rest) env
+      (if (pair? some)
+          (apply let-binding env some rest)
+          (apply let-loop env some rest))))
 
-(define let
-  (vau (some . rest) env
-    (if (pair? some)
-        (apply let-binding env some rest)
-        (apply let-loop env some rest))))
+  (define + (xeno +))
+  (define - (xeno -))
+  (define zero? (xeno zero?))
 
-(define + (xeno +))
-(define - (xeno -))
-(define zero? (xeno zero?))
-
-(define unless
-  (vau (test . body) env
+  (define unless
+    (vau (test . body) env
       (eval (list if (not test)
-                   (list* sequence body)
-                   #f)
+                  (list* sequence body)
+                  #f)
             env)))
 
-(define when
-  (vau (test . body) env
+  (define when
+    (vau (test . body) env
+      (pk 'when 'env env)
       (eval (list if test
-                   (list* sequence body)
-                   #f)
+                  (list* sequence body)
+                  #f)
             env)))
 
-(define ~check-let
-  (lambda ()
-    (let ((abc 42))
-      (let loop ((abc abc))
-        (when (not (zero? abc))
-          (loop (pk (- abc 1))))))))
+  (define environment-current
+    (vau _ env env))
+  
+  (define ~check-let
+    (lambda ()
+      (pk 'fuu 1)
+      (let ((abc 42))
+        (pk 'fuu 2)
+        (let loop ((abc abc))
+          (pk 'fuu 3 (environment-current))
+          (when (not (zero? abc))
+            (pk 'fuu 4)
+            (loop (pk (- abc 1))))))))
 
-(define and
-  (vau (a . args) env
-    (if (not (eval a env))
-        #f
-        (if (null? args)
-            #t
-            (apply and env args)))))
+  (define and
+    (vau (a . args) env
+      (if (not (eval a env))
+          #f
+          (if (null? args)
+              #t
+              (apply and env args)))))
 
-(define string-upper (xeno string-upcase))
-(define string-lower (xeno string-downcase))
+  (define string-upper (xeno string-upcase))
+  (define string-lower (xeno string-downcase))
 
-(define or
-  (vau (a . args) env
-    (if (eval a env)
-        #t
-        (if (null? args)
-            #f
-            (apply or env args)))))
+  (define or
+    (vau (a . args) env
+      (if (eval a env)
+          #t
+          (if (null? args)
+              #f
+              (apply or env args)))))
 
-(define cond
-  (vau (clause . clauses) env
-    (define predicate (car clause))
-    (define production (pk 'production (cdr clause)))
+  (define cond
+    (vau (clause . clauses) env
+      (define predicate (car clause))
+      (define production (pk 'production (cdr clause)))
 
-    (if (eq? predicate 'else)
-        (eval (list* sequence production) env)
-        (if (pk (eval predicate env))
-            (eval (list* sequence production) env)
-            (if (null? clauses)
-                (error 'cond "no condition is met")
-                (apply cond env clauses))))))
+      (if (eq? predicate 'else)
+          (eval (list* sequence production) env)
+          (if (pk (eval predicate env))
+              (eval (list* sequence production) env)
+              (if (null? clauses)
+                  (error 'cond "no condition is met")
+                  (apply cond env clauses))))))
 
-(define match
-  (vau (exp clause . clauses) env
-    (define obj (eval exp env))
+  (define match
+    (vau (exp clause . clauses) env
+      (define obj (eval exp env))
 
-    (define aux
-      (vau (clause . clauses)
-        (define pattern (car clause))
-        (define production (car (cdr clause)))
-        (define env* (match-exec pattern exp))
-        (if env*
-            (eval production
-                  (environment-cons* env env*))
-            (if (null? clauses)
-                (error 'match "no match :(")
-                (apply match env obj clauses)))))
+      (define aux
+        (vau (clause . clauses)
+            (define pattern (car clause))
+          (define production (car (cdr clause)))
+          (define env* (match-exec pattern exp))
+          (if env*
+              (eval production
+                    (environment-cons* env env*))
+              (if (null? clauses)
+                  (error 'match "no match :(")
+                  (apply match env obj clauses)))))
 
-    (apply aux clause clauses)))
+      (apply aux clause clauses)))
 
-(define for-each
-  (lambda (p x*)
-    (let loop ((x* x*))
-      (unless (null? x*)
-        (p (car x*))
-        (loop (cdr x*))))))
+  (define for-each
+    (lambda (p x*)
+      (let loop ((x* x*))
+        (unless (null? x*)
+          (p (car x*))
+          (loop (cdr x*))))))
 
-(define call-with-values
-  (lambda (x seed)
-    (define B<3 (x))
-    (seed (car B<3) (car (cdr B<3)) (car (cdr (cdr B<3))))))
+  (define call-with-values
+    (lambda (x seed)
+      (define B<3 (x))
+      (seed (car B<3) (car (cdr B<3)) (car (cdr (cdr B<3))))))
 
-(define ~check-capsule
-  (lambda ()
-    (pk ~check-capsule)
-    (call-with-values (lambda () (capsule 'life))
-      (lambda (enlive life? inlife)
-        (define life-love (pk 'enlive (enlive 'love)))
-        (assert (pk 'love life-love))
-        (assert (pk 'life? (life? (pk life-love))))
-        (assert (pk 'inlife (inlife life-love)))))))
+  (define ~check-capsule
+    (lambda ()
+      (pk ~check-capsule)
+      (call-with-values (lambda () (capsule 'life))
+        (lambda (enlive life? inlife)
+          (define life-love (pk 'enlive (enlive 'love)))
+          (assert (pk 'love life-love))
+          (assert (pk 'life? (life? (pk life-love))))
+          (assert (pk 'inlife (inlife life-love)))))))
 
-(when (posix-environment "DEBUG")
-  (~check-let)
-  (~check-capsule))
+  (when (posix-environment "SEED_DEBUG")
+    (pk 'check-let)
+    (~check-let)
+    (pk 'check-capsule)
+    (~check-capsule)))

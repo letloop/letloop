@@ -31,6 +31,7 @@
 
   (define environment-env
     (lambda (who x)
+      (pk 'environment-env who)
       (environment-env* x)))
 
   (define-record-type* <applicative>
@@ -40,8 +41,8 @@
 
   (define combiner?
     (lambda (x)
-      (or (object-applicative? x) (object-operative? x)))
-)
+      (or (object-applicative? x) (object-operative? x))))
+
   (define make-applicative
     (case-lambda
      ((meta) (make-applicative~ (make-operative meta)))
@@ -62,7 +63,7 @@
   (define object-environment-ref
     (lambda (who env symbol)
       (unbox (object-environment-ref~ who env symbol))))
-  
+
   (define meta-apply
     (lambda (name combiner args env)
       (cond
@@ -81,12 +82,13 @@
      ((boolean? exp) exp)
      ((string? exp) exp)
      ((pair? exp)
+      (pk 'meta-eval (car exp))
       (meta-apply (car exp)
                   (meta-eval (car exp) env)
                   (cdr exp)
                   env))
      (else exp)))
-    
+
   (define object-environment-define!
     (lambda (env symbol object)
       (define box (object-environment-ref~ 'define! env symbol))
@@ -101,7 +103,7 @@
     (lambda (env symbol)
       (define frame (car (environment-env 'allocate env)))
       (set-box! frame (cons (cons symbol (box (void))) (unbox frame)))))
-  
+
   (define (environment-cons env alist)
     (make-environment~ (cons (box alist) (environment-env 'cons env))))
 
@@ -142,13 +144,13 @@
       (make-applicative
        (lambda (env args)
          (box (car args))))))
-  
+
   (define object-unbox
     (make-object-ground! 'unbox
       (make-applicative
        (lambda (env args)
          (unbox (car args))))))
-  
+
   (define object-environment-cons*
     (make-object-ground! 'environment-cons*
       (make-applicative (lambda (env args) (apply environment-cons* args)))))
@@ -163,7 +165,7 @@
        (lambda (env args)
          (match args
            ((,env ((,a* . ,b*) ...))
-            (environment-cons env (map cons a* b*))))))))
+            (environment-cons env (map (lambda (a b) (cons a (box b))) a* b*))))))))
 
   (define object-pk
     (make-object-ground! 'pk
@@ -242,7 +244,7 @@
                (null? args))
           (error 'object "wrong number of arguments"))
          ((null? positionals)
-          (reverse (cons (cons rest args) out)))
+          (reverse (cons (cons rest (box args)) out)))
          (else (loop (cdr positionals) (cdr args)
                      (cons (cons (car positionals)
                                  (box (car args)))
@@ -279,7 +281,7 @@
                          static-env)
                         (make-operative
                          (lambda (dynamic-env args*)
-                           (let* ((alist (map cons args args*))
+                           (let* ((alist (map (lambda (x y) (cons x (box y))) args args*))
                                   (env* (environment-cons static-env alist)))
                              (meta-eval `(sequence ,@body) env*)))
                          source
