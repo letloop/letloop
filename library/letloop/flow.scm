@@ -1,30 +1,30 @@
 #!chezscheme
-(library (letloop entangle)
+(library (letloop flow)
 
-  (export make-entangle
-          entangle-abort
-          entangle-log
-          entangle-run
-          entangle-jiffy
-          entangle-parallel
-          entangle-sleep-jiffies
-          entangle-spawn
-          entangle-spawn-threadsafe
-          entangle-stop
-          entangle-tcp-serve
+  (export make-flow
+          flow-abort
+          flow-log
+          flow-run
+          flow-jiffy
+          flow-parallel
+          flow-sleep-jiffies
+          flow-spawn
+          flow-spawn-threadsafe
+          flow-stop
+          flow-tcp-serve
 
-          entangle-open
-          entangle-close
-          entangle-bytes
-          entangle-pread
-          entangle-pwrite
-          entangle-sync
+          flow-open
+          flow-close
+          flow-bytes
+          flow-pread
+          flow-pwrite
+          flow-sync
 
-          with-entangle
+          with-flow
 
-          ~check-entangle-000
-          ~check-entangle-001
-          ~check-entangle-002
+          ~check-flow-000
+          ~check-flow-001
+          ~check-flow-002
           )
 
   (import (chezscheme)
@@ -45,19 +45,19 @@
 
   (define pk
     (lambda args
-      (when (or (getenv "LETLOOP_ENTANGLE")
+      (when (or (getenv "LETLOOP_FLOW")
                 (getenv "LETLOOP_DEBUG"))
-        (display "#;(letloop entangle) " (current-error-port))
+        (display "#;(letloop flow) " (current-error-port))
         (write args (current-error-port))
         (newline (current-error-port))
         (flush-output-port (current-error-port)))
       (car (reverse args))))
 
-  (define entangle-log
+  (define flow-log
     (lambda (level message . objects)
       (pk level message objects)))
 
-  (define entangle-current (make-parameter #f))
+  (define flow-current (make-parameter #f))
 
   (define prompt-current #f)
 
@@ -66,21 +66,21 @@
 
   (define prompt-singleton '(prompt-singleton))
 
-  (define-record-type* <entangle>
-    (make-entangle-base start jiffy sleeping running epoll events thunks others readable writable)
-    entangle?
-    (start entangle-start)
-    (jiffy entangle-jiffy-base entangle-jiffy!)
-    (sleeping entangle-sleeping entangle-sleeping!)
-    (running entangle-running? entangle-running!)
-    (epoll entangle-epoll)
-    (events entangle-events)
-    (thunks entangle-thunks entangle-thunks!)
-    (others entangle-others entangle-others!)
-    (readable entangle-readable)
-    (writable entangle-writable))
+  (define-record-type* <flow>
+    (make-flow-base start jiffy sleeping running epoll events thunks others readable writable)
+    flow?
+    (start flow-start)
+    (jiffy flow-jiffy-base flow-jiffy!)
+    (sleeping flow-sleeping flow-sleeping!)
+    (running flow-running? flow-running!)
+    (epoll flow-epoll)
+    (events flow-events)
+    (thunks flow-thunks flow-thunks!)
+    (others flow-others flow-others!)
+    (readable flow-readable)
+    (writable flow-writable))
 
-  (define call-with-entangle-prompt
+  (define call-with-flow-prompt
     (lambda (thunk handler)
       (call-with-values (lambda ()
                           (call/1cc
@@ -96,7 +96,7 @@
             (apply handler (cdr out)))
            (else (apply values out)))))))
 
-  (define entangle-abort
+  (define flow-abort
     (lambda args
       (call/cc
        (lambda (k)
@@ -110,12 +110,12 @@
   (define event-continuation car)
   (define event-mode cdr)
 
-  (define entangle-apply
-    (lambda (entangle thunk)
+  (define flow-apply
+    (lambda (flow thunk)
       (guard (ex (else (pk ex) (pk (apply format #f
                                   (condition-message ex)
                                   (condition-irritants ex)))))
-        (call-with-entangle-prompt
+        (call-with-flow-prompt
          thunk
          (lambda (k handler)
            (handler k))))))
@@ -124,112 +124,112 @@
     (lambda (h)
       (fx=? (hashtable-size h) 0)))
 
-  (define entangle-jiffy
+  (define flow-jiffy
     (lambda ()
-      (entangle-jiffy-base (entangle-current))))
+      (flow-jiffy-base (flow-current))))
 
-  (define entangle-run-once
-    (lambda (entangle)
+  (define flow-run-once
+    (lambda (flow)
       (define timeout #t)
-      (entangle-jiffy! entangle (current-jiffy))
-      (unless (fxmapping-empty? (entangle-sleeping entangle))
+      (flow-jiffy! flow (current-jiffy))
+      (unless (fxmapping-empty? (flow-sleeping flow))
         (call-with-values (lambda () (fxmapping-split
-                                      (entangle-sleeping entangle)
-                                      (- (entangle-jiffy)
-                                         (entangle-start (entangle-current)))))
+                                      (flow-sleeping flow)
+                                      (- (flow-jiffy)
+                                         (flow-start (flow-current)))))
           (lambda (thunks sleeping)
-            (entangle-sleeping! entangle sleeping)
-            (for-each (lambda (thunk) (entangle-apply entangle thunk)) (fxmapping-values thunks)))))
-      (let ((thunks (entangle-thunks entangle)))
-        (entangle-thunks! entangle '())
-        (for-each (lambda (thunk) (entangle-apply entangle thunk)) thunks))
+            (flow-sleeping! flow sleeping)
+            (for-each (lambda (thunk) (flow-apply flow thunk)) (fxmapping-values thunks)))))
+      (let ((thunks (flow-thunks flow)))
+        (flow-thunks! flow '())
+        (for-each (lambda (thunk) (flow-apply flow thunk)) thunks))
       ;; this `unless` condition is dubious
-      (when (and (not (hashtable-empty? (entangle-events entangle)))
-                 (entangle-running? entangle))
-        (if (fxmapping-empty? (entangle-sleeping entangle))
+      (when (and (not (hashtable-empty? (flow-events flow)))
+                 (flow-running? flow))
+        (if (fxmapping-empty? (flow-sleeping flow))
             (set! timeout -1)
             (set! timeout (floor
-                           (/ (- (+ (entangle-start (entangle-current))
+                           (/ (- (+ (flow-start (flow-current))
                                     (call-with-values (lambda ()
                                                         (fxmapping-min
-                                                         (entangle-sleeping entangle)))
+                                                         (flow-sleeping flow)))
                                       (lambda args
                                         (car args))))
-                                 (entangle-jiffy))
+                                 (flow-jiffy))
                               (expt 10 6)))))
         ;; Wait for ONE event...
         (let* ((event (make-epoll-event))
                ;; TODO: increase max events from 1 to 1024?
-               (count (epoll-wait (entangle-epoll (entangle-current)) event 1 timeout)))
+               (count (epoll-wait (flow-epoll (flow-current)) event 1 timeout)))
           (if (fxzero? count)
               (foreign-free (ftype-pointer-address event))
               (let* ((mode (if (epoll-event-in? event) 'read 'write))
-                     (k (hashtable-ref (entangle-events entangle)
+                     (k (hashtable-ref (flow-events flow)
                                        (cons (epoll-event-fd event) mode)
                                        #f)))
                 (foreign-free (ftype-pointer-address event))
-                (hashtable-delete! (entangle-events entangle) event)
+                (hashtable-delete! (flow-events flow) event)
                 ;; remove the associated event mode from epoll instance
-                (entangle-apply entangle k)))))))
+                (flow-apply flow k)))))))
 
-  (define entangle-watcher
+  (define flow-watcher
     (lambda ()
-      (entangle-read (entangle-readable (entangle-current)))
+      (flow-read (flow-readable (flow-current)))
       (let ((new
              (with-mutex mutex
-               (let ((new (entangle-others (entangle-current))))
-                 (entangle-others! (entangle-current) '())
+               (let ((new (flow-others (flow-current))))
+                 (flow-others! (flow-current) '())
                  new))))
-        (entangle-thunks! (entangle-current)
+        (flow-thunks! (flow-current)
                           (append new
-                                  (entangle-thunks
-                                   (entangle-current)))))
-      (entangle-watcher)))
+                                  (flow-thunks
+                                   (flow-current)))))
+      (flow-watcher)))
 
-  (define entangle-stop
+  (define flow-stop
     (lambda ()
-      (entangle-running! (entangle-current) #f)))
+      (flow-running! (flow-current) #f)))
 
-  (define entangle-run
+  (define flow-run
     (lambda ()
-      (entangle-spawn entangle-watcher)
+      (flow-spawn flow-watcher)
       (let loop ()
-        (when (entangle-running? (entangle-current))
+        (when (flow-running? (flow-current))
           (guard (ex (else (format #t "Exception ~a: ~a\n" (condition-message ex) (condition-irritants ex))))
-            (entangle-run-once (entangle-current)))
+            (flow-run-once (flow-current)))
           (loop)))
-      (entangle-current #f)))
+      (flow-current #f)))
 
-  (define entangle-spawn
+  (define flow-spawn
     (lambda (thunk)
-      (entangle-thunks! (entangle-current)
-                        (cons thunk (entangle-thunks (entangle-current))))))
+      (flow-thunks! (flow-current)
+                        (cons thunk (flow-thunks (flow-current))))))
 
-  (define entangle-sleep-jiffies
+  (define flow-sleep-jiffies
     (lambda (nanoseconds)
-      (entangle-abort
+      (flow-abort
        (lambda (k)
-         (entangle-sleeping! (entangle-current)
-                             (fxmapping-set (entangle-sleeping (entangle-current))
-                                            (- (+ (entangle-jiffy) nanoseconds)
-                                               (entangle-start (entangle-current)))
+         (flow-sleeping! (flow-current)
+                             (fxmapping-set (flow-sleeping (flow-current))
+                                            (- (+ (flow-jiffy) nanoseconds)
+                                               (flow-start (flow-current)))
                                             k))))))
 
-  (define entangle-spawn-threadsafe
+  (define flow-spawn-threadsafe
     (lambda (thunk)
       (with-mutex mutex
-        (entangle-others! (entangle-current)
-                          (cons thunk (entangle-others (entangle-current)))))
-      (entangle-write (entangle-writable (entangle-current))
+        (flow-others! (flow-current)
+                          (cons thunk (flow-others (flow-current)))))
+      (flow-write (flow-writable (flow-current))
                       (bytevector 20 06))))
 
-  (define entangle-parallel
+  (define flow-parallel
     (lambda (thunk)
-      (entangle-abort
+      (flow-abort
        (lambda (k)
          (fork-thread (lambda () (call-with-values thunk
                                    (lambda args
-                                     (entangle-spawn-threadsafe (lambda () (apply k args)))))))))))
+                                     (flow-spawn-threadsafe (lambda () (apply k args)))))))))))
 
   (define fcntl!
     (let ((func (foreign-procedure "fcntl" (int int int) int)))
@@ -248,7 +248,7 @@
   (define F_SETFL 4)
   (define O_NONBLOCK 2048)
 
-  (define entangle-nonblock!
+  (define flow-nonblock!
     (lambda (fd)
       (fcntl! fd F_SETFL
               (fxlogior O_NONBLOCK
@@ -261,25 +261,25 @@
         (call-with-errno (lambda () (func pointer 0))
           (lambda (out errno)
             (when (fx=? out -1)
-              (error '(letloop entangle) (strerror errno) errno))))
+              (error '(letloop flow) (strerror errno) errno))))
         (let  ((pipe (make-ftype-pointer <pipe> pointer)))
           (values (ftype-ref <pipe> (0) pipe) ;; readable
                   (ftype-ref <pipe> (1) pipe)))))) ;; writable
 
-  (define make-entangle
+  (define make-flow
     (lambda ()
-      (unless (entangle-current)
-        (entangle-log 'notice "Making an entanglement...")
+      (unless (flow-current)
+        (flow-log 'notice "Making an flowment...")
         ;; (register-signal-handler 10
         ;;                          (lambda (oof)
         ;;                            (pk 'signaling... 'USR1?)))
         (call-with-values make-pipe
           (lambda (readable writable)
-            (entangle-nonblock! readable)
-            (entangle-nonblock! writable)
+            (flow-nonblock! readable)
+            (flow-nonblock! writable)
             (let ((epoll (epoll-create1 0))
                   (events (make-hashtable equal-hash equal?)))
-              (entangle-current (make-entangle-base (current-jiffy)
+              (flow-current (make-flow-base (current-jiffy)
                                                     (current-jiffy)
                                                     (fxmapping)
                                                     #t
@@ -289,61 +289,61 @@
                                                     '()
                                                     readable
                                                     writable))))))
-      (entangle-current)))
+      (flow-current)))
 
-  (define entangle-socket
+  (define flow-socket
     (let ((socket (foreign-procedure "socket" (int int int) int)))
       (lambda (domain type protocol)
         (define out (socket domain type protocol))
-        (entangle-nonblock! out)
+        (flow-nonblock! out)
         out)))
 
-  (define entangle-accept-base
-    (let ((entangle-accept (foreign-procedure "accept4" (int void* void* int) int)))
+  (define flow-accept-base
+    (let ((flow-accept (foreign-procedure "accept4" (int void* void* int) int)))
       (lambda (fd)
-        (entangle-accept fd 0 0 2048))))
+        (flow-accept fd 0 0 2048))))
 
-  (define entangle-update-epoll
+  (define flow-update-epoll
     (lambda (fd mode)
-      (if (hashtable-ref (entangle-events (entangle-current))
+      (if (hashtable-ref (flow-events (flow-current))
                          (cons fd (if (eq? mode 'read) 'write 'read))
                          #f)
-          (epoll-ctl (entangle-epoll (entangle-current))
+          (epoll-ctl (flow-epoll (flow-current))
                      3
                      fd
                      (make-epoll-event-out fd))
-          (epoll-ctl (entangle-epoll (entangle-current))
+          (epoll-ctl (flow-epoll (flow-current))
                      2
                      fd
                      (make-epoll-event-out fd)))))
 
 
-  (define entangle-accept
+  (define flow-accept
     (lambda (fd)
 
       (define accept-handler
         (lambda (k)
-          (hashtable-set! (entangle-events (entangle-current))
+          (hashtable-set! (flow-events (flow-current))
                           (cons fd 'read)
                           k)
-          (epoll-ctl (entangle-epoll (entangle-current))
+          (epoll-ctl (flow-epoll (flow-current))
                      1
                      fd
                      (make-epoll-event-in fd))))
 
       (let loop ()
-        (call-with-errno (lambda () (entangle-accept-base fd))
+        (call-with-errno (lambda () (flow-accept-base fd))
           (lambda (out errno)
             (if (fx=? out -1)
                 (if (fx=? errno EWOULDBLOCK)
                     (begin
-                      (entangle-abort accept-handler)
-                      (entangle-update-epoll fd 'read)
+                      (flow-abort accept-handler)
+                      (flow-update-epoll fd 'read)
                       (loop))
                     #f)
                 out))))))
 
-  (define entangle-close
+  (define flow-close
     (let ((close (foreign-procedure "close" (int) int)))
       (lambda (fd)
         (close fd))))
@@ -377,8 +377,8 @@
       ;;((socket-option/sndlowat) (int 19))
       (else (error 'setsockopt "Unknown socket option" socket level optname optval))))
 
-  (define entangle-bind
-    (let ((entangle-bind
+  (define flow-bind
+    (let ((flow-bind
            (foreign-procedure "bind" (int void* size_t) int)))
       (lambda (fd ip port)
         (setsockopt fd 1 'socket-option/reuseaddr #t)
@@ -386,7 +386,7 @@
         (call-with-sockaddr-in
          ip port
          (lambda (address)
-           (entangle-bind fd
+           (flow-bind fd
                           address
                           (ftype-sizeof %sockaddr-in)))))))
 
@@ -438,41 +438,41 @@
           (foreign-free ptr)
           (apply values args)))))
 
-  (define entangle-listen
-    (let ((entangle-listen (foreign-procedure "listen" (int int) int)))
+  (define flow-listen
+    (let ((flow-listen (foreign-procedure "listen" (int int) int)))
       (lambda (fd backlog)
-        (entangle-listen fd backlog))))
+        (flow-listen fd backlog))))
 
-  (define entangle-read-base
-    (let ((entangle-read
+  (define flow-read-base
+    (let ((flow-read
            (foreign-procedure "read" (int void* size_t) ssize_t)))
       (lambda (fd bytevector)
         (with-lock (list bytevector)
-                   (entangle-read fd
+                   (flow-read fd
                                   (bytevector-pointer bytevector)
                                   (bytevector-length bytevector))))))
 
-  (define entangle-read
+  (define flow-read
     (lambda (fd)
       (define bv (make-bytevector 1024))
 
       (define handler
         (lambda (k)
-          (hashtable-set! (entangle-events (entangle-current))
+          (hashtable-set! (flow-events (flow-current))
                           (cons fd 'read)
                           k)
-          (epoll-ctl (entangle-epoll (entangle-current))
+          (epoll-ctl (flow-epoll (flow-current))
                      1
                      fd
                      (make-epoll-event-in fd))))
 
       (let loop ()
-        (call-with-errno (lambda () (entangle-read-base fd bv))
+        (call-with-errno (lambda () (flow-read-base fd bv))
           (lambda (out errno)
             (if (fx=? out -1)
                 (if (fx=? errno EWOULDBLOCK)
                     (begin
-                      (entangle-abort handler)
+                      (flow-abort handler)
                       (loop))
                     #f)
                 (if (fxzero? out)
@@ -480,34 +480,34 @@
                     (subbytevector bv 0 out))))))))
 
 
-  (define entangle-write-base
-    (let ((entangle-write
+  (define flow-write-base
+    (let ((flow-write
            (foreign-procedure "write" (int void* size_t) ssize_t)))
       (lambda (fd bytevector)
         (with-lock (list bytevector)
-                   (entangle-write fd
+                   (flow-write fd
                                    (bytevector-pointer bytevector)
                                    (bytevector-length bytevector))))))
 
-  (define entangle-write
+  (define flow-write
     (lambda (fd bv)
       (define handler
         (lambda (k)
-          (hashtable-set! (entangle-events (entangle-current))
+          (hashtable-set! (flow-events (flow-current))
                           (cons fd 'write)
                           k)
-          (epoll-ctl (entangle-epoll (entangle-current))
+          (epoll-ctl (flow-epoll (flow-current))
                      3 ;; EPOLL_CTL_MOD
                      fd
                      (make-epoll-event-out fd))))
 
       (let loop ((bv bv))
-        (call-with-errno (lambda () (entangle-write-base fd bv))
+        (call-with-errno (lambda () (flow-write-base fd bv))
           (lambda (out errno)
             (if (fx=? out -1)
                 (if (fx=? errno EWOULDBLOCK)
                     (begin
-                      (entangle-abort handler)
+                      (flow-abort handler)
                       (loop bv))
                     #f)
                 (if (fx=? out (bytevector-length bv))
@@ -530,31 +530,31 @@
       ((bv start)
        (subbytevector bv start (bytevector-length bv)))))
 
-  (define entangle-tcp-serve
+  (define flow-tcp-serve
     (lambda (ip port)
       (define SOCKET-DOMAIN=AF-INET 2)
       (define SOCKET-TYPE=STREAM 1)
-      (define fd (entangle-socket SOCKET-DOMAIN=AF-INET SOCKET-TYPE=STREAM 0))
+      (define fd (flow-socket SOCKET-DOMAIN=AF-INET SOCKET-TYPE=STREAM 0))
 
-      (define close (lambda () (entangle-close fd)))
+      (define close (lambda () (flow-close fd)))
 
       (define read
         (lambda ()
-          (let ((client (entangle-accept fd)))
+          (let ((client (flow-accept fd)))
             (if client
-                (values (lambda () (entangle-read client))
-                        (lambda (bv) (entangle-write client bv))
-                        (lambda () (entangle-close client)))
+                (values (lambda () (flow-read client))
+                        (lambda (bv) (flow-write client bv))
+                        (lambda () (flow-close client)))
                 (begin
                   (values #f #f #f))))))
 
 
-      (entangle-bind fd ip port)
-      (entangle-listen fd 128)
+      (flow-bind fd ip port)
+      (flow-listen fd 128)
 
       (values read close)))
 
-  (define entangle-open
+  (define flow-open
     (let ((open (foreign-procedure "open" (string int integer-32) int)))
       (lambda (path options)
 
@@ -563,17 +563,17 @@
             (if (pair? o)
                 (apply fxlogior (map file-options->flags o))
                 (case o
-                  (entangle-file-append 1024)
-                  (entangle-file-create 64)
-                  (entangle-file-direct 65536)
-                  (entangle-file-read-only 0)
-                  (entangle-file-write-only 1)
-                  (entangle-file-read-write 2)
-                  (else (error 'letloop-entangle "Unknown entangle-file option" o))))))
+                  (flow-file-append 1024)
+                  (flow-file-create 64)
+                  (flow-file-direct 65536)
+                  (flow-file-read-only 0)
+                  (flow-file-write-only 1)
+                  (flow-file-read-write 2)
+                  (else (error 'letloop-flow "Unknown flow-file option" o))))))
 
         (call-with-values
             (lambda ()
-              (entangle-parallel
+              (flow-parallel
                (lambda ()
                  (call-with-errno (lambda () (open path
                                                    (file-options->flags options)
@@ -582,28 +582,28 @@
                    values))))
           (lambda (out errno)
             (if (fx=? out -1)
-                (error 'letloop-entangle "Failed to open file: ~a ~a ~a" path options (strerror errno))
+                (error 'letloop-flow "Failed to open file: ~a ~a ~a" path options (strerror errno))
                 out))))))
 
-  (define entangle-bytes
+  (define flow-bytes
     (let ((lseek (foreign-procedure "lseek" (int unsigned-64 int) unsigned-64)))
       (lambda (fd)
         (define SEEK_END 2)
         (call-with-values (lambda ()
-                            (entangle-parallel
+                            (flow-parallel
                              (lambda ()
                                (call-with-errno (lambda () (lseek fd 0 SEEK_END)) values))))
           (lambda (out errno)
             ;; otherwise out is the absolute offset from the beginning of the file
             (if (= out (- (expt 2 64) 1))
-                (error 'letloop-entangle "Failed to seek to the end of file descriptor: ~a ~a" fd (strerror errno))
+                (error 'letloop-flow "Failed to seek to the end of file descriptor: ~a ~a" fd (strerror errno))
                 out))))))
 
-  (define entangle-sync
+  (define flow-sync
     (let ((sync (foreign-procedure "sync_file_range" (int unsigned-64 unsigned-64 unsigned-32) int)))
       (lambda (fd offset length)
         ;; The magic 7 is: SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE | SYNC_FILE_RANGE_WAIT_AFTER
-        (entangle-parallel (lambda () (sync fd offset length 7))))))
+        (flow-parallel (lambda () (sync fd offset length 7))))))
 
   (define bytevector-slice
     (lambda (bv start end)
@@ -614,12 +614,12 @@
                           ret 0 (fx- end start))
         ret)))
 
-  (define entangle-pread
+  (define flow-pread
     (let ((pread (foreign-procedure "pread" (int void* size_t unsigned-64) ssize_t)))
       (lambda (fd offset length)
         (define buffer (make-bytevector length))
         (call-with-values (lambda ()
-                            (entangle-parallel
+                            (flow-parallel
                              (lambda ()
                                (call-with-errno (lambda () (with-lock (list buffer)
                                                              (pread fd
@@ -629,17 +629,17 @@
                                  values))))
           (lambda (out errno)
             (if (fx=? out -1)
-                (error 'letloop-entangle "Failed to pread: ~a ~a" fd (strerror errno))
+                (error 'letloop-flow "Failed to pread: ~a ~a" fd (strerror errno))
                 (if (fx=? out length)
                     buffer
                     (bytevector-slice buffer 0 out))))))))
 
-  (define entangle-pwrite
+  (define flow-pwrite
     (let ((pwrite (foreign-procedure "pwrite" (int void* size_t unsigned-64) ssize_t)))
       (lambda (fd offset bytevector)
         (let loop ((bytevector bytevector))
           (call-with-values (lambda ()
-                              (entangle-parallel
+                              (flow-parallel
                                (lambda ()
                                  (call-with-errno (lambda () (with-lock (list bytevector)
                                                                (pwrite fd
@@ -649,9 +649,9 @@
                                    values))))
             (lambda (out errno)
               (if (fx=? out -1)
-                  (error 'letloop-entangle "Failed to pwrite: ~a ~a" fd (strerror errno))
+                  (error 'letloop-flow "Failed to pwrite: ~a ~a" fd (strerror errno))
                   (if (fx=? out 0)
-                      (error 'letloop-entangle "Failed to pwrite, nothing was written" fd)
+                      (error 'letloop-flow "Failed to pwrite, nothing was written" fd)
                       (unless (fx=? out (bytevector-length bytevector))
                         (loop ((bytevector-slice bytevector out (bytevector-length bytevector)))))))))))))
 
@@ -663,14 +663,14 @@
          body ...
          (- (current-jiffy) start)))))
 
-  (define ~check-entangle-000
+  (define ~check-flow-000
     (lambda ()
       (< 3 (with-jiffies
-            (make-entangle)
-            (entangle-spawn (lambda ()
-                              (entangle-sleep-jiffies (* 4 (expt 10 9)))
-                              (entangle-stop)))
-            (entangle-run)))))
+            (make-flow)
+            (flow-spawn (lambda ()
+                              (flow-sleep-jiffies (* 4 (expt 10 9)))
+                              (flow-stop)))
+            (flow-run)))))
 
   (define fib
     (lambda (n)
@@ -680,70 +680,70 @@
        (else (+ (fib (- n 1))
                 (fib (- n 2)))))))
 
-  (define-syntax with-entangle
+  (define-syntax with-flow
     (syntax-rules ()
-      ((with-entangle body ...)
-       (let ((entangle (make-entangle)))
-         (entangle-spawn (lambda () body ... (entangle-stop)))
-         (entangle-run)
+      ((with-flow body ...)
+       (let ((flow (make-flow)))
+         (flow-spawn (lambda () body ... (flow-stop)))
+         (flow-run)
          #t))))
 
-  (define ~check-entangle-001
+  (define ~check-flow-001
     (lambda ()
-      ;; check that entangle-parallel let other lambda to run in the
+      ;; check that flow-parallel let other lambda to run in the
       ;; main thread.
       (> (let ()
           (define inc 0)
           (define a #f)
           (define b #f)
-          (make-entangle)
-          (entangle-spawn
+          (make-flow)
+          (flow-spawn
            (lambda ()
              (let loop ()
                (set! inc (+ inc 1))
-               (entangle-sleep-jiffies (expt 10 3))
+               (flow-sleep-jiffies (expt 10 3))
                (loop))))
-          (entangle-spawn
+          (flow-spawn
            (lambda ()
-             (set! a (entangle-parallel (lambda () (fib 21))))
-             (set! b (entangle-parallel (lambda () (fib 21))))
-             (entangle-stop)))
-          (entangle-run)
+             (set! a (flow-parallel (lambda () (fib 21))))
+             (set! b (flow-parallel (lambda () (fib 21))))
+             (flow-stop)))
+          (flow-run)
           inc)
          (let ()
            (define inc 0)
            (define a #f)
            (define b #f)
-           (make-entangle)
-           (entangle-spawn
+           (make-flow)
+           (flow-spawn
             (lambda ()
               (let loop ()
                 (set! inc (+ inc 1))
-                (entangle-sleep-jiffies (expt 10 6))
+                (flow-sleep-jiffies (expt 10 6))
                 (loop))))
-           (entangle-spawn
+           (flow-spawn
             (lambda ()
               (set! a (fib 21))
               (set! b (fib 21))
-              (entangle-stop)))
-           (entangle-run)
+              (flow-stop)))
+           (flow-run)
            inc))))
 
-  (define ~check-entangle-002
+  (define ~check-flow-002
     (lambda ()
       (define expected (bytevector 1 2 3 4 5 6 7 8 9 10 11 12 13))
-      (make-entangle)
-      (entangle-spawn
+      (make-flow)
+      (flow-spawn
        (lambda ()
-         (define fd (entangle-open "check-entangle-002-0" (list 'entangle-file-create 'entangle-file-read-write)))
-         (assert (= 0 (entangle-bytes fd)))
-         (assert (= 0 (bytevector-length (entangle-pread fd 0 13))))
-         (entangle-pwrite fd 0 expected)
-         (entangle-sync fd 0 13)
-         (assert (= 13 (entangle-bytes fd)))
-         (assert (equal? expected (entangle-pread fd 0 13)))
-         (entangle-stop)))
-      (entangle-run)
+         (define fd (flow-open "check-flow-002-0" (list 'flow-file-create 'flow-file-read-write)))
+         (assert (= 0 (flow-bytes fd)))
+         (assert (= 0 (bytevector-length (flow-pread fd 0 13))))
+         (flow-pwrite fd 0 expected)
+         (flow-sync fd 0 13)
+         (assert (= 13 (flow-bytes fd)))
+         (assert (equal? expected (flow-pread fd 0 13)))
+         (flow-stop)))
+      (flow-run)
       #t))
 
   )

@@ -1,0 +1,9 @@
+(sequence
+  (define zero? (xeno zero?))
+
+  (define - (xeno -))  
+
+  (let loopx ((index 10))
+    (when (not (zero? index))
+      (pk index)
+      (loopx (- index 1)))))

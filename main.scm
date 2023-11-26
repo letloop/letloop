@@ -3,7 +3,7 @@
 (import (letloop match))
 (import (letloop lsm1 okvs))
 (import (letloop commonmark))
-(import (letloop entangle))
+(import (letloop flow))
 (import (letloop http))
 (import (letloop html))
 (import (letloop byter))
@@ -302,7 +302,7 @@
 
 (define main
   (lambda ()
-    (call-with-values (lambda () (entangle-tcp-serve "0.0.0.0" 9999))
+    (call-with-values (lambda () (flow-tcp-serve "0.0.0.0" 9999))
       (lambda (accept close)
         (format #t "HTTP server running at http://127.0.0.1:~a\n" 9999)
         (let loop ()
@@ -312,12 +312,12 @@
                                          (condition-irritants ex)))))
             (call-with-values accept
               (lambda (read write close)
-                (entangle-spawn
+                (flow-spawn
                                 (lambda ()
                                   (handle read write close))))))
           (loop))))))
 
 
-(make-entangle)
-(entangle-spawn main)
-(entangle-run)
+(make-flow)
+(flow-spawn main)
+(flow-run)

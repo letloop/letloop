@@ -1,5 +1,5 @@
 #!chezscheme
-(library (letloop foundationdb entangle)
+(library (letloop foundationdb flow)
 
   (export
    make-fdb
@@ -21,7 +21,7 @@
 
   (import (chezscheme)
           (letloop byter)
-          (letloop flow entangle)
+          (letloop flow)
           (letloop foundationdb base)
           (letloop foundationdb helpers))
 
@@ -35,7 +35,7 @@
     okvs-transaction?
     (pointer transaction-pointer))
 
-  (define network-thread-mutex (make-mutex 'fdb-entangle))
+  (define network-thread-mutex (make-mutex 'fdb-flow))
   (define network-thread-setup? #f)
 
   (define (fdb-init!)
@@ -73,11 +73,11 @@
   (define-syntax-rule (with-future-ready future body ...)
     (begin
       ;; (define prefix (foundationdb-prefix))
-      (entangle-abort
+      (flow-abort
        (lambda (k)
          (letrec* ((code (foreign-callable __collect_safe
                                            (lambda (future data)
-                                             (entangle-spawn-threadsafe
+                                             (flow-spawn-threadsafe
                                               (lambda ()
                                                 ;; (foundationdb-prefix prefix)
                                                 (unlock-object code)
@@ -296,8 +296,8 @@
 
   (define ~fuzz
     (lambda ()
-      (make-entangle)
-      (entangle-spawn
+      (make-flow)
+      (flow-spawn
        (lambda ()
          (with-fdb
           (do-times (expt 10 6)
@@ -309,7 +309,7 @@
                 (fdb-query tx (bytevector 41) (bytevector 43))
                 (fdb-clear! tx (bytevector) (bytevector 255))
                 (fdb-ref tx (bytevector 42))))))
-          (entangle-stop)))
-      (entangle-run)))
+          (flow-stop)))
+      (flow-run)))
 
   )

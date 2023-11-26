@@ -1,4 +1,4 @@
-(import (chezscheme) (letloop http) (letloop entangle))
+(import (chezscheme) (letloop http) (letloop flow))
 
 
 
@@ -40,7 +40,7 @@
 
 (define main
   (lambda ()
-    (call-with-values (lambda () (entangle-tcp-serve "0.0.0.0" port))
+    (call-with-values (lambda () (flow-tcp-serve "0.0.0.0" port))
       (lambda (accept close)
         (format #t "HTTP server running at http://127.0.0.1:~a\n" port)
         (let loop ()
@@ -50,7 +50,7 @@
                                          (condition-irritants ex)))))
             (call-with-values accept
               (lambda (read write close)
-                (entangle-spawn 
+                (flow-spawn 
                                 (lambda ()
                                   (handle read write close))))))
           (loop))))))
@@ -58,6 +58,6 @@
 
 (define port (string->number (cadr (command-line))))
 
-(make-entangle)
-(entangle-spawn main)
-(entangle-run)
+(make-flow)
+(flow-spawn main)
+(flow-run)

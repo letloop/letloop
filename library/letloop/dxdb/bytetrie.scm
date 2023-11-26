@@ -9,7 +9,7 @@
 
   (import (chezscheme)
           (letloop r999)
-          (letloop entangle)
+          (letloop flow)
           (letloop dxdb notebook)
           (letloop byter))
 
@@ -281,7 +281,7 @@
 
       (call-with-temporary-filepath "notebook-check"
         (lambda (filepath)
-          (with-entangle
+          (with-flow
            (let* ((notebook (make-notebook filepath 1024))
                   (x (bytetrie-write b notebook)))
              (pk (make-notebook-chapter-x notebook x))))))))

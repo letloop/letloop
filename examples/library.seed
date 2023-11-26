@@ -4,7 +4,7 @@
   (define print (xeno (lambda args (write args) (newline) (flush-output-port))))
   (define flush-output-port (xeno flush-output-port))
 
-  (define pk
+  (define pk*
     (xeno (lambda args
             (display ";; ")
             (write args)
@@ -29,18 +29,22 @@
   (define let-loop
     (vau (name bindings . body) env
       (sequence
-        (define proc (eval (list* 'lambda
-                                  (map car bindings)
-                                  body) env*))
         (define env*
           (make-environment env
                             (list (cons name
                                         proc))))
-        (pk 'fufufufu (environment-current))
-        (eval (pk 'youpi (list* name
-                                (map (lambda (x) (car (cdr x)))
-                                     bindings)))
-              env*))))
+
+        (pk 'PROCING)
+        
+        (define proc (eval (list* 'lambda
+                                  (map car bindings)
+                                  body)
+                           env*))
+        (pk 'eval?)
+        (eval (list* name
+                     (map (lambda (x) (car (cdr x)))
+                          bindings))
+              (pk env*)))))
 
   (define pair? (xeno pair?))
 
@@ -63,7 +67,7 @@
 
   (define when
     (vau (test . body) env
-      (pk 'when 'env env)
+      (pk 'testxx testing)
       (eval (list if test
                   (list* sequence body)
                   #f)
@@ -105,11 +109,11 @@
   (define cond
     (vau (clause . clauses) env
       (define predicate (car clause))
-      (define production (pk 'production (cdr clause)))
+      (define production (cdr clause))
 
       (if (eq? predicate 'else)
           (eval (list* sequence production) env)
-          (if (pk (eval predicate env))
+          (if (eval predicate env)
               (eval (list* sequence production) env)
               (if (null? clauses)
                   (error 'cond "no condition is met")

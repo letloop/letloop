@@ -31,7 +31,7 @@
   (import (chezscheme)
           (letloop r999)
           (letloop byter)
-          (letloop entangle))
+          (letloop flow))
 
   ;;
   ;; XXX: DO NOT CACHE PAGES: READ, WRITE, AND SYNC ON NEED BY NEED
@@ -95,13 +95,13 @@
 
   (define notebook-bytes
     (lambda (notebook)
-      (entangle-bytes (notebook-fd notebook))))
+      (flow-bytes (notebook-fd notebook))))
 
   (define make-notebook
     (lambda (filepath page-bytes)
-      (define fd (entangle-open filepath
-                                (list 'entangle-file-create
-                                      'entangle-file-read-write)))
+      (define fd (flow-open filepath
+                                (list 'flow-file-create
+                                      'flow-file-read-write)))
       (define notebook (make-notebook-base fd page-bytes))
 
       (when (= 0 (notebook-bytes notebook))
@@ -127,13 +127,13 @@
 
   (define notebook-set!
     (lambda (notebook pid bytevector)
-      (entangle-pwrite (notebook-fd notebook)
+      (flow-pwrite (notebook-fd notebook)
                        (* pid (notebook-page-bytes notebook))
                        bytevector)))
 
   (define notebook-ref
     (lambda (notebook pid)
-      (define out (entangle-pread (notebook-fd notebook)
+      (define out (flow-pread (notebook-fd notebook)
                                   (* pid (notebook-page-bytes notebook))
                                   (notebook-page-bytes notebook)))
 
@@ -143,7 +143,7 @@
 
   (define notebook-sync!
     (lambda (notebook pid)
-      (entangle-sync (notebook-fd notebook)
+      (flow-sync (notebook-fd notebook)
                      (* pid (notebook-page-bytes notebook))
                      (notebook-page-bytes notebook))))
 
@@ -225,13 +225,13 @@
   (define ~check-notebook-000
     (lambda ()
       ;;
-      ;; Check that the entangle necessary entangle interface works:
+      ;; Check that the flow necessary flow interface works:
       ;;
-      ;; - with-entangle
-      ;; - entangle-open
-      ;; - entangle-pwrite
-      ;; - entangle-sync
-      ;; - entangle-pread
+      ;; - with-flow
+      ;; - flow-open
+      ;; - flow-pwrite
+      ;; - flow-sync
+      ;; - flow-pread
       ;;
       (define filepath #f)
       (call-with-temporary-filepath "notebook-check"
@@ -242,13 +242,13 @@
           ;;   (assert (not (file-exists? filepath*)))
           ;;
           (set! filepath filepath*)
-          (with-entangle
-           (let ((fd (entangle-open filepath
-                                    (list 'entangle-file-create
-                                          'entangle-file-read-write))))
-             (entangle-pwrite fd 0 (bytevector 101 13 37))
-             (entangle-sync fd 0 3)
-             (assert (equal? (bytevector 101 13 37) (entangle-pread fd 0 3)))))))
+          (with-flow
+           (let ((fd (flow-open filepath
+                                    (list 'flow-file-create
+                                          'flow-file-read-write))))
+             (flow-pwrite fd 0 (bytevector 101 13 37))
+             (flow-sync fd 0 3)
+             (assert (equal? (bytevector 101 13 37) (flow-pread fd 0 3)))))))
       (not (file-exists? filepath))))
 
   (define ~check-notebook-001
@@ -261,7 +261,7 @@
       ;;
       (call-with-temporary-filepath "notebook-check"
         (lambda (filepath)
-          (with-entangle
+          (with-flow
            (let* ((notebook (make-notebook filepath 128))
                   (expected (make-bytevector (notebook-page-bytes notebook))))
              (notebook-set! notebook 0 expected)
@@ -281,7 +281,7 @@
       ;;
       (call-with-temporary-filepath "notebook-check"
         (lambda (filepath)
-          (with-entangle
+          (with-flow
            (let* ((notebook (make-notebook filepath 1024))
                   (expected (bytevector-random (notebook-page-bytes notebook)))
                   (pid (notebook-pop! notebook)))
@@ -416,7 +416,7 @@
     (lambda ()
       (call-with-temporary-filepath "notebook-check"
         (lambda (filepath)
-          (with-entangle
+          (with-flow
            (let* ((notebook (make-notebook filepath 512))
                   (x (make-notebook-chapter-x notebook))
                   (bv0 (make-bytevector (notebook-page-bytes notebook) 1))
@@ -433,7 +433,7 @@
     (lambda ()
       (call-with-temporary-filepath "notebook-check"
         (lambda (filepath)
-          (with-entangle
+          (with-flow
            (let* ((notebook (make-notebook filepath 128))
                   (chapter-x (make-notebook-chapter-x notebook))
                   (bv0 (make-bytevector (notebook-page-bytes notebook) 0))

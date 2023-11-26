@@ -11,7 +11,7 @@
           (letloop argon2)
           (letloop lsm1 okvs)
           (letloop commonmark)
-          (letloop entangle)
+          (letloop flow)
           (letloop http)
           (letloop html)
           (letloop byter)

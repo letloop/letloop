@@ -13,16 +13,23 @@
       (car (reverse args))))
 
   (define-record-type* <operative>
-    (make-operative~ meta source env)
+    (make-operative~ uid meta source env)
     object-operative?
+    (uid operative-uid)
     (meta operative-meta)
     (source operative-source)
     (env operative-env))
 
+  (define uid 0)
+  
   (define make-operative
     (case-lambda
-     ((meta) (make-operative~ meta #f #f))
-     ((meta source env) (make-operative~ meta source env))))
+     ((meta)
+      (set! uid (+ uid 1))
+      (make-operative~ uid meta #f #f))
+     ((meta source env)
+      (set! uid (+ uid 1))
+      (make-operative~ uid meta source env))))
 
   (define-record-type* <environment>
     (make-environment~ env)
@@ -31,7 +38,6 @@
 
   (define environment-env
     (lambda (who x)
-      (pk 'environment-env who)
       (environment-env* x)))
 
   (define-record-type* <applicative>
@@ -53,19 +59,23 @@
       (let loopx ((frames (environment-env 'ref env)))
         (when (null? frames)
           (error 'object "symbol not found" symbol))
+        (pk 'loopx symbol)
         (let loopy ((frame (unbox (car frames))))
+          (pk 'loopy symbol (length frame))
           (if (null? frame)
               (loopx (cdr frames))
-              (if (eq? (caar frame) symbol)
-                  (cdar frame)
-                  (loopy (cdr frame))))))))
+              (guard (ex (else (pk frame)))
+                (if (eq? (caar frame) symbol)
+                    (cdar frame)
+                    (loopy (cdr frame)))))))))
 
   (define object-environment-ref
     (lambda (who env symbol)
-      (unbox (object-environment-ref~ who env symbol))))
+      (object-environment-ref~ who env symbol)))
 
   (define meta-apply
-    (lambda (name combiner args env)
+    (lambda (name combiner~ args env)
+      (define combiner (unbox combiner~))
       (cond
        ((object-operative? combiner)
         ((operative-meta combiner) env args))
@@ -73,7 +83,8 @@
         (let ((proc (operative-meta (unwrap combiner))))
           (proc env
                 (map (lambda (x) (meta-eval x env)) args))))
-       (else (error 'object "combiner not found" name)))))
+       (else      
+        (error 'object "combiner not found" name)))))
 
   (define (meta-eval exp env)
     (cond
@@ -82,7 +93,6 @@
      ((boolean? exp) exp)
      ((string? exp) exp)
      ((pair? exp)
-      (pk 'meta-eval (car exp))
       (meta-apply (car exp)
                   (meta-eval (car exp) env)
                   (cdr exp)
@@ -92,12 +102,13 @@
   (define object-environment-define!
     (lambda (env symbol object)
       (define box (object-environment-ref~ 'define! env symbol))
-      (set-box! box object)))
+      (set-box! box (unbox object))))
 
   (define object-environment-set! object-environment-define!)
 
   (define (make-environment alist)
-    (make-environment~ (list (box (list)) (box (map (lambda (x) (cons (car x) (box (cdr x)))) alist)))))
+    (make-environment~ (list (box (map (lambda (x)
+                                         (cons (car x) (box (cdr x)))) alist)))))
 
   (define object-environment-allocate
     (lambda (env symbol)
@@ -145,6 +156,13 @@
        (lambda (env args)
          (box (car args))))))
 
+  (define object-box!
+    (make-object-ground! 'box!
+      (make-applicative
+       (lambda (env args)
+         (set-box! (car args)
+                   (cadr args))))))
+
   (define object-unbox
     (make-object-ground! 'unbox
       (make-applicative
@@ -165,7 +183,8 @@
        (lambda (env args)
          (match args
            ((,env ((,a* . ,b*) ...))
-            (environment-cons env (map (lambda (a b) (cons a (box b))) a* b*))))))))
+            (environment-cons env (map (lambda (a b)
+                                         (cons a (box b))) a* b*))))))))
 
   (define object-pk
     (make-object-ground! 'pk
@@ -260,32 +279,32 @@
             (if (symbol? (car args))
                 (match args
                   ((,formal ,dynamic-env-name ,body ...)
-                   (make-operative
+                   (box (make-operative
                     (lambda (dynamic-env args)
                       (let* ((alist (list (cons formal (box args))
                                           (cons dynamic-env-name (box dynamic-env))))
                              (env* (environment-cons static-env alist)))
                         (meta-eval `(sequence ,@body) env*)))
                     source
-                    static-env)))
+                    static-env))))
                 (call-with-values (lambda () (arguments-with-rest? (car args)))
                   (lambda (rest? positionals rest)
                     (if rest?
-                        (make-operative
+                        (box (make-operative
                          (lambda (dynamic-env args*)
                            (let* ((alist (cons (cons dynamic-env-name (box dynamic-env))
                                                (parse-arguments-with-rest positionals rest args*)))
                                   (env* (environment-cons static-env alist)))
                              (meta-eval `(sequence ,@body) env*)))
                          source
-                         static-env)
-                        (make-operative
+                         static-env))
+                        (box (make-operative
                          (lambda (dynamic-env args*)
                            (let* ((alist (map (lambda (x y) (cons x (box y))) args args*))
                                   (env* (environment-cons static-env alist)))
                              (meta-eval `(sequence ,@body) env*)))
                          source
-                         static-env)))))))))))
+                         static-env))))))))))))
 
   (define object-lambda
     (make-object-ground! 'lambda
@@ -293,17 +312,19 @@
        (lambda (env args)
          (match args
            (((,formals ...) ,body ...)
-            (make-applicative
-             (lambda (_ args)
-               (let* ((alist (map (lambda (x y) (cons x (box y))) formals args))
-                      (env* (environment-cons env alist)))
-                 (meta-eval `(sequence ,@body) env*)))))
+            (box
+             (make-applicative
+              (lambda (_ args)
+                (let* ((alist (map (lambda (x y) (cons x (box y))) formals args))
+                       (env* (environment-cons env alist)))
+                  (meta-eval `(sequence ,@body) env*))))))
            ((,formal ,body ...)
-            (make-applicative
-             (lambda (_ args)
-               (let* ((alist (list (cons formal (box args))))
-                      (env* (environment-cons env alist)))
-                 (meta-eval `(sequence ,@body) env*)))))
+            (box
+             (make-applicative
+              (lambda (_ args)
+                (let* ((alist (list (cons formal (box args))))
+                       (env* (environment-cons env alist)))
+                  (meta-eval `(sequence ,@body) env*))))))
            (,else (error 'seed "Can't build lambda")))))))
 
   (define object-eval
@@ -320,13 +341,14 @@
 
   (define object-sequence
     (make-object-ground! 'sequence
-      (make-operative (lambda (env args)
-                        (meta-boxes env args)
-                        (let loop ((args args))
-                          (let ((out (meta-eval (car args) env)))
-                            (if (null? (cdr args))
-                                out
-                                (loop (cdr args)))))))))
+      (make-operative
+       (lambda (env args)
+         (meta-boxes env args)
+         (let loop ((args args))
+           (let ((out (meta-eval (car args) env)))
+             (if (null? (cdr args))
+                 out
+                 (loop (cdr args)))))))))
 
   (define object-+
     (make-object-ground! '+
@@ -457,8 +479,8 @@
                (set! library (car args))
                (set! proc (cadr args))))
          (let ((proc (eval proc (environment library))))
-           (make-applicative
-            (lambda (env args) (apply proc args))))))))
+           (box (make-applicative
+                 (lambda (env args) (apply proc args)))))))))
 
   (define (make-seed-environment)
     (make-environment~ (list (box (list)) object-ground)))
