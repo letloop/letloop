@@ -104,7 +104,7 @@ p code {
 }
 
 body {
-    color: hsla(0, 0%, 20%, 1);
+    color: hsla(0, 0%, 5%, 1);
     font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 18px;
     line-height: 1.6em;
@@ -119,16 +119,16 @@ body {
 }
 
 #header a:hover, #footer a:hover {
-    color: black;  /* #3399FF; */
+    color: pink;
 }
 
 
 a:link, a:active, a:visited {
-    color: #333;  /* #3399FF; */
+    color: #444;  /* #3399FF; */
 }
 
 a:hover {
-    color: black;
+    color: pink;
 }
 
 /* ROOT */
