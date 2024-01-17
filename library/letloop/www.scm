@@ -1,5 +1,6 @@
 (library (letloop www)
   (export www-request www-host-read www-uri-read www-query-read
+          www-request-line-uri-split
           www-form-urlencoded-read
           ~check-www-000 ~check-www-001 ~check-www-002 ~check-www-002-bis
           ~check-www-003)
@@ -36,7 +37,6 @@
                                            body))))
           (lambda (version code reason headers body)
             (values code headers (body)))))))
-
 
   (define ~check-www-000
     (lambda ()
