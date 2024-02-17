@@ -3,7 +3,7 @@ name: checks
 on: push
 
 env:
-  GH_TOKEN: ${{ secrets.LETLOOP }}
+  GH_TOKEN: ${{ github.token }}
   BRANCH: ${{ github.head_ref || github.ref_name }}
 
 jobs:
@@ -11,8 +11,8 @@ jobs:
     name: checks
     runs-on: ubuntu-22.04
     steps:
+      - run: gh auth status
       - run: sudo apt -qq install chezscheme chezscheme-dev uuid-dev liblz4-dev liburing* > /dev/null
-      - run: gh auth login
       - run: gh repo clone letloop/letloop -- --branch $BRANCH --depth 1
       - run: cd letloop && make
       - run: cd letloop && ./local/bin/letloop
