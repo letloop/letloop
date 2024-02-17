@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - run: sudo apt -qq install chezscheme chezscheme-dev uuid-dev liblz4-dev liburing* > /dev/null
-      - run: gh repo clone letloop/cli -- --branch $BRANCH --depth 1
-      - run: cd cli && make
-      - run: cd cli && ./local/bin/letloop
-      - run: cd cli && LETLOOP_ROOT=$(pwd) make LETLOOP=$(pwd)/local/bin/letloop check
+      - run: gh repo clone letloop/letloop -- --branch $BRANCH --depth 1
+      - run: cd letloop && make
+      - run: cd letloop && ./local/bin/letloop
+      - run: cd letloop && LETLOOP_ROOT=$(pwd) make LETLOOP=$(pwd)/local/bin/letloop check
