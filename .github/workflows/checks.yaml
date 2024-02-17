@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - run: sudo apt -qq install chezscheme chezscheme-dev uuid-dev liblz4-dev liburing* > /dev/null
+      - run: gh auth login
       - run: gh repo clone letloop/letloop -- --branch $BRANCH --depth 1
       - run: cd letloop && make
       - run: cd letloop && ./local/bin/letloop
