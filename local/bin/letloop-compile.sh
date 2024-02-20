@@ -36,7 +36,7 @@ if [ "x$LETLOOP_FLAVOR" = "xcisco" ]; then
 
     cd $LETLOOP_PREFIX/src/chez/cisco/
 
-    ./configure --threads --disable-x11 --disable-curses --installprefix=$PREFIX > /dev/null
+    ./configure --threads --disable-x11 --disable-curses --installprefix=$PREFIX --kernelobj > /dev/null
     make -j $(nproc) > /dev/null
     make install > /dev/null
 else
