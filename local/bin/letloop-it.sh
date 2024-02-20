@@ -55,7 +55,7 @@ fi
 
 set -xe
 
-FEED_URL="https://uk.lxd.images.canonical.com/images/$LETLOOP_DISTRO/$LETLOOP_DISTRO_VERSION/$FEED_ARCH/default"
+FEED_URL="https://images.linuxcontainers.org/images/$LETLOOP_DISTRO/$LETLOOP_DISTRO_VERSION/$FEED_ARCH/default"
 LATEST=$($LETLOOP_ROOT/local/bin/letloop-rootfs-latest-version.py "$FEED_URL")
 ROOTFS_URL="$FEED_URL/$LATEST/rootfs.tar.xz"
 
