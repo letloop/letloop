@@ -105,12 +105,12 @@ jobs:
             flavor: racket
 
           - distribution: amazonlinux
-            version: current
+            version: 2
             arch: amd64
             flavor: cisco
 
           - distribution: amazonlinux
-            version: current
+            version: 2
             arch: amd64
             flavor: racket
 
