@@ -3,7 +3,7 @@ name: pre-release
 on: workflow_dispatch
 
 env:
-  GH_TOKEN: ${{ secrets.LETLOOP }}
+  GH_TOKEN: ${{ github.token }}
   BRANCH: ${{ github.head_ref || github.ref_name }}
 
 jobs:
@@ -55,6 +55,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: sudo apt update --yes && sudo apt install --yes systemd-container qemu-user-static python3-lxml python3-requests
-      - run: gh repo clone letloop/cli -- --branch $BRANCH --depth 1
-      - run: cd cli && git fetch --tags
-      - run: cd cli && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local timeout 3600 ./local/bin/letloop-it.sh ${{ matrix.arch }} ${{ matrix.distribution }} ${{ matrix.version }} ${{ matrix.flavor }}
+      - run: gh repo clone letloop/letloop -- --branch $BRANCH --depth 1
+      - run: cd letloop && git fetch --tags
+      - run: cd letloop && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local timeout 3600 ./local/bin/letloop-it.sh ${{ matrix.arch }} ${{ matrix.distribution }} ${{ matrix.version }} ${{ matrix.flavor }}
