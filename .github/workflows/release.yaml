@@ -26,13 +26,8 @@ jobs:
 
           - distribution: ubuntu
             version: jammy
-            arch: amd64
-            flavor: racket
-
-          - distribution: ubuntu
-            version: jammy
             arch: aarch64
-            flavor: racket
+            flavor: cisco
 
           - distribution: ubuntu
             version: focal
@@ -41,24 +36,14 @@ jobs:
 
           - distribution: ubuntu
             version: focal
-            arch: amd64
-            flavor: racket
-
-          - distribution: ubuntu
-            version: focal
             arch: aarch64
-            flavor: racket
+            flavor: cisco
 
           - distribution: mint
             version: vera
             arch: amd64
             flavor: cisco
 
-          - distribution: mint
-            version: vera
-            arch: amd64
-            flavor: racket
-
           - distribution: alpine
             version: 3.17
             arch: amd64
@@ -66,13 +51,8 @@ jobs:
 
           - distribution: alpine
             version: 3.17
-            arch: amd64
-            flavor: racket
-
-          - distribution: alpine
-            version: 3.17
             arch: aarch64
-            flavor: racket
+            flavor: cisco
 
           - distribution: alpine
             version: 3.18
@@ -81,13 +61,8 @@ jobs:
 
           - distribution: alpine
             version: 3.18
-            arch: amd64
-            flavor: racket
-
-          - distribution: alpine
-            version: 3.18
             arch: aarch64
-            flavor: racket
+            flavor: cisco
 
           - distribution: archlinux
             version: current
@@ -96,13 +71,8 @@ jobs:
 
           - distribution: archlinux
             version: current
-            arch: amd64
-            flavor: racket
-
-          - distribution: archlinux
-            version: current
             arch: aarch64
-            flavor: racket
+            flavor: cisco
 
           - distribution: amazonlinux
             version: 2
@@ -111,13 +81,8 @@ jobs:
 
           - distribution: amazonlinux
             version: 2
-            arch: amd64
-            flavor: racket
-
-          - distribution: amazonlinux
-            version: current
             arch: aarch64
-            flavor: racket
+            flavor: cisco
 
           - distribution: rockylinux
             version: 8
@@ -126,13 +91,8 @@ jobs:
 
           - distribution: rockylinux
             version: 8
-            arch: amd64
-            flavor: racket
-
-          - distribution: rockylinux
-            version: 8
             arch: aarch64
-            flavor: racket
+            flavor: cisco
 
           - distribution: rockylinux
             version: 9
@@ -141,13 +101,8 @@ jobs:
 
           - distribution: rockylinux
             version: 9
-            arch: amd64
-            flavor: racket
-
-          - distribution: rockylinux
-            version: 9
             arch: aarch64
-            flavor: racket
+            flavor: cisco
 
           - distribution: fedora
             version: 37
@@ -156,13 +111,8 @@ jobs:
 
           - distribution: fedora
             version: 37
-            arch: amd64
-            flavor: racket
-
-          - distribution: fedora
-            version: 37
             arch: aarch64
-            flavor: racket
+            flavor: cisco
 
           - distribution: fedora
             version: 38
@@ -171,13 +121,8 @@ jobs:
 
           - distribution: fedora
             version: 38
-            arch: amd64
-            flavor: racket
-
-          - distribution: fedora
-            version: 38
             arch: aarch64
-            flavor: racket
+            flavor: cisco
 
           - distribution: debian
             version: bookworm
@@ -186,13 +131,8 @@ jobs:
 
           - distribution: debian
             version: bookworm
-            arch: amd64
-            flavor: racket
-
-          - distribution: debian
-            version: bookworm
             arch: aarch64
-            flavor: racket
+            flavor: cisco
 
     runs-on: ubuntu-latest
     needs: create-release
