@@ -3,7 +3,7 @@ name: release
 on: workflow_dispatch
 
 env:
-  GH_TOKEN: ${{ github.token }}
+  GH_TOKEN: ${{ secrets.LETLOOP }}
   BRANCH: ${{ github.head_ref || github.ref_name }}
 
 jobs:
