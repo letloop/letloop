@@ -10,7 +10,7 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     steps:
-      - run: gh auth login
+      - run: GH_TOKEN= gh auth login
       - run: gh repo clone letloop/letloop -- --branch $BRANCH --depth 1
       - run: cd letloop && git fetch --tags
       - run: cd letloop && gh release create --draft $(git tag --points-at HEAD)
