@@ -10,6 +10,7 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     steps:
+      - run: gh auth login
       - run: gh repo clone letloop/letloop -- --branch $BRANCH --depth 1
       - run: cd letloop && git fetch --tags
       - run: cd letloop && gh release create --draft $(git tag --points-at HEAD)
@@ -137,6 +138,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: create-release
     steps:
+      - run: gh auth login
       - run: sudo apt install systemd-container qemu-user-static python3-lxml python3-requests
       - run: gh repo clone letloop/letloop -- --branch $BRANCH --depth 1
       - run: cd letloop && git fetch --tags
