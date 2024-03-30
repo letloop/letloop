@@ -93,8 +93,8 @@ case "$LETLOOP_DISTRO" in
         ;;
     "amazonlinux"|"rockylinux"|"oracle")
         $PROOT yum group install -y "Development Tools"
-        $PROOT yum install -y curl git lz4-devel libuuid-devel zlib-devel tcl which
-        $PROOT pip install cmake
+        $PROOT yum install -y curl git lz4-devel libuuid-devel zlib-devel tcl which python-pip
+        $PROOT pip install --upgrade cmake
         ;;
     "archlinux")
         $PROOT pacman -Sy --noconfirm curl cmake base-devel git lz4 util-linux-libs zlib tcl
