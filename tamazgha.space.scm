@@ -26,7 +26,7 @@
   (list
    (list "🚰" "eau" "water" "aman" "ⴰⵎⴰⵊ")
    (list "🚪" "porte" "door" "tabburt" "ⵜⴰⵀⵀⴻⵔⵜ")
-   (list "👨‍👩‍👦‍👦" "famille" "famila" "tawacult" "ⵜⴰⵡⴰⵛⴻⵏⵜ")
+   (list "👨‍👩‍👦‍👦" "famille" "family" "tawacult" "ⵜⴰⵡⴰⵛⴻⵏⵜ")
    (list "⛰️" "montagne" "moutain" "adrar" "ⴰⴷⵔⴰⵔ")
    (list "🥾" "chaussure" "boot" "asbbadd" "ⴰⵙⴻⴱⴱⴰⴹ")
    (list "🔥" "feu" "fire" "times" "ⵜⵉⵎⴻⵙ")
