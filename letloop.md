@@ -6,10 +6,6 @@ Usage:
   letloop exec PROGRAM.SCM [ -- ARGUMENT ...]
   letloop literally LIBRARY.MD
   letloop repl
-  letloop seed A.SEED [SEED ...]
-  
-All subcommands can use directories, and extension of libraries as
-standalone arguments.
 
 The following flags are available:
 
