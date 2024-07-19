@@ -6,6 +6,11 @@
 
 A Chez Scheme distribution with many goodies packed in.
 
+## Available Libraries
+
+<div align=center>
+· `(letloop argon2)` · `(letloop assembly)` · `(letloop blake3)` · `(letloop byter)` · `(letloop byter)` · `(letloop bytevector)` · `(letloop cairo)` · `(letloop commonmark)` · `(letloop dxdb eavt)` · `(letloop dxdb nstore)` · `(letloop dxdb)` · `(letloop epoll)` · `(letloop flow)` · `(letloop gamma)` · `(letloop hook)` · `(letloop html)` · `(letloop http)` · `(letloop json)` · `(letloop lsm1)` · `(letloop match)` · `(letloop okvs)` · `(letloop r999)` · `(letloop seed)` · `(letloop sqlite3)` · `(letloop sxpath)` · `(letloop termbox2)` · `(letloop unknown)` · `(letloop www)` · `(scheme base)` · `(scheme bitwise)` · `(scheme box)` · `(scheme bytevector)` · `(scheme case-lambda)` · `(scheme char)` · `(scheme charset)` · `(scheme comparator)` · `(scheme complex)` · `(scheme cxr)` · `(scheme division)` · `(scheme eval)` · `(scheme file)` · `(scheme fixnum)` · `(scheme generator)` · `(scheme hash-table)` · `(scheme ideque)` · `(scheme ilist)` · `(scheme inexact)` · `(scheme lazy)` · `(scheme list-queue)` · `(scheme load)` · `(scheme lseq)` · `(scheme mapping hash)` · `(scheme mapping)` · `(scheme process-context)` · `(scheme r5rs)` · `(scheme read)` · `(scheme repl)` · `(scheme rlist)` · `(scheme set)` · `(scheme stream)` · `(scheme time)` · `(scheme write)` · `(srfi srfi-1)` · `(srfi srfi-1)` · `(srfi srfi-2)` · `(srfi srfi-4)` · `(srfi srfi-5)` · `(srfi srfi-6)` · `(srfi srfi-8)` · `(srfi srfi-9)` · `(srfi srfi-11)` · `(srfi srfi-13)` · `(srfi srfi-14)` · `(srfi srfi-16)` · `(srfi srfi-17)` · `(srfi srfi-19)` · `(srfi srfi-23)` · `(srfi srfi-26)` · `(srfi srfi-28)` · `(srfi srfi-29)` · `(srfi srfi-31)` · `(srfi srfi-34)` · `(srfi srfi-35)` · `(srfi srfi-37)` · `(srfi srfi-37)` · `(srfi srfi-39)` · `(srfi srfi-41)` · `(srfi srfi-42)` · `(srfi srfi-43)` · `(srfi srfi-45)` · `(srfi srfi-48)` · `(srfi srfi-51)` · `(srfi srfi-60)` · `(srfi srfi-61)` · `(srfi srfi-67)` · `(srfi srfi-69)` · `(srfi srfi-98)` · `(srfi srfi-99)` · `(srfi srfi-101)` · `(srfi srfi-111)` · `(srfi srfi-113)` · `(srfi srfi-115)` · `(srfi srfi-116)` · `(srfi srfi-117)` · `(srfi srfi-125)` · `(srfi srfi-127)` · `(srfi srfi-128)` · `(srfi srfi-134)` · `(srfi srfi-141)` · `(srfi srfi-143)` · `(srfi srfi-145)` · `(srfi srfi-146)` · `(srfi srfi-146)` · `(srfi srfi-151)` · `(srfi srfi-158)` · `(srfi srfi-167)` · `(srfi srfi-173)` · `(srfi srfi-224)` · </div>
+
 ## Usage
 
 ```
@@ -18,9 +23,6 @@ Usage:
   letloop literally LIBRARY.MD
   letloop repl
 
-All subcommands can use directories, and extension of libraries as
-standalone arguments.
-
 The following flags are available:
 
   --dev Generate allocation, and instruction counts, debug on
@@ -29,52 +31,6 @@ The following flags are available:
   --optimize-level=0-3 Configure optimization level, higher is less
                        safe, but faster
 ```
-
-## Change Log
-
-### v8
-
-- Focus on Debian, and its derivative Ubuntu. Feel free to dare add
-  support, and maintain the support for your favorite distribution.
-
-#### Libraries
-
-- Improve `(letloop www)`: add uri, host, and query readers
-- Improve `(letlop html)`: no need for an accumulator
-
-- Add support nix
-- Add https://letloop.github.io/letloop/
-- Add zero-knowledge password verification;
-- Add blake3 bindings
-- Add argon2 bindings
-- Add termbox bindings
-- Add lsm1 bindings
-- Add sqlite3 bindings
-- Add commonmark bindings
-- `(letloop unknown)`: initial version of zero-knowledge password
-  verification;
-- Add sqlite3's lsm1 extension in `(letloop lsm1)`, with an okvs shim
-  in `(letloop lsm1 okvs)`;
-- Add blake3 bindings in `(letloop blake3)`
-
-### v7
-
-#### Primary
-
-- Embed scheme libraries into letloop, and elf binaries produced by
-  `letloop compile`;
-- More robust, more efficient, and less noisy pre-release checks;
-
-#### Secondary
-
-- Release debian bookworm, mint vera, and more fedora binaries;
-- Add some libraries from SRFI process;
-- Add some libraries from R7RS aliasing libraries from SRFI;
-- Create files in inside `/tmp/letloop/`, and cleanup whenever possible;
-- Add a subcommand to execute benchmarks: `letloop benchmark
-  LIBRARY.SCM THUNK [N]`;
-- Add sqlite3's lsm1 extension in `(letloop lsm1)`, with an okvs shim
-  in `(letloop lsm1 okvs)`;
 
 ## Binary Installation
 
@@ -110,7 +66,7 @@ The following flags are available:
       ```
 
 3. Enjoy all around best scheme
-4. [Star the project](https://github.com/letloop/cli/stargazers)
+4. [Star the project](https://github.com/letloop/letloop/stargazers)
 
 ## `letloop benchmark LIBRARY.SCM THUNK [N]`
 
@@ -201,6 +157,6 @@ Generate a Scheme library from `LIBRARY.MD`.
 
 ## `letloop repl`
 
-Basic Read-Eval-Print-Loop (REPL). The use of a tool similar to
-`rlwrap` may be necessary.
->>>>>>> 687dbe3 (letloop lsm1 (#1793))
+Basic Read-Eval-Print-Loop (REPL). The use of a readline tool similar
+to [`rlwrap`](https://pkgs.org/search/?q=rlwrap&on=name) may be
+necessary.
