@@ -44,11 +44,6 @@ jobs:
             arch: amd64
             flavor: racket
 
-          - distribution: debian
-            version: bullseye
-            arch: amd64
-            flavor: cisco
-
           - distribution: alpine
             version: 3.19
             arch: amd64
