@@ -60,12 +60,22 @@ jobs:
             flavor: cisco
 
           - distribution: alpine
-            version: 3.18
+            version: 3.19
             arch: amd64
             flavor: cisco
 
           - distribution: alpine
-            version: 3.18
+            version: 3.19
+            arch: aarch64
+            flavor: cisco
+            
+          - distribution: alpine
+            version: 3.20
+            arch: amd64
+            flavor: cisco
+
+          - distribution: alpine
+            version: 3.20
             arch: aarch64
             flavor: cisco
 
@@ -110,22 +120,22 @@ jobs:
             flavor: cisco
 
           - distribution: fedora
-            version: 37
+            version: 39
             arch: amd64
             flavor: cisco
 
           - distribution: fedora
-            version: 37
+            version: 39
             arch: aarch64
             flavor: cisco
 
           - distribution: fedora
-            version: 38
+            version: 40
             arch: amd64
             flavor: cisco
 
           - distribution: fedora
-            version: 38
+            version: 40
             arch: aarch64
             flavor: cisco
 
