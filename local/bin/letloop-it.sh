@@ -108,7 +108,7 @@ esac
 FILE=$WORK/usr/bin/python
 if [ ! -f "$FILE" ]; then
     cd $WORK/usr/bin/
-    ln -s python3 python
+    sudo ln -s python3 python
 fi
 
 cd $WORK
