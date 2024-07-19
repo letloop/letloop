@@ -72,11 +72,11 @@ LD_PRELOAD=""
 
 # TODO: Why? It related to systemd-id128 call below
 
-rm -rf $(pwd)/etc/machine-id
-rm -rf $(pwd)/etc/resolv.conf
-cp /etc/resolv.conf $(pwd)/etc/resolv.conf
+rm -rf $WORK/etc/machine-id
+rm -rf $WORK/etc/resolv.conf
+cp /etc/resolv.conf $WORK/etc/resolv.conf
 
-PROOT="sudo systemd-nspawn --uuid=$(systemd-id128 new) -D $(pwd) --bind=$LETLOOP_ROOT:/mnt"
+PROOT="sudo systemd-nspawn --uuid=$(systemd-id128 new) -D $WORK --bind=$LETLOOP_ROOT:/mnt"
 
 case "$LETLOOP_DISTRO" in
     "debian"|"ubuntu"|"mint")
@@ -104,9 +104,13 @@ case "$LETLOOP_DISTRO" in
         ;;
 esac
 
-FILE=$(pwd)/usr/bin/python
+# Create a python alias if necessary
+FILE=$WORK/usr/bin/python
 if [ ! -f "$FILE" ]; then
-    ln -s $(pwd)/usr/bin/python3 $(pwd)/usr/bin/python
-fi 
+    cd $WORK/usr/bin/
+    ln -s python3 python
+fi
+
+cd $WORK
 
 $PROOT /mnt/local/bin/letloop-compile.sh /mnt/ /usr/local/ $LETLOOP_FLAVOR
