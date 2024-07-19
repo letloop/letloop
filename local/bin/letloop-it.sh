@@ -104,4 +104,9 @@ case "$LETLOOP_DISTRO" in
         ;;
 esac
 
+FILE=$(pwd)/usr/bin/python
+if [ ! -f "$FILE" ]; then
+    ln -s $(pwd)/usr/bin/python3 $(pwd)/usr/bin/python
+fi 
+
 $PROOT /mnt/local/bin/letloop-compile.sh /mnt/ /usr/local/ $LETLOOP_FLAVOR
