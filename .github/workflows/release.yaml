@@ -50,32 +50,32 @@ jobs:
             flavor: cisco
 
           - distribution: alpine
-            version: 3.17
+            version: 3.19
             arch: amd64
             flavor: cisco
 
           - distribution: alpine
-            version: 3.17
+            version: 3.19
             arch: aarch64
             flavor: cisco
 
           - distribution: alpine
-            version: 3.19
+            version: "3.20"
             arch: amd64
             flavor: cisco
 
           - distribution: alpine
-            version: 3.19
+            version: "3.20"
             arch: aarch64
             flavor: cisco
             
           - distribution: alpine
-            version: 3.20
+            version: edge
             arch: amd64
             flavor: cisco
 
           - distribution: alpine
-            version: 3.20
+            version: edge
             arch: aarch64
             flavor: cisco
 
