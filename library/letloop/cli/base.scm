@@ -32,12 +32,6 @@
                       (cons (car paths) out))
                 (loop (cdr paths) out))))))
 
-  (define oops
-    (lambda (x)
-      (if (= x -1)
-          0
-          x)))
- 
   (meta define (pk* . args)
         (display ";;; " (current-error-port))
         (write args (current-error-port))
@@ -190,9 +184,9 @@
                                                ;; when the action checkout a tag,
                                                ;; according to git there is no branch
                                                "main"
-                                               (substring branch 0 (oops (fx- (string-length branch) 1))))
+                                               (substring branch 0 (fx- (string-length branch) 1)))
                                            "-"
-                                           (substring describe 0 (oops (fx- (string-length describe) 1)))))))
+                                           (substring describe 0 (fx- (string-length describe) 1))))))
 
   (define-syntax include-date
     (lambda (x)
@@ -203,7 +197,7 @@
              #'exp))])))
 
   (define build-date (let ((date (include-date)))
-                       (substring date 0 (oops (fx- (string-length date) 1)))))
+                       (substring date 0 (fx- (string-length date) 1))))
 
   (define make-accumulator
     (lambda ()
