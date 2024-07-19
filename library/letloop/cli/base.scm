@@ -186,7 +186,11 @@
                         (if (and (fxzero? (string-length describe))
                                  (fxzero? (string-length branch)))
                             (include-git-head)
-                            (string-append (substring branch 0 (oops (fx- (string-length branch) 1)))
+                            (string-append (if (string=? branch "")
+                                               ;; when the action checkout a tag,
+                                               ;; according to git there is no branch
+                                               "main"
+                                               (substring branch 0 (oops (fx- (string-length branch) 1))))
                                            "-"
                                            (substring describe 0 (oops (fx- (string-length describe) 1)))))))
 
