@@ -18,7 +18,7 @@ jobs:
             flavor: cisco
 
           - distribution: alpine
-            version: 3.18
+            version: edge
             arch: amd64
             flavor: cisco
 
