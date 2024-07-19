@@ -38,7 +38,7 @@ jobs:
             flavor: cisco
 
           - distribution: fedora
-            version: 38
+            version: 39
             arch: amd64
             flavor: cisco
 
