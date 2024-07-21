@@ -84,25 +84,25 @@ jobs:
             arch: aarch64
             flavor: cisco
 
-          - distribution: amazonlinux
-            version: 2
-            arch: amd64
-            flavor: cisco
+          # - distribution: amazonlinux
+          #   version: 2
+          #   arch: amd64
+          #   flavor: cisco
 
-          - distribution: amazonlinux
-            version: 2
-            arch: aarch64
-            flavor: cisco
+          # - distribution: amazonlinux
+          #   version: 2
+          #   arch: aarch64
+          #   flavor: cisco
 
-          - distribution: rockylinux
-            version: 9
-            arch: amd64
-            flavor: cisco
+          # - distribution: rockylinux
+          #   version: 9
+          #   arch: amd64
+          #   flavor: cisco
 
-          - distribution: rockylinux
-            version: 9
-            arch: aarch64
-            flavor: cisco
+          # - distribution: rockylinux
+          #   version: 9
+          #   arch: aarch64
+          #   flavor: cisco
 
           - distribution: fedora
             version: 39
