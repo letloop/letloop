@@ -109,20 +109,20 @@ jobs:
             arch: amd64
             flavor: cisco
 
-          - distribution: fedora
-            version: 39
-            arch: aarch64
-            flavor: cisco
+          # - distribution: fedora
+          #   version: 39
+          #   arch: aarch64
+          #   flavor: cisco
 
           - distribution: fedora
             version: 40
             arch: amd64
             flavor: cisco
 
-          - distribution: fedora
-            version: 40
-            arch: aarch64
-            flavor: cisco
+          # - distribution: fedora
+          #   version: 40
+          #   arch: aarch64
+          #   flavor: cisco
 
           - distribution: debian
             version: bookworm
