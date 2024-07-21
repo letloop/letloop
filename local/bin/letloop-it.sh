@@ -104,13 +104,4 @@ case "$LETLOOP_DISTRO" in
         ;;
 esac
 
-# Create a python alias if necessary
-FILE=$WORK/usr/bin/python
-if [ ! -f "$FILE" ]; then
-    cd $WORK/usr/bin/
-    sudo ln -s python3 python
-fi
-
-cd $WORK
-
 $PROOT /mnt/local/bin/letloop-compile.sh /mnt/ /usr/local/ $LETLOOP_FLAVOR
