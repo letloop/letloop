@@ -85,19 +85,19 @@ case "$LETLOOP_DISTRO" in
         $PROOT apt -qq install --yes python-is-python3 curl cmake git build-essential uuid-dev liblz4-dev zlib1g-dev tcl > /dev/null
         ;;
     "alpine")
-        $PROOT apk add build-base curl cmake git lz4-dev libuuid util-linux-dev zlib-dev tcl
+        $PROOT apk add build-base curl cmake git lz4-dev libuuid util-linux-dev zlib-dev tcl python3
         ;;
     "fedora"|"centos")
         $PROOT yum group install -y "C Development Tools and Libraries"
-        $PROOT yum install -y curl cmake git lz4-devel libuuid-devel zlib-devel tcl
+        $PROOT yum install -y curl cmake git lz4-devel libuuid-devel zlib-devel tcl python3
         ;;
     "amazonlinux"|"rockylinux"|"oracle")
         $PROOT yum group install -y "Development Tools"
-        $PROOT yum install -y curl git lz4-devel libuuid-devel zlib-devel tcl which python-pip
+        $PROOT yum install -y curl git lz4-devel libuuid-devel zlib-devel tcl which python3 python3-pip
         $PROOT pip install --upgrade cmake
         ;;
     "archlinux")
-        $PROOT pacman -Sy --noconfirm curl cmake base-devel git lz4 util-linux-libs zlib tcl
+        $PROOT pacman -Sy --noconfirm curl cmake base-devel git lz4 util-linux-libs zlib tcl python3
         ;;
     *)
         echo "distro not supported"

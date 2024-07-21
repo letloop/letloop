@@ -88,7 +88,7 @@ cmark: local/lib/libcmark.so
 local/lib/libcmark.so:
 	rm -rf local/src/cmark
 	mkdir -p local/src
-	cd local/src && git clone --depth=1 https://github.com/amirouche/cmark
+	cd local/src && git clone --depth=1 https://github.com/commonmark/cmark
 	cd local/src/cmark && make -j$(shell nproc --ignore 1) && make && cp build/src/libcmark.so* $(PWD)/local/lib/
 
 www:
