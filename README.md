@@ -39,29 +39,29 @@ The following flags are available:
     - alpine:
 
       ```shell
-      apk add build-base git lz4-dev libuuid util-linux-dev zlib-dev
+      apk add python3 build-base git lz4-dev libuuid util-linux-dev zlib-dev
       ```
 
     - arch:
 
       ```shell
-      pacman -Sy --noconfirm base-devel git lz4 util-linux-libs zlib
+      pacman -Sy --noconfirm python3 base-devel git lz4 util-linux-libs zlib
       ```
 
     - fedora:
 
       ```shell
-      yum group install -y "C Development Tools and Libraries" && yum install -y git lz4-devel libuuid-devel zlib-devel
+      yum group install -y "C Development Tools and Libraries" && yum install -y git lz4-devel libuuid-devel zlib-devel python3
       ```
 
     - redhat:
       ```shell
-      yum group install -y "Development Tools" && yum install -y git lz4-devel libuuid-devel zlib-devel
+      yum group install -y "Development Tools" && yum install -y git lz4-devel libuuid-devel zlib-devel python3
       ```
     - ubuntu:
 
       ```shell
-      apt install build-essential uuid-dev liblz4-dev zlib1g-dev
+      apt install build-essential uuid-dev liblz4-dev zlib1g-dev python3
       ```
 
 3. Enjoy all around best scheme
@@ -149,10 +149,6 @@ profile of the execution will be generated in `/tmp`.
 You can adjust optimization with the `--optimize-level=n` where `n`
 can be `0`, `1`, `2`, or `3`. Higher is harder to debug, unsafe, but
 faster.
-
-## `letloop literally LIBRARY.MD`
-
-Generate a Scheme library from `LIBRARY.MD`.
 
 ## `letloop repl`
 
