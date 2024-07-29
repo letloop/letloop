@@ -155,3 +155,24 @@ faster.
 Basic Read-Eval-Print-Loop (REPL). The use of a readline tool similar
 to [`rlwrap`](https://pkgs.org/search/?q=rlwrap&on=name) may be
 necessary.
+
+## Source installation
+
+On Ubuntu, you will need to install a couple of packages:
+
+```shell
+apt install git build-essential chezscheme chezscheme-dev
+apt build-dep chezscheme
+```
+
+Then clone the repository, and at the root of the repository do:
+
+```shell
+git clone https://github.com/letloop/letloop
+cd letloop
+make local/bin/letloop
+```
+
+Now there is a `letloop` binary at `~letloop/local/bin/letloop`.
+
+Enjoy!
