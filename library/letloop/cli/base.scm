@@ -89,7 +89,6 @@
                                                        out)))))
                            (prefix (run/output (format #f "realpath $(ls -d ~a/../lib/csv~a*) | tr -d '\n'" path version))))
                       (let ((out (format #f "~a/~a/~a" prefix (machine-type) what)))
-                        (pk* out)
                         (when (file-exists? out)
                           (k out)))))))
               (list scheme "/usr/local/bin/" "/usr/bin/"))))))
@@ -99,7 +98,7 @@
       (syntax-case x ()
         [(k filename)
          (let* ([fn (datum filename)]
-                [fn (pk* (binarypath->scheme-home (scheme-binarypath) fn))])
+                [fn (binarypath->scheme-home (scheme-binarypath) fn)])
            (with-syntax ([exp (get-bytevector-all (open-file-input-port fn))])
              #'exp))])))
 
