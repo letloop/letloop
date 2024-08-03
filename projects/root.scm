@@ -233,4 +233,38 @@
          (system* directory '() "echo ~a > etc/hostname" (basename directory))
          (system* directory '() "echo root filesystem available @ ~a" directory))))
 
-(root-init-exec "debian" "bookworm" "amd64" (make-temporary-directory "/tmp/letloop-root/bookbook"))
+(define root-init
+  (lambda ()
+    (error 'root "not implemented")))
+
+(define root-exec-exec
+  (lambda (directory target-directory env command)
+    (define string-join
+      (lambda (strings delimiter)
+        (let loop ((out (list delimiter))
+                   (strings strings))
+          (if (null? strings)
+              (apply string-append (reverse out))
+              (loop (cons* delimiter (car strings) out)
+                    (cdr strings))))))
+
+    (define env* (if (not env) ""
+                     (pk 'fuuu (string-join (map (lambda (x) (string-append " " (symbol->string (car x)) "=" (cdr x)))
+                                                 env)
+                                            " "))))
+    (define target-directory* (or target-directory "/"))
+
+    (system* directory #f "cp /etc/resolv.conf ~a/etc/resolv.conf" directory)
+    (system* directory #f "mkdir -p ~a/mnt/host" directory)
+    (system* directory
+             #f
+             (string-append "sudo systemd-nspawn --uuid=$(systemd-id128 new) -D ~s --bind=$(pwd):/mnt/host --chdir ~s"
+                            " /usr/bin/env ~a ~a")
+             directory
+             target-directory*
+             env*
+             command)))
+
+(define tmp (make-temporary-directory "/tmp/letloop-root/bookbook"))
+(root-init-exec "debian" "bookworm" "amd64" tmp)
+(root-exec-exec "/tmp/letloop-root/bookbook-BVsa65" "/tmp" '((TODO . "TUTU")) "/bin/bash")
