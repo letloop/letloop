@@ -267,4 +267,4 @@
 
 (define tmp (make-temporary-directory "/tmp/letloop-root/bookbook"))
 (root-init-exec "debian" "bookworm" "amd64" tmp)
-(root-exec-exec "/tmp/letloop-root/bookbook-BVsa65" "/tmp" '((TODO . "TUTU")) "/bin/bash")
+(root-exec-exec tmp "/tmp" '((TOTO . "TITI")) "/bin/bash")
