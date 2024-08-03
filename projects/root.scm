@@ -23,8 +23,10 @@
   (define mkdtemp
     (foreign-procedure "mkdtemp" (string) string))
 
+  (system* #f #f "mkdir -p $(dirname ~s)" prefix)
+  
   (let ((input (string-append prefix "-XXXXXX")))
-    (mkdtemp input)))
+    (pk (mkdtemp input))))
 
 (define call-with-env
   (lambda (env thunk)
@@ -65,9 +67,15 @@
   (lambda (command)
     (zero? (system command))))
 
-(define run
+(define system*
   (lambda (directory env command . variables)
-    (pk 'apply 'run directory env command)
+    (pk 'system* directory env command variables)
+    ;; TODO: check directory exists
+    (unless (or (not directory)
+                (and 
+                 (file-exists? directory)
+                 (file-directory? directory)))
+      (error 'root "directory not found" directory))
     (unless (call-with-env env (lambda ()
                                  (if directory
                                      (parameterize ((current-directory directory))
@@ -154,9 +162,10 @@
         (if (null? x) x (p x))))
     
     (and=> (reverse (root-index-hrefs (string-append IMAGES.LINUXCONTAINERS.ORG
-                                                     distribution-href
-                                                     version-href
-                                                     machine-href
+                                                     ;; there might be duplicated slash
+                                                     distribution-href "/"
+                                                     version-href "/"
+                                                     machine-href "/"
                                                      "default/")))
            car)))
 
@@ -186,4 +195,42 @@
   (lambda ()
     (generator-for-each (lambda (x) (apply format #t "~a ~a ~a\n" x)) (root-available-generator))))
 
-(root-available)
+
+(define root-init-exec
+  (lambda (distribution version machine directory)
+
+    (define basename
+      (lambda (string)
+        (let loop ((index (string-length string)))
+          (if (char=? (string-ref string (- index 1)) #\/)
+              (substring string index (string-length string))
+              (loop (- index 1))))))
+
+    (define build (root-distribution-version-machine-latest-build distribution
+                                                                  version
+                                                                  machine))
+    (define rootfs.tar.xz (string-append IMAGES.LINUXCONTAINERS.ORG
+                                         distribution "/"
+                                         version "/"
+                                         machine "/"
+                                         "default" "/"
+                                         build
+                                         "rootfs.tar.xz"))
+    (define SHA256SUMS (string-append IMAGES.LINUXCONTAINERS.ORG
+                                      distribution "/"
+                                      version "/"
+                                      machine "/"
+                                      "default" "/"
+                                      build
+                                      "SHA256SUMS"))
+
+    (and (system* directory '() "wget ~a" rootfs.tar.xz)
+         (system* directory '() "wget ~a" SHA256SUMS)
+         (system* directory '() "fgrep rootfs.tar.xz SHA256SUMS | sha256sum -c -")
+         (system* directory '() "tar xf rootfs.tar.xz")
+         ;; TODO: why rm machine-id
+         (system* directory '() "rm -f etc/resolv.conf etc/machine-id")
+         (system* directory '() "echo ~a > etc/hostname" (basename directory))
+         (system* directory '() "echo root filesystem available @ ~a" directory))))
+
+(root-init-exec "debian" "bookworm" "amd64" (make-temporary-directory "/tmp/letloop-root/bookbook"))
