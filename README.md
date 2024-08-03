@@ -33,7 +33,7 @@ The following flags are available:
 
 ## Binary Installation
 
-1. [Download the latest release for your favorite Linux distribution](https://github.com/letloop/cli/releases/latest/)
+1. [Download the latest release for your favorite Linux distribution](https://github.com/letloop/letloop/releases/latest/)
 2. Install system dependencies:
 
     - alpine:
