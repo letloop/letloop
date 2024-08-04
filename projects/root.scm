@@ -195,16 +195,15 @@
   (lambda ()
     (generator-for-each (lambda (x) (apply format #t "~a ~a ~a\n" x)) (root-available-generator))))
 
+(define basename
+  (lambda (string)
+    (let loop ((index (string-length string)))
+      (if (char=? (string-ref string (- index 1)) #\/)
+          (substring string index (string-length string))
+          (loop (- index 1))))))
 
 (define root-init-exec
   (lambda (distribution version machine directory)
-
-    (define basename
-      (lambda (string)
-        (let loop ((index (string-length string)))
-          (if (char=? (string-ref string (- index 1)) #\/)
-              (substring string index (string-length string))
-              (loop (- index 1))))))
 
     (define build (root-distribution-version-machine-latest-build distribution
                                                                   version
@@ -261,12 +260,32 @@
              #f
              (string-append "sudo systemd-nspawn --uuid=$(systemd-id128 new) --directory=~s"
                             " --bind=$(pwd):/mnt/host --chdir=~s"
-                            " /usr/bin/env ~a ~a")
+                            " --machine=~a"
+                            " --private-users=pick"
+                            " /usr/bin/env ~a"
+                            " ~a")
              directory
              target-directory*
+             (basename directory)
              env*
              command)))
 
-(define tmp (make-temporary-directory "/tmp/letloop-root/bookbook"))
-(root-init-exec "debian" "bookworm" "amd64" tmp)
-(root-exec-exec tmp "/tmp" '((TOTO . "TITI")) "/bin/bash")
+(define root-spawn-exec
+  (lambda (directory)
+    (system* #f
+             #f
+             (string-append "sudo systemd-nspawn --uuid=$(systemd-id128 new) --directory=~s"
+                            " --boot"
+                            " --capability=CAP_NET_ADMIN"
+                            " --bind=$(pwd):/mnt/host"
+                            " --private-users=pick"
+                            " --machine=~a")
+             directory
+             (basename directory))))
+    
+
+;; (define tmp (make-temporary-directory "/tmp/letloop-root/bookbook"))
+;; (root-init-exec "debian" "bookworm" "amd64" tmp)
+;; (root-exec-exec tmp "/tmp" '((TOTO . "TITI")) "/bin/bash")
+;; (root-exec-exec "/tmp/letloop-root/bookbook-6Xwngr" "/tmp" '() "/bin/bash")
+(root-spawn-exec "/tmp/letloop-root/bookbook-6Xwngr")
