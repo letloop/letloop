@@ -80,7 +80,8 @@ local/lib/sqlite3.so:
 	which tclsh || exit 42
 	rm -rf local/src/sqlite
 	mkdir -p local/src
-	cd local/src && git clone --depth=1 https://github.com/sqlite/sqlite
+	cd local/src && git clone https://github.com/sqlite/sqlite
+	cd local/src/sqlite && git checkout version-3.46.0
 	cd local/src/sqlite && ./configure --disable-tcl --prefix=$(PWD)/local/ && make -j$(shell nproc --ignore 1) && make install
 
 cmark: local/lib/libcmark.so
