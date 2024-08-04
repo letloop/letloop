@@ -249,16 +249,18 @@
                     (cdr strings))))))
 
     (define env* (if (not env) ""
-                     (pk 'fuuu (string-join (map (lambda (x) (string-append " " (symbol->string (car x)) "=" (cdr x)))
-                                                 env)
-                                            " "))))
+                     (string-join (map (lambda (x) (string-append " " (symbol->string (car x))
+                                                                  "=" (cdr x)))
+                                       env)
+                                  " ")))
     (define target-directory* (or target-directory "/"))
 
     (system* directory #f "cp /etc/resolv.conf ~a/etc/resolv.conf" directory)
     (system* directory #f "mkdir -p ~a/mnt/host" directory)
-    (system* directory
+    (system* #f
              #f
-             (string-append "sudo systemd-nspawn --uuid=$(systemd-id128 new) -D ~s --bind=$(pwd):/mnt/host --chdir ~s"
+             (string-append "sudo systemd-nspawn --uuid=$(systemd-id128 new) --directory=~s"
+                            " --bind=$(pwd):/mnt/host --chdir=~s"
                             " /usr/bin/env ~a ~a")
              directory
              target-directory*
