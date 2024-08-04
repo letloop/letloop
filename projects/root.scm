@@ -297,6 +297,8 @@
 
 (define root-emulate
   (lambda (directory)
+    ;; TODO: support more machine architecture amd64, aarch64, etc...
+    ;;
     ;; Install linux-image-amd64, add fsRoot /etc/fstab, and include 9p in initrd
     ;;
     ;; ref: https://superuser.com/a/536352/115319
