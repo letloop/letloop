@@ -33,7 +33,7 @@
         (call-with-values (lambda ()
                             (http-response-read
                              (bytevector->generator
-                              (command-run (format #f "curl --http1.1 -X ~s -i ~a ~{-H ~s ~}" method url headers*)
+                              (command-run (format #f "curl --raw --http1.1 -X ~s -i ~a ~{-H ~s ~}" method url headers*)
                                            body))))
           (lambda (version code reason headers body)
             (values code headers (body)))))))
