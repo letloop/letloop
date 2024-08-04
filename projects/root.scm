@@ -6,6 +6,7 @@
 (import (letloop sxpath))
 (import (scheme generator))
 
+
 ;; helpers
 
 (define pk
@@ -124,7 +125,7 @@
            (else (loop (cdr arguments) keywords (cons head standalone))))))))
 
 
-(define IMAGES.LINUXCONTAINERS.ORG "https://images.linuxcontainers.org/images/")
+(define URL_IMAGES_INDEX "https://images.linuxcontainers.org/images/")
 
 ;; template url
 (define url_rootfs "{URL}{distribution}/{release}/{arch}/default/{build}/rootfs.tar.xz")
@@ -144,15 +145,15 @@
 
 (define root-distribution-hrefs
   (lambda ()
-    (root-index-hrefs IMAGES.LINUXCONTAINERS.ORG)))
+    (root-index-hrefs URL_IMAGES_INDEX)))
 
 (define root-distribution-version-hrefs
   (lambda (distribution-href)
-    (root-index-hrefs (string-append IMAGES.LINUXCONTAINERS.ORG distribution-href))))
+    (root-index-hrefs (string-append URL_IMAGES_INDEX distribution-href))))
 
 (define root-distribution-version-machine-hrefs
   (lambda (distribution-href version-href)
-    (root-index-hrefs (string-append IMAGES.LINUXCONTAINERS.ORG distribution-href version-href))))
+    (root-index-hrefs (string-append URL_IMAGES_INDEX distribution-href version-href))))
 
 (define root-distribution-version-machine-latest-build
   (lambda (distribution-href version-href machine-href)
@@ -161,7 +162,7 @@
       (lambda (x p)
         (if (null? x) x (p x))))
     
-    (and=> (reverse (root-index-hrefs (string-append IMAGES.LINUXCONTAINERS.ORG
+    (and=> (reverse (root-index-hrefs (string-append URL_IMAGES_INDEX
                                                      ;; there might be duplicated slash
                                                      distribution-href "/"
                                                      version-href "/"
@@ -208,14 +209,14 @@
     (define build (root-distribution-version-machine-latest-build distribution
                                                                   version
                                                                   machine))
-    (define rootfs.tar.xz (string-append IMAGES.LINUXCONTAINERS.ORG
+    (define rootfs.tar.xz (string-append URL_IMAGES_INDEX
                                          distribution "/"
                                          version "/"
                                          machine "/"
                                          "default" "/"
                                          build
                                          "rootfs.tar.xz"))
-    (define SHA256SUMS (string-append IMAGES.LINUXCONTAINERS.ORG
+    (define SHA256SUMS (string-append URL_IMAGES_INDEX
                                       distribution "/"
                                       version "/"
                                       machine "/"
@@ -282,10 +283,31 @@
                             " --machine=~a")
              directory
              (basename directory))))
-    
 
+(define qemu-9p-bare-command "qemu-system-x86_64 \
+    -enable-kvm \
+    -machine pc,accel=kvm,usb=off,dump-guest-core=off -m 2048 \
+    -smp 4,sockets=4,cores=1,threads=1 -rtc base=utc \
+    -boot strict=on -kernel ~a \
+    -initrd ~a \
+    -append 'init=/usr/lib/systemd/systemd root=fsRoot rw rootfstype=9p rootflags=trans=virtio,version=9p2000.L,msize=5000000,posixacl console=ttyS0' \
+    -fsdev local,security_model=none,multidevs=remap,id=fsRoot,path=~a \
+    -device virtio-9p-pci,id=fsRoot,fsdev=fsRoot,mount_tag=fsRoot \
+    -nographic")
+
+(define root-emulate
+  (lambda (directory)
+    ;; Install linux-image-amd64, add fsRoot /etc/fstab, and include 9p in initrd
+    ;;
+    ;; ref: https://superuser.com/a/536352/115319
+    (system* #f #f qemu-9p-bare-command
+             (string-append directory "/boot/vmlinuz*")
+             (string-append directory "/boot/initrd.img*")
+             directory)))
+  
 ;; (define tmp (make-temporary-directory "/tmp/letloop-root/bookbook"))
 ;; (root-init-exec "debian" "bookworm" "amd64" tmp)
-;; (root-exec-exec tmp "/tmp" '((TOTO . "TITI")) "/bin/bash")
-;; (root-exec-exec "/tmp/letloop-root/bookbook-6Xwngr" "/tmp" '() "/bin/bash")
-(root-spawn-exec "/tmp/letloop-root/bookbook-6Xwngr")
+;; (root-exec-exec tmp #f #f "/bin/bash")
+;; (root-exec-exec "/tmp/letloop-root/bookbook-8TPZrc/" "/tmp" '() "/bin/bash")
+;; (root-spawn-exec "/tmp/letloop-root/bookbook-6Xwngr")
+;; (root-emulate "/tmp/letloop-root/bookbook-8TPZrc/")
