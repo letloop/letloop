@@ -6,7 +6,12 @@ Usage:
   letloop exec PROGRAM.SCM [ -- ARGUMENT ...]
   letloop literally LIBRARY.MD
   letloop repl
-
+  letloop root available
+  letloop root init DISTRIBUTION VERSION DIRECTORY
+  letloop root exec DIRECTORY TARGET-DIRECTORY -- COMMAND ARGS ...
+  letloop root spawn DIRECTORY
+  letloop root emulate DIRECTORY
+  
 The following flags are available:
 
   --dev Generate allocation, and instruction counts, debug on

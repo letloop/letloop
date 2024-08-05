@@ -1,10 +1,11 @@
 (library (letloop root)
 
-  (export root-temporary-directory
-          root-available
-          root-init-exec
-          root-exec-exec
-          root-spawn-exec
+  (export letloop-root
+          root-temporary-directory
+          root-available-print
+          root-init
+          root-exec
+          root-spawn
           root-emulate)
    
    (import (chezscheme)
@@ -92,7 +93,7 @@
                                         (parameterize ((current-directory directory))
                                           (system? (apply format #f command variables)))
                                         (system? (apply format #f command variables)))))
-         (error 'run "failed" directory env command))))
+         (error 'system* "non-zero exit code" directory env command variables))))
 
    (define URL_IMAGES_INDEX "https://images.linuxcontainers.org/images/")
 
@@ -161,7 +162,7 @@
               (root-distribution-version-hrefs distribution)))
            (root-distribution-hrefs))))))
    
-   (define root-available
+   (define root-available-print
      (lambda ()
        (generator-for-each (lambda (x) (apply format #t "~a ~a ~a\n" x)) (root-available-generator))))
 
@@ -172,7 +173,7 @@
              (substring string index (string-length string))
              (loop (- index 1))))))
 
-   (define root-init-exec
+   (define root-init
      (lambda (distribution version machine directory)
 
        (define build (root-distribution-version-machine-latest-build distribution
@@ -201,21 +202,18 @@
             (system* directory '() "rm -f etc/resolv.conf etc/machine-id")
             (system* directory '() "echo ~a > etc/hostname" (basename directory))
             (system* directory '() "echo root filesystem available @ ~a" directory))))
+   
+   (define string-join
+     (lambda (strings delimiter)
+       (let loop ((out (list delimiter))
+                  (strings strings))
+         (if (null? strings)
+             (apply string-append (reverse out))
+             (loop (cons* delimiter (car strings) out)
+                   (cdr strings))))))
 
-   (define root-init
-     (lambda ()
-       (error 'root "not implemented")))
-
-   (define root-exec-exec
+   (define root-exec
      (lambda (directory target-directory env command . variables)
-       (define string-join
-         (lambda (strings delimiter)
-           (let loop ((out (list delimiter))
-                      (strings strings))
-             (if (null? strings)
-                 (apply string-append (reverse out))
-                 (loop (cons* delimiter (car strings) out)
-                       (cdr strings))))))
 
        (define env* (if (not env) ""
                         (string-join (map (lambda (x) (string-append " " (symbol->string (car x))
@@ -228,7 +226,7 @@
        (system* directory #f "mkdir -p ~a/mnt/host" directory)
        (system* #f
                 #f
-                (string-append "sudo systemd-nspawn --uuid=$(systemd-id128 new) --directory=~s"
+                (string-append "systemd-nspawn --uuid=$(systemd-id128 new) --directory=~s"
                                " --bind=$(pwd):/mnt/host --chdir=~s"
                                " --machine=~a"
                                " /usr/bin/env ~a"
@@ -239,11 +237,11 @@
                 env*
                 (apply format #f command variables))))
 
-   (define root-spawn-exec
+   (define root-spawn
      (lambda (directory)
        (system* #f
                 #f
-                (string-append "sudo systemd-nspawn --uuid=$(systemd-id128 new) --directory=~s"
+                (string-append "systemd-nspawn --uuid=$(systemd-id128 new) --directory=~s"
                                " --boot"
                                " --capability=CAP_NET_ADMIN"
                                " --bind=$(pwd):/mnt/host"
@@ -275,9 +273,24 @@
                 directory)))
    
    ;; (define tmp (make-temporary-directory "/tmp/letloop-root/bookbook"))
-   ;; (root-init-exec "debian" "bookworm" "amd64" tmp)
-   ;; (root-exec-exec tmp #f #f "/bin/bash")
-   ;; (root-exec-exec "/tmp/letloop-root/bookbook-8TPZrc/" "/tmp" '() "/bin/bash")
-   ;; (root-spawn-exec "/tmp/letloop-root/bookbook-6Xwngr")
+   ;; (root-init "debian" "bookworm" "amd64" tmp)
+   ;; (root-exec tmp #f #f "/bin/bash")
+   ;; (root-exec "/tmp/letloop-root/bookbook-8TPZrc/" "/tmp" '() "/bin/bash")
+   ;; (root-spawn "/tmp/letloop-root/bookbook-6Xwngr")
    ;; (root-emulate "/tmp/letloop-root/bookbook-8TPZrc/")
+
+   (define letloop-root
+     (lambda (args)
+       (if (null? args)
+           (begin (display "You can do it!\n")
+                  (exit 1))
+           (case (string->symbol (car args))
+             ((available) (root-available-print))
+             ((init) (apply root-init (cdr args)))
+             ((exec) (root-exec (cadr args) (caddr args) '() (string-join (cddr (cddr args)) " ")))
+             ((spawn) (root-spawn (cadr args)))
+             ((emulate) (root-emulate (cadr args)))
+             (else (display "A typo? Almost, try again...!\n")
+                   (exit 1))))))
+
    )
