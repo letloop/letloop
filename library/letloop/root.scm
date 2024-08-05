@@ -207,7 +207,7 @@
        (error 'root "not implemented")))
 
    (define root-exec-exec
-     (lambda (directory target-directory env command)
+     (lambda (directory target-directory env command . variables)
        (define string-join
          (lambda (strings delimiter)
            (let loop ((out (list delimiter))
@@ -237,7 +237,7 @@
                 target-directory*
                 (basename directory)
                 env*
-                command)))
+                (apply format #f command variables))))
 
    (define root-spawn-exec
      (lambda (directory)
