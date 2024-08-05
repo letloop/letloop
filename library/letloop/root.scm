@@ -92,7 +92,7 @@
                                         (parameterize ((current-directory directory))
                                           (system? (apply format #f command variables)))
                                         (system? (apply format #f command variables)))))
-         (error 'system* "failre with non-zero exit code" directory env command))))
+         (error 'system* "failure with non-zero exit code" directory env command))))
 
 
    (define URL_IMAGES_INDEX "https://images.linuxcontainers.org/images/")
@@ -227,7 +227,7 @@
 
        (system* directory #f "cp /etc/resolv.conf ~a/etc/resolv.conf" directory)
        (system* directory #f "mkdir -p ~a/mnt/host" directory)
-       (apply system*
+       (system*
               #f
               #f
               (string-append "sudo systemd-nspawn --uuid=$(systemd-id128 new) --directory=~s"
@@ -239,7 +239,7 @@
               target-directory*
               (basename directory)
               env*
-              command variables)))
+              (apply format command variables))))
 
    (define root-spawn-exec
      (lambda (directory)
