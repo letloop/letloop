@@ -247,7 +247,7 @@
                                           "make -j$(nproc --ignore=1)")
                           (root-exec-exec just-linux (string-append directory "/build") '()
                                           "make DESTDIR=/mnt/just-linux/seed/ install")
-                          (patchelf (string-append just-linux "/mnt/just-linux/seed/"))))))
+                          #;(patchelf (string-append just-linux "/mnt/just-linux/seed/"))))))
 
 (define gcc `((name . "gcc")
                 (version . "14.2.0")
@@ -299,7 +299,7 @@
                                           "make -j$(nproc --ignore=1)")
                           (root-exec-exec just-linux (string-append directory "/build") '()
                                           "make DESTDIR=/mnt/just-linux/seed/ install")
-                          (patchelf (string-append just-linux "/mnt/just-linux/seed/"))))))
+                          #;(patchelf (string-append just-linux "/mnt/just-linux/seed/"))))))
 
 
 (define binutils `((name . "binutils")
@@ -380,5 +380,5 @@
                                                        (basename (cdr (assq 'source step))))))))
           steps)
 
-(patchelf "/home/amirouche/rootfs/")
+#;(patchelf "/home/amirouche/rootfs/")
 (define ei1 (root-exec-exec just-linux #f '() "bash"))
