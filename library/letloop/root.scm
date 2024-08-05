@@ -92,47 +92,7 @@
                                         (parameterize ((current-directory directory))
                                           (system? (apply format #f command variables)))
                                         (system? (apply format #f command variables)))))
-         (error 'run "failed" directory env command))))
-
-   (define (command-line-parse arguments)
-
-     ;; Given the following ARGUMENTS:
-     ;;
-     ;;   '("--foo=bar" "--qux" "-vvv" "name" "another" "--" "olive" "extra")
-     ;;
-     ;; command-line-parse* returns the following values:
-     ;;
-     ;;   (values '((--foo . "bar") (--qux . #t) (-vvv . #t))
-     ;;           '("name" "other")
-     ;;           '("olive" "extra"))
-     ;;
-     ;; Standalone arguments e.g. "name" and "other" and extra arguments
-     ;; e.g. "olive" and "extra" are returned in the same order as
-     ;; found in ARGUMENTS.
-
-     (define keyword/value
-       (lambda (string)
-         (define index (list-index (lambda (x) (char=? x #\=)) (string->list string)))
-
-
-         (if (not index)
-             (values (string->symbol string) #t)
-             (values (string->symbol (substring string 0 index)) (substring string (+ index 1) (string-length string))))))
-
-     (let loop ((arguments arguments)
-                (keywords '())
-                (standalone '()))
-       (if (null? arguments)
-           (values keywords (reverse standalone) '())
-           (let ((head (car arguments)))
-             (cond
-              ((string=? head "--")
-               (values keywords (reverse standalone) (cdr arguments)))
-              ((char=? (string-ref head 0) #\-)
-               (call-with-values (lambda () (keyword/value head))
-                 (lambda (key value)
-                   (loop (cdr arguments) (cons (cons key value) keywords) standalone))))
-              (else (loop (cdr arguments) keywords (cons head standalone))))))))
+         (error 'system* "failre with non-zero exit code" directory env command))))
 
 
    (define URL_IMAGES_INDEX "https://images.linuxcontainers.org/images/")
@@ -248,7 +208,7 @@
        (error 'root "not implemented")))
 
    (define root-exec-exec
-     (lambda (directory target-directory env command)
+     (lambda (directory target-directory env command . variables)
        (define string-join
          (lambda (strings delimiter)
            (let loop ((out (list delimiter))
@@ -267,19 +227,19 @@
 
        (system* directory #f "cp /etc/resolv.conf ~a/etc/resolv.conf" directory)
        (system* directory #f "mkdir -p ~a/mnt/host" directory)
-       (system* #f
-                #f
-                (string-append "sudo systemd-nspawn --uuid=$(systemd-id128 new) --directory=~s"
-                               " --bind=$(pwd):/mnt/host --chdir=~s"
-                               " --machine=~a"
-                               " --private-users=pick"
-                               " /usr/bin/env ~a"
-                               " ~a")
-                directory
-                target-directory*
-                (basename directory)
-                env*
-                command)))
+       (apply system*
+              #f
+              #f
+              (string-append "sudo systemd-nspawn --uuid=$(systemd-id128 new) --directory=~s"
+                             " --bind=$(pwd):/mnt/host --chdir=~s"
+                             " --machine=~a"
+                             " /usr/bin/env ~a"
+                             " ~a")
+              directory
+              target-directory*
+              (basename directory)
+              env*
+              command variables)))
 
    (define root-spawn-exec
      (lambda (directory)
@@ -289,7 +249,6 @@
                                " --boot"
                                " --capability=CAP_NET_ADMIN"
                                " --bind=$(pwd):/mnt/host"
-                               " --private-users=pick"
                                " --machine=~a")
                 directory
                 (basename directory))))
