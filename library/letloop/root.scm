@@ -94,47 +94,6 @@
                                         (system? (apply format #f command variables)))))
          (error 'run "failed" directory env command))))
 
-   (define (command-line-parse arguments)
-
-     ;; Given the following ARGUMENTS:
-     ;;
-     ;;   '("--foo=bar" "--qux" "-vvv" "name" "another" "--" "olive" "extra")
-     ;;
-     ;; command-line-parse* returns the following values:
-     ;;
-     ;;   (values '((--foo . "bar") (--qux . #t) (-vvv . #t))
-     ;;           '("name" "other")
-     ;;           '("olive" "extra"))
-     ;;
-     ;; Standalone arguments e.g. "name" and "other" and extra arguments
-     ;; e.g. "olive" and "extra" are returned in the same order as
-     ;; found in ARGUMENTS.
-
-     (define keyword/value
-       (lambda (string)
-         (define index (list-index (lambda (x) (char=? x #\=)) (string->list string)))
-
-
-         (if (not index)
-             (values (string->symbol string) #t)
-             (values (string->symbol (substring string 0 index)) (substring string (+ index 1) (string-length string))))))
-
-     (let loop ((arguments arguments)
-                (keywords '())
-                (standalone '()))
-       (if (null? arguments)
-           (values keywords (reverse standalone) '())
-           (let ((head (car arguments)))
-             (cond
-              ((string=? head "--")
-               (values keywords (reverse standalone) (cdr arguments)))
-              ((char=? (string-ref head 0) #\-)
-               (call-with-values (lambda () (keyword/value head))
-                 (lambda (key value)
-                   (loop (cdr arguments) (cons (cons key value) keywords) standalone))))
-              (else (loop (cdr arguments) keywords (cons head standalone))))))))
-
-
    (define URL_IMAGES_INDEX "https://images.linuxcontainers.org/images/")
 
    ;; template url
