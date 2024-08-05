@@ -231,7 +231,6 @@
                 (string-append "sudo systemd-nspawn --uuid=$(systemd-id128 new) --directory=~s"
                                " --bind=$(pwd):/mnt/host --chdir=~s"
                                " --machine=~a"
-                               " --private-users=pick"
                                " /usr/bin/env ~a"
                                " ~a")
                 directory
@@ -248,7 +247,6 @@
                                " --boot"
                                " --capability=CAP_NET_ADMIN"
                                " --bind=$(pwd):/mnt/host"
-                               " --private-users=pick"
                                " --machine=~a")
                 directory
                 (basename directory))))
