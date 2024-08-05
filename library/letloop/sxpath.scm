@@ -2,4 +2,4 @@
   (export sxpath)
   (import (except (chezscheme) filter))
 
-  (include "letloop/sxpath/sxpath.body.scm"))
+  (include "sxpath/sxpath.body.scm"))
