@@ -8,6 +8,7 @@ Usage:
   letloop repl
   letloop root available
   letloop root init DISTRIBUTION VERSION DIRECTORY
+  letloop root chroot DIRECTORY -- COMMAND ... ARGS
   letloop root exec DIRECTORY TARGET-DIRECTORY -- COMMAND ARGS ...
   letloop root spawn DIRECTORY
   letloop root emulate DIRECTORY
