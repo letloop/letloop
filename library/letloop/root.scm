@@ -246,13 +246,8 @@
        (teardown directory)))
 
    (define root-exec
-     (lambda (directory target-directory env command . variables)
+     (lambda (directory target-directory command . variables)
 
-       (define env* (if (not env) ""
-                        (string-join (map (lambda (x) (string-append " " (symbol->string (car x))
-                                                                     "=" (cdr x)))
-                                          env)
-                                     " ")))
        (define target-directory* (or target-directory "/"))
 
        (system* directory #f "cp /etc/resolv.conf ~a/etc/resolv.conf" directory)
@@ -262,12 +257,10 @@
                 (string-append "systemd-nspawn --uuid=$(systemd-id128 new) --directory=~s"
                                " --bind=$(pwd):/mnt/host --chdir=~s"
                                " --machine=~a"
-                               " /usr/bin/env ~a"
                                " ~a")
                 directory
                 target-directory*
                 (basename directory)
-                env*
                 (apply format #f command variables))))
 
    (define root-spawn
@@ -321,7 +314,7 @@
              ((available) (root-available-print))
              ((init) (apply root-init (cdr args)))
              ((chroot) (apply root-chroot (cdr args)))
-             ((exec) (root-exec (cadr args) (caddr args) '() (string-join (cddr (cddr args)) " ")))
+             ((exec) (root-exec (cadr args) (caddr args) (string-join (cddr (cddr args)) " ")))
              ((spawn) (root-spawn (cadr args)))
              ((emulate) (root-emulate (cadr args)))
              (else (display "A typo? Almost, try again...!\n")
