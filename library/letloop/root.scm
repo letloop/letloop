@@ -4,6 +4,7 @@
           root-temporary-directory
           root-available-print
           root-init
+          root-chroot
           root-exec
           root-spawn
           root-emulate)
@@ -212,6 +213,38 @@
              (loop (cons* delimiter (car strings) out)
                    (cdr strings))))))
 
+   (define root-chroot
+     (lambda (directory command . variables)
+
+       (define setup
+         (lambda (directory)
+           (system* directory #f "cp /etc/resolv.conf ~a/etc/resolv.conf" directory)
+           (system* directory #f "mkdir -p ~a/mnt/host" directory)
+           (system* directory #f "mount --bind ~a ~a/mnt/host" (current-directory) directory)
+           (for-each (lambda (x) (system* directory #f "mkdir -pv ~a/~a" directory x))
+                     (list "dev" "proc" "sys" "run"))
+           (system* directory #f "mount -v --bind /dev ~a/dev" directory)
+           (system* directory #f "mount -vt devpts devpts -o gid=5,mode=0620 ~a/dev/pts" directory)
+           (system* directory #f "mount -vt proc proc ~a/proc" directory)
+           (system* directory #f "mount -vt tmpfs tmpfs ~a/run" directory)))
+
+       (define teardown
+         (lambda (directory)
+           (system* directory #f "umount -v ~a/mnt/host" directory)
+           (system* directory #f "umount -v ~a/dev/pts" directory)
+           (system* directory #f "umount -v ~a/proc" directory)
+           (system* directory #f "umount -v ~a/run" directory)
+           (system* directory #f "umount -v ~a/dev" directory)))
+       
+       (setup directory)
+       (guard (ex (else (void)))
+         (system* #f
+                  #f
+                  (string-append "chroot ~a ~a")
+                  directory
+                  (apply format #f command variables)))
+       (teardown directory)))
+
    (define root-exec
      (lambda (directory target-directory env command . variables)
 
@@ -287,6 +320,7 @@
            (case (string->symbol (car args))
              ((available) (root-available-print))
              ((init) (apply root-init (cdr args)))
+             ((chroot) (apply root-chroot (cdr args)))
              ((exec) (root-exec (cadr args) (caddr args) '() (string-join (cddr (cddr args)) " ")))
              ((spawn) (root-spawn (cadr args)))
              ((emulate) (root-emulate (cadr args)))
