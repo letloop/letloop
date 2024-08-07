@@ -7,7 +7,7 @@ Usage:
   letloop literally LIBRARY.MD
   letloop repl
   letloop root available
-  letloop root init DISTRIBUTION VERSION DIRECTORY
+  letloop root init DISTRIBUTION VERSION MACHINE DIRECTORY
   letloop root chroot DIRECTORY -- COMMAND ... ARGS
   letloop root exec DIRECTORY TARGET-DIRECTORY -- COMMAND ARGS ...
   letloop root spawn DIRECTORY
