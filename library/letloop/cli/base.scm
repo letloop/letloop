@@ -300,6 +300,7 @@
     (lambda (active?)
       (when active?
         (compile-profile 'source))
+      (import-notify active?)
       (generate-allocation-counts active?)
       (generate-covin-files active?)
       (generate-inspector-information active?)
