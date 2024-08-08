@@ -797,8 +797,8 @@
       (maybe-display-errors-then-exit errors)
 
       (unless (null? directories)
-        (library-directories directories)
-        (source-directories directories))
+        (library-directories (append directories (library-directories)))
+        (source-directories (append directories (source-directories))))
 
       (optimize-level optimize-level*)
 
@@ -862,8 +862,8 @@
     (maybe-display-errors-then-exit errors)
 
     (unless (null? directories)
-      (library-directories directories)
-      (source-directories directories))
+      (library-directories (append directories (library-directories)))
+      (source-directories (append directories (source-directories))))
 
     (when optimize-level*
       (optimize-level optimize-level*))
@@ -937,8 +937,8 @@
     (maybe-display-errors-then-exit errors)
 
     (unless (null? directories)
-      (library-directories directories)
-      (source-directories directories))
+      (library-directories (append directories (library-directories)))
+      (source-directories (append directories (source-directories))))
 
     (when optimize-level*
       (optimize-level optimize-level*))
