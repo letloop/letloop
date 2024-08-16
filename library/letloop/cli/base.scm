@@ -421,7 +421,6 @@
 
               (define do
                 (lambda (root filepath sexp)
-
                   (let ((name (and (pair? sexp)
                                    ;; TODO: use match to do this.
                                    (eq? (car sexp) 'library)
@@ -452,7 +451,6 @@
 
           (define ftw
             (lambda (root directory)
-              (pk 'directory directory
                   (let loop ((paths (map (lambda (x) (string-append directory "/" x))
                                          (guard (ex (else (list)))
                                            (directory-list directory))))
@@ -462,7 +460,7 @@
                         (if (file-directory? (car paths))
                             (loop (append (map cdr (ftw root (car paths))) (cdr paths))
                                   out)
-                            (loop (cdr paths) (cons (cons root (car paths)) out))))))))
+                            (loop (cdr paths) (cons (cons root (car paths)) out)))))))
 
           (define ref
             (lambda (alist key default)
@@ -608,11 +606,12 @@
 
       (for-each maybe-compile-file* (map car (letloop-discover-libraries)))
       (pk (maybe-compile-file program.scm))
+      (for-each pk (map car (letloop-discover-libraries)))
       (apply make-boot-file "letloop.boot"
-                            (list "scheme" "petite")
+                            (list "scheme")
                             (.so program.scm)
-                            (filter file-exists?
-                                    (map .so (map car (letloop-discover-libraries)))))))
+                            (pk (filter file-exists?
+                                    (map .so (map car (letloop-discover-libraries))))))))
 
 
 
