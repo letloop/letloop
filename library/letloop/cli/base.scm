@@ -3,12 +3,32 @@
   (export letloop-benchmark
           letloop-check
           letloop-compile
+          letloop-main
           letloop-repl
           letloop-exec
           letloop-usage)
-  (import (chezscheme))
+  (import (chezscheme)
+          (letloop root)
+          (letloop literally))
 
   (define LETLOOP_DEBUG (getenv "LETLOOP_DEBUG"))
+
+  (define letloop-main
+    (lambda ()
+
+      (when (null? (cdr (command-line)))
+        (letloop-usage)
+        (exit 0))
+
+      (case (string->symbol (cadr (command-line)))
+        ((benchmark) (letloop-benchmark (cddr (command-line))))
+        ((check) (letloop-check (cddr (command-line))))
+        ((compile) (letloop-compile (cddr (command-line))))
+        ((exec) (letloop-exec (cddr (command-line))))
+        ((literally) (letloop-literally (caddr (command-line))))
+        ((repl) (letloop-repl (cddr (command-line))))
+        ((root) (letloop-root (cddr (command-line))))
+        (else (letloop-usage) (exit 1)))))
 
   (define ftw
     (lambda (directory)
@@ -54,6 +74,13 @@
                             (open-process-ports command 'line (current-transcoder)))
           (lambda (stdin stdout stderr pid)
             (read-string stdout))))
+
+(define basename-without-extension
+  (lambda (filename)
+    (let loop ((index (string-length filename)))
+      (if (char=? (string-ref filename (- index 1)) #\.)
+          (substring filename 0 (- index 1))
+          (loop (- index 1))))))
 
   (meta define basename
         (lambda (string)
@@ -344,33 +371,6 @@
   (define letloop-compile
     (lambda (arguments)
 
-      (define scheme.h (include-chez-file "scheme.h"))
-      (define kernel.o (include-chez-file "kernel.o"))
-      (define petite.boot (include-chez-file "petite.boot"))
-      (define scheme.boot (include-chez-file "scheme.boot"))
-
-      (define loot*
-        (lambda ()
-          ;; TODO: I do not understand why loot* is necessary.
-          ;; compile-whole-program should pick .so from the
-          ;; letloop-directory, and include them in the boot file.
-          (define pointer->bytevector
-            (lambda (pointer length)
-              ;; Copy a memory region starting at POINTER of LENGTH into a
-              ;; bytevector.
-              (let ((out (make-bytevector length)))
-                (let loop ((index length))
-                  (unless (fxzero? index)
-                    (let ((index (fx- index 1)))
-                      (bytevector-u8-set! out index (foreign-ref 'unsigned-8 pointer index))
-                      (loop index))))
-                out)))
-
-          (guard (ex (else #f))
-            (let ((letloop-extra-size (foreign-entry "letloop-extra-size"))
-                  (letloop-extra (foreign-entry "letloop-extra")))
-              (bytevector->u8-list (pointer->bytevector letloop-extra letloop-extra-size))))))
-
       (define (string-suffix? s1 s2)
 
         (define (%string-suffix-length s1 start1 end1 s2 start2 end2)
@@ -399,7 +399,7 @@
 
           (%string-suffix? s1 start1 end1 s2 start2 end2)))
 
-      (define letloop-discover-libraries
+    (define letloop-discover-libraries
         (lambda ()
 
           (define library-prepare
@@ -508,86 +508,6 @@
           (lambda (object)
             (char=? char object))))
 
-      (define program.boot.scm
-        '(letrec*
-             ((program-name (foreign-procedure "program-name" () string))
-              (letloop-directory ((foreign-procedure "letloop-directory" () string)))
-              (letloop-extra-size (foreign-entry "letloop-extra-size"))
-              (letloop-extra (foreign-entry "letloop-extra")))
-
-           (define mkdir*
-             (lambda (path)
-
-               (define string-join
-                 (lambda (strings delimiter)
-                   (let loop ((out (list delimiter))
-                              (strings strings))
-                     (if (null? strings)
-                         (apply string-append (reverse out))
-                         (loop (cons* "/" (car strings) out)
-                               (cdr strings))))))
-
-               (define (string-split char-delimiter? string)
-                 (define (maybe-add a b parts)
-                   (if (= a b) parts (cons (substring string a b) parts)))
-                 (let ((n (string-length string)))
-                   (let loop ((a 0) (b 0) (parts '()))
-                     (if (< b n)
-                         (if (not (char-delimiter? (string-ref string b)))
-                             (loop a (+ b 1) parts)
-                             (loop (+ b 1) (+ b 1) (maybe-add a b parts)))
-                         (reverse (maybe-add a b parts))))))
-
-               (define make-char-predicate
-                 (lambda (char)
-                   (lambda (object)
-                     (char=? char object))))
-
-               (let loop ((directories (reverse
-                                        (cdr (reverse (string-split (make-char-predicate #\/) path)))))
-                          (out '()))
-                 (unless (null? directories)
-                   (let ((target (string-join (append '() (reverse out)
-                                                      (list (car directories))) "/")))
-                     (unless (file-directory? target)
-                       (mkdir target))
-                     (loop (cdr directories) (cons (car directories) out)))))
-               path))
-
-           (define pointer->bytevector
-             (lambda (pointer length)
-               ;; Copy a memory region starting at POINTER of LENGTH into a
-               ;; bytevector.
-               (let ((out (make-bytevector length)))
-                 (let loop ((index length))
-                   (unless (fxzero? index)
-                     (let ((index (fx- index 1)))
-                       (bytevector-u8-set! out index (foreign-ref 'unsigned-8 pointer index))
-                       (loop index))))
-                 out)))
-
-           (for-each
-            (lambda (path+so+wpo)
-              (define basename (car path+so+wpo))
-              (define path (mkdir* (string-append letloop-directory "/" (car path+so+wpo))))
-              (call-with-port (open-file-output-port (string-append path ".so"))
-                (lambda (port)
-                  (put-bytevector port (list-ref path+so+wpo 1))))
-              #;(call-with-port (open-file-output-port (string-append path ".wpo"))
-              (lambda (port)
-              (put-bytevector port (list-ref path+so+wpo 2)))))
-            (call-with-port (open-bytevector-input-port (pointer->bytevector letloop-extra letloop-extra-size)) fasl-read))
-
-           (library-directories (list (cons letloop-directory letloop-directory)))
-           (source-directories  (list letloop-directory))
-
-           (scheme-program
-            (lambda (fn . fns)
-              (command-line (cons (program-name) fns))
-              (command-line-arguments fns)
-              (compile-file-message #f)
-              (load-program fn)))))
-
       ;; parse ARGUMENTS, and set the following variables:
 
       (define extensions '())
@@ -655,138 +575,14 @@
                 (loop (cdr directories) (cons (car directories) out)))))
           path))
 
-      (define letloop-compile-program
-        (lambda (program.scm)
+      (define .so
+        (lambda (x)
+          (string-append (basename-without-extension x) ".so")))
 
-          (define loot
-            (lambda (libraries)
-              (call-with-values open-bytevector-output-port
-                (lambda (port read)
-                  (define path+so+wpo
-                    (map (lambda (x)
-                           (let ((root (list-ref x 1)))
-                             (list (list-ref x 2)
-                                   (call-with-port (open-file-input-port
-                                                    (string-append root
-                                                                   "/"
-                                                                   (list-ref x 2)
-                                                                   ".so"))
-                                     get-bytevector-all)
-                                   ;; Why remove wpos? Rework the loot
-                                   ;; file if it not necessary.
-                                   (bytevector)
-                                   #;(call-with-port (open-file-input-port
-                                   (string-append root
-                                   "/"
-                                   (list-ref x 2)
-                                   ".wpo"))
-                                   get-bytevector-all))))
-                         libraries))
-                  (fasl-write path+so+wpo port)
-                  (bytevector->u8-list (read))))))
-
-          (let ((temporary-directory (make-temporary-directory "/tmp/letloop/compile")))
-            (call-with-output-file (string-append temporary-directory "/program.boot.scm")
-              (lambda (port)
-                (write program.boot.scm port)))
-
-            (pk 'program.scm program.scm)
-
-            (let loop ((todo (list
-                              (cons kernel.o "kernel.o")
-                              (cons scheme.h "scheme.h")
-                              (cons petite.boot "petite.boot")
-                              (cons scheme.boot "scheme.boot"))))
-              (unless (null? todo)
-                (call-with-port (open-file-output-port
-                                 (string-append temporary-directory "/" (cdar todo)))
-                  (lambda (port)
-                    (put-bytevector port (caar todo))))
-                (loop (cdr todo))))
-
-            (let* ((libraries (pk 'yupi (letloop-discover-libraries)))
-                   #;(boot (let ((filepath (string-append temporary-directory "/"
-                   (basename (current-directory))
-                   ".boot")))
-                   (apply make-boot-file filepath
-                   '()
-                   (string-append temporary-directory "/petite.boot")
-                   (string-append temporary-directory "/scheme.boot")
-                   (map car libraries))
-                   (call-with-port (open-file-input-port filepath) get-bytevector-all))))
-
-              (pk 'compile-library)
-              (for-each (lambda (x)
-                          (unless (file-exists? (string-append (substring x 0
-                                                                          (- (string-length x) 3))
-                                                               "so"))
-                            ;; (delete-file (string-append (substring x 0
-                            ;;                                      (- (string-length x) 3))
-                            ;;                           "wpo"))
-                            (compile-library x)))
-                        (map car libraries))
-
-              (pk 'make-boot-file)
-              (make-boot-file (string-append temporary-directory "/program.boot")
-                              '()
-                              (string-append temporary-directory "/petite.boot")
-                              (string-append temporary-directory "/scheme.boot")
-                              (string-append temporary-directory "/program.boot.scm"))
-
-              ;; create main.c
-
-              (system* (format #f "cp ~a ~a/program.scm" program.scm temporary-directory))
-
-              (pk 'compile-program)
-              (let ((libs (compile-program (string-append temporary-directory "/program.scm"))))
-
-                ;; (define req
-                ;;   (lambda (x)
-                ;;     (for-each req (library-requirements x))
-                ;;     (unless (or (equal? x '(chezscheme))
-                ;;                 (equal? x '(rnrs (6))))
-                ;;       (compile-library (library-name->filepath x)))))
-
-                ;; (pk 'fooo (library-object-filename '(letloop y v2024 cli serve)))
-
-                ;; (for-each req libs)
-
-                ;; (pk 'barr (library-object-filename '(letloop y v2024 cli serve)))
-                (void)
-                )
-
-              (compile-whole-program (string-append temporary-directory "/program.wpo")
-                                     (string-append temporary-directory "/program.chez")
-                                     #f)
-
-              (call-with-output-file (string-append temporary-directory "/main.c")
-                (lambda (port)
-                  (let ((boot (bytevector->u8-list
-                               (get-bytevector-all
-                                (open-file-input-port
-                                 (string-append temporary-directory "/program.boot")))))
-                        (program (bytevector->u8-list
-                                  (get-bytevector-all
-                                   (open-file-input-port
-                                    (string-append temporary-directory "/program.chez"))))))
-
-                    (format port main.c boot program (or (loot*) (loot libraries))) port)))
-
-              ;; XXX: pass -fno-lto to disable link-time optimization, because
-              ;; kernel.o may have been compiled with the different version of
-              ;; GCC or LLVM that is not the current cc. It only works when
-              ;; kernel.o has been compiled to included both intermediate
-              ;; code, and binary.
-              ;;
-              ;; ref: https://stackoverflow.com/a/72249840/140837
-              (system* (format #f "cc -march=native ~a ~a/main.c ~a/kernel.o -o ~a -ldl -lz -llz4 -lm -luuid -lpthread -fno-lto"
-                               (string-join extra " ")
-                               temporary-directory
-                               temporary-directory
-                               "a.out"))
-              (for-each delete-file (ftw temporary-directory))
-              (for-each delete-directory (ftw* temporary-directory))
-              (delete-directory temporary-directory)))))
+      (define maybe-compile-file*
+        (lambda (f)
+          (guard (ex (else (void)))
+            (maybe-compile-file f))))
 
       (call-with-values (lambda () (command-line-parse arguments))
         (lambda (keywords standalone extra*)
@@ -807,10 +603,18 @@
 
       (dev! dev?)
 
-      (compile-imported-libraries #t)
+      ;;(compile-imported-libraries #t)
       (generate-wpo-files #t)
 
-      (letloop-compile-program program.scm)))
+      (for-each maybe-compile-file* (map car (letloop-discover-libraries)))
+      (pk (maybe-compile-file program.scm))
+      (apply make-boot-file "letloop.boot"
+                            (list "scheme" "petite")
+                            (.so program.scm)
+                            (filter file-exists?
+                                    (map .so (map car (letloop-discover-libraries)))))))
+
+
 
   (define (letloop-exec arguments)
 

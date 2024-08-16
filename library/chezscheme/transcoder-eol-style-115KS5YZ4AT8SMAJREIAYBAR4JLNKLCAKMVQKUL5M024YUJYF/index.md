@@ -1,4 +1,0 @@
-
-# transcoder-eol-style
-
-

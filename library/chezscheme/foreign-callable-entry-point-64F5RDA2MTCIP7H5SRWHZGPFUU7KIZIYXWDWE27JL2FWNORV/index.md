@@ -1,4 +1,0 @@
-
-# foreign-callable-entry-point
-
-

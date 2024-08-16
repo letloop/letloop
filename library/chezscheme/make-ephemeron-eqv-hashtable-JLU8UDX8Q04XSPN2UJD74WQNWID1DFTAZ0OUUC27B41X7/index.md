@@ -1,4 +1,0 @@
-
-# make-ephemeron-eqv-hashtable
-
-

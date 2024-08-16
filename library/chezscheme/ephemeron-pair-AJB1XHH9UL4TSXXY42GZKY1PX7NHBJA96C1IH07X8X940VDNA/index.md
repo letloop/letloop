@@ -1,4 +1,0 @@
-
-# ephemeron-pair?
-
-

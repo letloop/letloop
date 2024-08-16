@@ -1,4 +1,0 @@
-
-# self-evaluating-vectors
-
-

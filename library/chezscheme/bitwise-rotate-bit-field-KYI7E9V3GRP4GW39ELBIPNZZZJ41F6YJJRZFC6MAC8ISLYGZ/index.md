@@ -1,4 +1,0 @@
-
-# bitwise-rotate-bit-field
-
-

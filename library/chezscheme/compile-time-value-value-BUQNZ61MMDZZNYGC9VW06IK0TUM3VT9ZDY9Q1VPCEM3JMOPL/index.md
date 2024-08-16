@@ -1,4 +1,0 @@
-
-# compile-time-value-value
-
-

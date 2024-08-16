@@ -1,4 +1,0 @@
-
-# open-string-output-port
-
-

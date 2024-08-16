@@ -1,4 +1,0 @@
-
-# bitwise-reverse-bit-field
-
-

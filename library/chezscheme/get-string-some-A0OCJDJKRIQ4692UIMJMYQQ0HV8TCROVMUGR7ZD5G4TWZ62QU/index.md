@@ -1,4 +1,0 @@
-
-# get-string-some
-
-

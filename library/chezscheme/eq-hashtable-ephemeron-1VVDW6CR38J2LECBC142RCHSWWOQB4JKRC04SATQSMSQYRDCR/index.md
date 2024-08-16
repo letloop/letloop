@@ -1,4 +1,0 @@
-
-# eq-hashtable-ephemeron?
-
-

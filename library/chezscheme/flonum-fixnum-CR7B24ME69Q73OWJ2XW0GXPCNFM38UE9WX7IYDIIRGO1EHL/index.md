@@ -1,4 +1,0 @@
-
-# flonum->fixnum
-
-

@@ -1,4 +1,0 @@
-
-# hashtable-delete!
-
-

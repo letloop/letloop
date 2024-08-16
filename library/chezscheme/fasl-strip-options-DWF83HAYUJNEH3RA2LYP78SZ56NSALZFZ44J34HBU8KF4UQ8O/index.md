@@ -1,4 +1,0 @@
-
-# fasl-strip-options
-
-

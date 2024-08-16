@@ -1,4 +1,0 @@
-
-# release-minimum-generation
-
-

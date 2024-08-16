@@ -1,4 +1,0 @@
-
-# with-input-from-string
-
-

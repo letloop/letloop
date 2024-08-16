@@ -1,4 +1,0 @@
-
-# default-record-equal-procedure
-
-
