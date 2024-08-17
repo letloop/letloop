@@ -1,21 +1,25 @@
-SCHEME=scheme
+SCHEME="$(shell which scheme)"
 
 LETLOOP='letloop'
 
 letloop: sqlite3 blake3 argon2 termbox2 lsm1 cmark ## Compile letloop into $(pwd)/local/bin/letloop
-	make local/bin/letloop
+	make local/lib/letloop.boot
 	@echo What is done is not to be done!
 
 help: ## HELP!...
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
 
-local/bin/letloop: letloop.scm letloop.md letloop.nfo
+local/lib/letloop.boot: main.scm letloop.scm letloop.md letloop.nfo
 	echo $(SCHEME)
 	$(SCHEME) --version
 	make clean
+	rm -f letloop.boot
 	mkdir -p /tmp/letloop/
-	$(SCHEME) --libdirs library/ --compile-imported-libraries --program letloop.scm compile library letloop.scm
-	mv a.out local/bin/letloop
+	$(SCHEME) --libdirs library/ --compile-imported-libraries --script main.scm library letloop.scm
+	mkdir -p local/lib/
+	mv letloop.boot local/lib/letloop.boot
+	echo $(shell which letloop)
+	letloop
 
 local/lib/libblake3.so:
 	rm -rf local/src/blake3

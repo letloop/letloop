@@ -1,4 +1,6 @@
 
+(suppress-greeting #t)
+
 (scheme-start 
  (lambda args
    (define LETLOOP_DEBUG (getenv "LETLOOP_DEBUG"))
@@ -579,8 +581,8 @@
        (maybe-display-errors-then-exit errors)
 
        (unless (null? directories)
-         (library-directories (append directories (library-directories)))
-         (source-directories (append directories (source-directories))))
+         (library-directories directories)
+         (source-directories directories))
 
        (optimize-level optimize-level*)
 
@@ -589,17 +591,17 @@
 
        (dev! dev?)
 
-       ;;(compile-imported-libraries #t)
        (generate-wpo-files #t)
 
        (for-each maybe-compile-file* (map car (letloop-discover-libraries)))
-       (pk (maybe-compile-file program.scm))
-       (for-each pk (map car (letloop-discover-libraries)))
+       (when program.scm
+         (pk (maybe-compile-file (pk 'program.scm program.scm))))
        (apply make-boot-file "letloop.boot"
               (list "scheme")
-              (.so program.scm)
-              (pk (filter file-exists?
-                          (map .so (map car (letloop-discover-libraries))))))))
+              (append (if program.scm (list (.so program.scm)) (list))
+                      (pk 'only-existing-library
+                          (filter file-exists?
+                            (map .so (map car (letloop-discover-libraries)))))))))
 
 
 
@@ -653,8 +655,8 @@
      (maybe-display-errors-then-exit errors)
 
      (unless (null? directories)
-       (library-directories (append directories (library-directories)))
-       (source-directories (append directories (source-directories))))
+       (library-directories directories)
+       (source-directories directories))
 
      (when optimize-level*
        (optimize-level optimize-level*))
