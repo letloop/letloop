@@ -1,4 +1,9 @@
-(import (chezscheme))
-(import (codex base))
+(suppress-greeting #t)
 
-(codex-usage)
+
+(scheme-start 
+  (lambda args 
+    (import (chezscheme))
+    (import (codex base))
+
+    (codex-usage)))
