@@ -269,9 +269,8 @@
           (write '(suppress-greeting #t) port)
           (write `(import ,(pk library.scm (maybe-library-name library.scm))) port)
           (write `(scheme-start ,(string->symbol main)) port)) 'truncate)
-      (set! program.scm "/tmp/letloop.scm"))
-
-    (maybe-compile-file program.scm)
+      (set! program.scm "/tmp/letloop.scm")
+      (maybe-compile-file (pk program.scm)))
 
     (apply make-boot-file
            (pk 'out (string-append (if program.scm

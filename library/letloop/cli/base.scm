@@ -1,14 +1,12 @@
 #!chezscheme
 (library (letloop cli base)
          (export letloop-main letloop-compile letloop-exec letloop-repl)
-         (import (chezscheme) (letloop cli compile) (letloop cli root))
+         (import (chezscheme) (letloop cli compile) (letloop root))
 
    (define LETLOOP_DEBUG (getenv "LETLOOP_DEBUG"))
 
    (define letloop-main
-     (lambda ()
-
-        (define args (command-line))
+     (lambda args
 
        (pk args)
 
@@ -22,6 +20,7 @@
          ((compile) (letloop-compile (cdr args)))
          ((exec) (letloop-exec (cdr args)))
          ((repl) (letloop-repl (cdr args)))
+         ((root) (letloop-root (cdr args)))
          (else (letloop-usage) (exit 1)))))
 
    (define ftw

@@ -9,17 +9,16 @@ letloop: sqlite3 blake3 argon2 termbox2 lsm1 cmark ## Compile letloop into $(pwd
 help: ## HELP!...
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
 
-local/lib/letloop.boot: library/letloop/cli/base.scm letloop.scm letloop.md letloop.nfo
+local/lib/letloop.boot: library/letloop/cli/base.scm letloop.scm letloop.md letloop.nfo clean
 	echo $(SCHEME)
 	$(SCHEME) --version
 	make clean
 	rm -f letloop.boot
 	mkdir -p /tmp/letloop/
-	echo '(import (letloop cli base)) (letloop-compile (list "library/" "letloop.scm"))' | $(SCHEME) --quiet --libdirs library/ --compile-imported-libraries
+	echo '(generate-wpo-files #t)(import (letloop cli compile)) (letloop-compile (list "library/" "library/letloop/cli/base.scm" "letloop-main"))' | $(SCHEME) --quiet --libdirs library/ --compile-imported-libraries
+    
 	mkdir -p local/lib/
 	mv /tmp/letloop.boot local/lib/letloop.boot
-	echo $(shell which letloop)
-	letloop
 
 local/lib/libblake3.so:
 	rm -rf local/src/blake3
