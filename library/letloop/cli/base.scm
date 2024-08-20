@@ -215,9 +215,6 @@
             (with-syntax ([exp (run/output "date +\"%Y-%m-%dT%H:%M:%S%z\"")])
               #'exp))])))
 
-   (define build-date (let ((date (include-date)))
-                        (substring date 0 (fx- (string-length date) 1))))
-
    (define make-accumulator
      (lambda ()
        (let ((out '()))
@@ -237,8 +234,6 @@
      (write `(scheme ,letloop-scheme-version))
      (newline)
      (write `(tag ,letloop-tag))
-     (newline)
-     (write `(build-date ,build-date))
      (newline)
      (write `(homepage "https://github.com/letloop/"))
      (newline))
