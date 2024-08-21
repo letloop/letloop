@@ -426,6 +426,24 @@
      (lambda (proc objs)
        (apply append (map proc objs))))
 
+  (define letloop-benchmark-program
+    (lambda (files unknown n)
+      (let* ((file (car files))
+            (unknown (string->symbol (car unknown)))
+            (name (maybe-library-name file)))
+
+           `(begin
+                (define start (current-jiffy))
+
+                (let loop ((n ,n))
+                  (unless (fxzero? n)
+                    (,unknown)
+                    (loop (fx- n 1))))
+
+                (format #t "Average nanoseconds spent per thunk ~a:\n~a\n"
+                        ,unknown
+                        (truncate (/ (- (current-jiffy) start) ,n)))))))
+
    (define letloop-benchmark
      (lambda (arguments)
 
@@ -452,57 +470,6 @@
                         (set! unknown (cons string* unknown)))))))
              (massage-standalone! (cdr standalone)))))
 
-       (define (maybe-library-exports library-name)
-         (guard (ex (else #f))
-           (eval `(library-exports ',library-name) (environment '(chezscheme) library-name))))
-
-       (define maybe-read-library
-         (lambda (file)
-           (pk 'maybe-read-library file)
-           (let ((sexp (guard (ex (else #f))
-                         (call-with-input-file file read))))
-             (if (not sexp)
-                 (begin
-                   (pk 'maybe-read-library "File is unreadable as Scheme file" file)
-                   '())
-                 (if (and (pair? sexp)
-                          (eq? (car sexp) 'library)
-                          (pair? (cdr sexp))
-                          (pair? (cadr sexp)))
-                     (let ((exports (maybe-library-exports (cadr sexp))))
-                       (if exports
-                           (begin
-                             (pk 'maybe-read-library "valid" file
-                                 (reverse (map (lambda (x) (cons (cadr sexp) x)) exports))))
-                           (begin
-                             (pk 'maybe-read-library "no interesting exports")
-                             '())))
-                     ;; Oops!
-                     (begin
-                       (pk 'maybe-read-library "not a valid scheme library file" file)
-                       '()))))))
-
-       (define build-benchmark-program
-         (lambda (files unknown)
-           (let* ((file (car files))
-                  (unknown (string->symbol (car unknown)))
-                  (name+exports (file->library file))
-                  (name (car name+exports))
-                  (exports (cdr name+exports)))
-             `((import (chezscheme) (only ,name ,unknown)
-                       (only (scheme time) current-jiffy))
-
-               (define start (current-jiffy))
-
-               (let loop ((n ,N))
-                 (unless (fxzero? n)
-                   (,unknown)
-                   (loop (fx- n 1))))
-
-               (format #t "Average nanoseconds spent per thunk ~a:\n~a\n"
-                       ,unknown
-                       (truncate (/ (- (current-jiffy) start) ,N)))))))
-
        (call-with-values (lambda () (command-line-parse arguments))
          (lambda (keywords standalone extra)
            (massage-standalone! standalone)))
@@ -512,23 +479,14 @@
        (source-directories directories)
 
        (unless (null? extensions)
-         (library-extensions extensions))
+         (library-extensions (append extensions (library-extensions))))
 
-       (let* ((temporary-directory
-               (make-temporary-directory
-                (string-append "/tmp/letloop/benchmark-"
-                               (timestamp))))
-              (benchmark (string-append temporary-directory "/benchmark.scm"))
-              (program (build-benchmark-program files unknown)))
-
-         (call-with-output-file benchmark
-           (lambda (port)
-             (let loop ((program program))
-               (unless (null? program)
-                 (pretty-print (car program) port)
-                 (loop (cdr program))))))
-
-         (letloop-exec (cons benchmark (reverse directories))))))
+       (eval (letloop-benchmark-program files unknown N) (copy-environment 
+                                                         (environment '(chezscheme) 
+                                                           '(only (scheme time) current-jiffy)
+                                                           `(only ,(maybe-library-name (car files)) ,(string->symbol (car unknown))))
+                                                         #t))))
+                                                            
 
    (define timestamp
      (lambda ()
