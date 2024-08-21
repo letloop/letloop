@@ -1,4 +1,3 @@
-Usage:
 
   letloop benchmark LIBRARY [THUNK [N]]
   letloop check [--fail-fast] LIBRARY ...

@@ -1,7 +1,7 @@
 #!chezscheme
 (library (letloop cli base)
          (export letloop-main letloop-compile letloop-exec letloop-repl)
-         (import (chezscheme) (letloop cli compile) (letloop root))
+         (import (chezscheme) (letloop cli) (letloop cli compile) (letloop cli exec) (letloop root))
 
    (define LETLOOP_DEBUG (getenv "LETLOOP_DEBUG"))
 
@@ -137,13 +137,6 @@
             (with-syntax ([exp (read-string (open-input-file fn))])
               #'exp))])))
 
-   (define (pk . args)
-     (when LETLOOP_DEBUG
-       (display ";;; " (current-error-port))
-       (write args (current-error-port))
-       (newline (current-error-port))
-       (flush-output-port (current-error-port)))
-     (car (reverse args)))
 
    (define (string-join strings)
      (let loop ((strings strings)
@@ -312,20 +305,6 @@
 
    (define stdlib (load-shared-object #f))
 
-   (define dev!
-     (lambda (active?)
-       (when active?
-         (compile-profile 'source))
-       (import-notify active?)
-       (generate-allocation-counts active?)
-       (generate-covin-files active?)
-       (generate-inspector-information active?)
-       (generate-instruction-counts active?)
-       (generate-interrupt-trap active?)
-       (generate-procedure-source-information active?)
-       (generate-profile-forms active?)
-       (debug-on-exception active?)))
-
    (define mkdtemp
      (foreign-procedure "mkdtemp" (string) string))
 
@@ -336,14 +315,6 @@
    (define (system* command)
      (unless (fxzero? (system command))
        (error 'letloop "System command failed" command)))
-
-   (define (maybe-display-errors-then-exit errors)
-     (let ((errors (errors (eof-object))))
-       (unless (null? errors)
-         (display "* Ooops :|")
-         (newline)
-         (for-each (lambda (x) (display "** ") (display x) (newline)) (reverse errors))
-         (exit 1))))
 
    (define (guess string)
      (cond
@@ -356,81 +327,6 @@
       ((char=? (string-ref string 0) #\.)
        (values 'extension string))
       (else (values 'unknown string))))
-
-   (define (letloop-exec arguments)
-
-     ;; parse ARGUMENTS, and set the following variables:
-
-     (define extensions '())
-     (define directories '())
-     (define dev? #f)
-     (define optimize-level* 0)
-     (define extra '())
-     (define program.scm #f)
-
-     (define errors (make-accumulator))
-
-     (define massage-standalone!
-       (lambda (standalone)
-         (unless (null? standalone)
-           (call-with-values (lambda () (guess (car standalone)))
-             (lambda (type string*)
-               (case type
-                 (directory (set! directories (cons string* directories)))
-                 (extension (set! extensions (cons string* extensions)))
-                 (file (if program.scm
-                           (errors (format #f "Already registred a file to execute, maybe remove: ~a" (car standalone)))
-                           (set! program.scm string*)))
-                 (unknown (errors (format #f "Directory does not exists: ~a" (car standalone)))))))
-           (massage-standalone! (cdr standalone)))))
-
-     (define massage-keywords!
-       (lambda (keywords)
-         (unless (null? keywords)
-           (let ((keyword (car keywords)))
-             (cond
-              ((and (eq? (car keyword) '--dev) (not (string? (cdr keyword))))
-               (set! dev? #t))
-              ((and (eq? (car keyword) '--optimize-level)
-                    (string->number (cdr keyword))
-                    (<= 0 (string->number (cdr keyword) 3)))
-               (set! optimize-level* (string->number (cdr keyword))))
-              (else (errors (format #f "Dubious keyword: ~a" (car keyword))))))
-           (massage-keywords! (cdr keywords)))))
-
-     (call-with-values (lambda () (command-line-parse arguments))
-       (lambda (keywords standalone extra*)
-         (massage-standalone! standalone)
-         (massage-keywords! keywords)
-         (set! extra extra*)))
-
-     (maybe-display-errors-then-exit errors)
-
-     (unless (null? directories)
-       (library-directories directories)
-       (source-directories directories))
-
-     (when optimize-level*
-       (optimize-level optimize-level*))
-
-     (unless (null? extensions)
-       (library-extensions extensions))
-
-     (dev! dev?)
-
-     (command-line (cons program.scm extra))
-
-     (dynamic-wind
-         (lambda () (void))
-         (lambda () (load-program program.scm))
-         (lambda ()
-           (guard (ex (else #f))
-             (define dir ((foreign-procedure "letloop-directory" () string)))
-             (for-each delete-file (ftw dir))
-             (for-each delete-directory (ftw* dir))
-             (delete-directory dir))
-           (when dev?
-             (profile-dump-html)))))
 
    (define (letloop-repl arguments)
 
@@ -739,9 +635,8 @@
            (define procedures (map cdr spec))
 
            (pk 'program
-               `((import (chezscheme) ,@libraries)
-
-                 (define errored? #f)
+               `(begin
+                  (define errored? #f)
 
                  (display "* Will run tests from the following libraries:\n")
                  (for-each
@@ -829,16 +724,19 @@
                 thunks))
 
              (begin
-               (call-with-output-file check
-                 (lambda (port)
-                   (let loop ((program program))
-                     (unless (null? program)
-                       (pretty-print (car program) port)
-                       (loop (cdr program))))))
+
 
                ;; Change directory to TEMPORARY-DIRECTORY to produce
                ;; the profile dump along the CHECK file.
                (current-directory temporary-directory)
-               (letloop-exec (list "--dev" "." check))
-               (format (current-output-port) "* Coverage profile can be found at: ~a/profile.html\n" temporary-directory)))))))
+
+               (dynamic-wind
+                (lambda () (void))
+                (lambda () (eval program (copy-environment (apply environment '(chezscheme)
+                                                           (reverse (uniquify (map car checks))))
+                                                           #t)))
+                (lambda ()
+                  (guard (ex (else (void)))
+                    (profile-dump-html)
+                    (format (current-output-port) "* Coverage profile can be found at: ~a/profile.html\n" temporary-directory))))))))))
 
