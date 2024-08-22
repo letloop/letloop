@@ -2,7 +2,7 @@ SCHEME="$(shell which scheme)"
 
 LETLOOP='letloop'
 
-letloop: sqlite3 blake3 argon2 termbox2 lsm1 cmark ## Compile letloop into $(pwd)/local/bin/letloop
+letloop: sqlite3 blake3 argon2 termbox2 lsm1 ## Compile letloop into $(pwd)/local/bin/letloop
 	make local/lib/letloop.boot
 	@echo What is done is not to be done!
 
@@ -86,14 +86,6 @@ local/lib/sqlite3.so:
 	cd local/src && git clone https://github.com/sqlite/sqlite
 	cd local/src/sqlite && git checkout version-3.46.0
 	cd local/src/sqlite && ./configure --disable-tcl --prefix=$(PWD)/local/ && make -j$(shell nproc --ignore 1) && make install
-
-cmark: local/lib/libcmark.so
-
-local/lib/libcmark.so:
-	rm -rf local/src/cmark
-	mkdir -p local/src
-	cd local/src && git clone --depth=1 https://github.com/commonmark/cmark
-	cd local/src/cmark && make -j$(shell nproc --ignore 1) && make && cp build/src/libcmark.so* $(PWD)/local/lib/
 
 www:
 	$(LETLOOP) exec library/ make-www.scm
