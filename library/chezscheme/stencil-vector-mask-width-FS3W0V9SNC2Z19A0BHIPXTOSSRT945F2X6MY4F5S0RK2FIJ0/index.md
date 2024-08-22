@@ -1,4 +1,0 @@
-
-# stencil-vector-mask-width
-
-

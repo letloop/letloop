@@ -1,0 +1,2 @@
+#!/bin/sh
+scheme --compile-imported-libraries --libdirs $LETLOOP_ROOT/library/ --program $LETLOOP_ROOT/letloop.scm $@

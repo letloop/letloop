@@ -1,4 +1,0 @@
-
-# make-weak-eqv-hashtable
-
-

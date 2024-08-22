@@ -1,4 +1,0 @@
-
-# critical-section
-
-

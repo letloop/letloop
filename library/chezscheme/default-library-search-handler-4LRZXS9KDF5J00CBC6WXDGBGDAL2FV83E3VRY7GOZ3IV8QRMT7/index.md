@@ -1,4 +1,0 @@
-
-# default-library-search-handler
-
-

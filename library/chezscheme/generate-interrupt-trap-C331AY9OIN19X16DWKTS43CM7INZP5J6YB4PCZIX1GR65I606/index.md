@@ -1,4 +1,0 @@
-
-# generate-interrupt-trap
-
-

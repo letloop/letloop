@@ -1,4 +1,0 @@
-
-# call-with-output-file
-
-

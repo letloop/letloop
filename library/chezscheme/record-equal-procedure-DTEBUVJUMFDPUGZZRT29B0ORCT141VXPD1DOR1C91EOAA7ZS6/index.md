@@ -1,4 +1,0 @@
-
-# record-equal-procedure
-
-

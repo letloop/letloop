@@ -1,21 +1,24 @@
-SCHEME=scheme
+SCHEME="$(shell which scheme)"
 
 LETLOOP='letloop'
 
-letloop: sqlite3 blake3 argon2 termbox2 lsm1 cmark ## Compile letloop into $(pwd)/local/bin/letloop
-	make local/bin/letloop
+letloop: sqlite3 blake3 argon2 termbox2 lsm1 ## Compile letloop into $(pwd)/local/bin/letloop
+	make local/lib/letloop.boot
 	@echo What is done is not to be done!
 
 help: ## HELP!...
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
 
-local/bin/letloop: letloop.scm letloop.md letloop.nfo
+local/lib/letloop.boot: library/letloop/cli/base.scm letloop.scm letloop.md letloop.nfo clean
 	echo $(SCHEME)
 	$(SCHEME) --version
 	make clean
+	rm -f letloop.boot
 	mkdir -p /tmp/letloop/
-	$(SCHEME) --libdirs library/ --compile-imported-libraries --program letloop.scm compile library letloop.scm
-	mv a.out local/bin/letloop
+	echo '(generate-wpo-files #t)(import (letloop cli compile)) (letloop-compile (list "library/" "library/letloop/cli/base.scm" "letloop-main"))' | $(SCHEME) --quiet --libdirs library/ --compile-imported-libraries
+    
+	mkdir -p local/lib/
+	mv /tmp/letloop.boot local/lib/letloop.boot
 
 local/lib/libblake3.so:
 	rm -rf local/src/blake3
@@ -83,14 +86,6 @@ local/lib/sqlite3.so:
 	cd local/src && git clone https://github.com/sqlite/sqlite
 	cd local/src/sqlite && git checkout version-3.46.0
 	cd local/src/sqlite && ./configure --disable-tcl --prefix=$(PWD)/local/ && make -j$(shell nproc --ignore 1) && make install
-
-cmark: local/lib/libcmark.so
-
-local/lib/libcmark.so:
-	rm -rf local/src/cmark
-	mkdir -p local/src
-	cd local/src && git clone --depth=1 https://github.com/commonmark/cmark
-	cd local/src/cmark && make -j$(shell nproc --ignore 1) && make && cp build/src/libcmark.so* $(PWD)/local/lib/
 
 www:
 	$(LETLOOP) exec library/ make-www.scm

@@ -1,4 +1,0 @@
-
-# ftype-spin-lock!
-
-

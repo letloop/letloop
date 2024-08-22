@@ -1,4 +1,0 @@
-
-# get-output-string
-
-

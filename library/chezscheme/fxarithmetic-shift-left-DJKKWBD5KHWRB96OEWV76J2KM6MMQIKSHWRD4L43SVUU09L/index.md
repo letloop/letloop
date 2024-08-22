@@ -1,4 +1,0 @@
-
-# fxarithmetic-shift-left
-
-

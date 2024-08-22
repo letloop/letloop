@@ -1,4 +1,0 @@
-
-# ftype-pointer-address
-
-

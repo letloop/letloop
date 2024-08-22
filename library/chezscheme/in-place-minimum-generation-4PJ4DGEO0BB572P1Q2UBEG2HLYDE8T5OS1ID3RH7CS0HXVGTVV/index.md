@@ -1,4 +1,0 @@
-
-# in-place-minimum-generation
-
-

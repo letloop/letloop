@@ -1,4 +1,0 @@
-
-# bitwise-arithmetic-shift-left
-
-

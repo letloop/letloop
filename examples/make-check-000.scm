@@ -1,5 +1,7 @@
-(import (chezscheme))
-(import (letloop json))
+(library (make-check-000)
+  (export main)
+  (import (chezscheme) (letloop json))
 
-
-(pretty-print (vector-ref (json-read) 70))
+  (define main
+    (lambda ()
+      (pretty-print (vector-ref (json-read) 70)))))

@@ -1,4 +1,0 @@
-
-# concatenate-object-files
-
-

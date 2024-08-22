@@ -1,4 +1,0 @@
-
-# compile-omit-concatenate-support
-
-

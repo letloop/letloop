@@ -1,4 +1,0 @@
-
-# record-type-hash-procedure
-
-

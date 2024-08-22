@@ -1,4 +1,0 @@
-
-# procedure-known-single-valued?
-
-

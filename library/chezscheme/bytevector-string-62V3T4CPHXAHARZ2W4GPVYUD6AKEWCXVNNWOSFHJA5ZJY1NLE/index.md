@@ -1,4 +1,0 @@
-
-# bytevector->string
-
-

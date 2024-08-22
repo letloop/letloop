@@ -1,4 +1,0 @@
-
-# waiter-prompt-string
-
-

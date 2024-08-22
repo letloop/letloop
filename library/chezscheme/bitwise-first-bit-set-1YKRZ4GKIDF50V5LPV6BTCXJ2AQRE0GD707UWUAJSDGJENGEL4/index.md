@@ -1,4 +1,0 @@
-
-# bitwise-first-bit-set
-
-

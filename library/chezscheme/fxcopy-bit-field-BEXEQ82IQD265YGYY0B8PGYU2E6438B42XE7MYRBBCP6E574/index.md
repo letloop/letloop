@@ -1,4 +1,0 @@
-
-# fxcopy-bit-field
-
-
