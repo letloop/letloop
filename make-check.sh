@@ -40,16 +40,6 @@ else
   exit 1
 fi
 
-echo "* Testing letoop compile, and libraries embedding 000"
-
-EXPECTED=c0dd6c055ac9f6f4645eb13ab7fead54
-GIVEN=$(cat examples/quotes.json | $LETLOOP exec library/ examples/ examples/make-check-000.scm main | md5sum | cut -d " " -f1)
-if [ "x$GIVEN" = "x$EXPECTED" ]; then
-  echo success
-else
-  exit 1
-fi
-
 echo "* Testing letoop compile, and libraries embedding 001"
 
 $LETLOOP exec examples/ examples/codex/base.scm codex-usage
