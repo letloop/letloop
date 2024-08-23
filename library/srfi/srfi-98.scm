@@ -110,7 +110,7 @@
              (if (= ptr-to-ptr 0)
                  0
                  (foreign-ref 'void* ptr-to-ptr 0)))))]
-      [(i3le a6le ti3le ta6le arm32le ppc32le)
+      [(i3le a6le ti3le ta6le arm32le ppc32le arm64le tarm64le)
        (load-shared-object "libc.so.6")
        (lambda ()
          (let ([ptr-to-ptr (foreign-entry "environ")])
