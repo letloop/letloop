@@ -156,7 +156,7 @@ jobs:
       - run: cd letloop && LETLOOP_ROOT=$(pwd) LETLOOP_PREFIX=$(pwd)/local timeout 5400 ./local/bin/letloop-it.sh ${{ matrix.arch }} ${{ matrix.distribution }} ${{ matrix.version }} ${{ matrix.flavor }}
 
       # Publish the binary with a name that documents the deployment target
-      - run: cd letloop && sudo mv local/rootfs/${{ matrix.arch }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.flavor }}/local/lib/letloop.boot letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}.boot
+      - run: cd letloop && sudo mv local/rootfs/${{ matrix.arch }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.flavor }}/mnt/local/lib/letloop.boot letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}.boot
       - run: cd letloop && gh release upload $(git tag --points-at HEAD) letloop.${{ matrix.flavor }}-${{ matrix.distribution }}-${{ matrix.version }}-${{ matrix.arch }}.boot
 
       # Publish sha256 checksum
