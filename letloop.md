@@ -2,7 +2,7 @@
   letloop benchmark LIBRARY [THUNK [N]]
   letloop check [--fail-fast] LIBRARY ...
   letloop compile LIBRARY.SCM PROCEDURE
-  letloop exec PROGRAM.SCM [ -- ARGUMENT ...]
+  letloop exec LIBRARY.SCM PROCEDURE [ -- ARGUMENT ...]
   letloop repl
   letloop root available
   letloop root init DISTRIBUTION VERSION MACHINE DIRECTORY
