@@ -185,8 +185,6 @@
 
    ;; Include some files
 
-   (define main.c (include-filename-as-string "main.c"))
-
    (define letloop-tag (let ((describe (include-git-describe))
                              (branch (include-git-branch)))
                          (if (and (fxzero? (string-length describe))
