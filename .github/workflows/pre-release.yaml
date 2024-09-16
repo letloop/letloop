@@ -13,7 +13,7 @@ jobs:
       matrix:
         include:
           - distribution: ubuntu
-            version: jammy
+            version: noble
             arch: amd64
             flavor: cisco
 

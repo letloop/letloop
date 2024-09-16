@@ -39,6 +39,16 @@ jobs:
             arch: aarch64
             flavor: cisco
 
+          - distribution: ubuntu
+            version: noble
+            arch: amd64
+            flavor: cisco
+
+          - distribution: ubuntu
+            version: noble
+            arch: aarch64
+            flavor: cisco
+
           - distribution: mint
             version: vera
             arch: amd64
