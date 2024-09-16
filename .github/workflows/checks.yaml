@@ -17,3 +17,5 @@ jobs:
       - run: cd letloop && make
       - run: cd letloop && ./venv ./local ./local/bin/letloop
       - run: cd letloop && LETLOOP_ROOT=$(pwd) make LETLOOP=$(pwd)/local/bin/letloop check
+      - run: cd letloop && ./venv ./local ./local/bin/letloopit
+      - run: cd letloop && LETLOOP_ROOT=$(pwd) make LETLOOP=$(pwd)/local/bin/letloopit check
