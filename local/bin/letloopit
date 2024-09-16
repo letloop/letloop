@@ -1,0 +1,2 @@
+#!/bin/sh
+scheme --boot $LETLOOP_ROOT/local/lib/letloop.boot $@
